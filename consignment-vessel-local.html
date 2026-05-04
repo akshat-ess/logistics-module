@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Local Clearance Cargo Consignment - Vessel</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-blue: #2a7ab5;
+    --erp-border: #dee2e6;
+    --erp-label-bg: #e8e8e8;
+  }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+
+  .top-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .top-navbar .user-info { color: var(--erp-blue); font-size: 13px; cursor: pointer; }
+
+  .main-content { padding: 16px 20px; }
+
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 22px; font-weight: 600; color: #222; margin: 0; }
+  .view-btn {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 4px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .view-btn:hover { background: #1a6aa0; }
+
+  .erp-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+  }
+  .erp-card-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-icon { color: var(--erp-blue); cursor: pointer; font-size: 12px; }
+
+  /* Top fields */
+  .top-fields { padding: 14px 14px 10px; }
+  .field-label-top { font-size: 11px; font-weight: 700; color: #444; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .form-select-erp {
+    font-size: 12px; height: 32px;
+    border: 1px solid #ccc; border-radius: 3px;
+    padding: 4px 8px; width: 100%;
+  }
+
+  /* Tabs */
+  .erp-tabs {
+    display: flex;
+    margin: 0 14px;
+    gap: 0;
+  }
+  .erp-tab {
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f0f0f0;
+    color: #555;
+    margin-right: 2px;
+    border-radius: 3px 3px 0 0;
+    text-decoration: none;
+    transition: background 0.15s;
+    display: inline-block;
+  }
+  .erp-tab.active { background: var(--erp-blue); color: #fff; border-color: var(--erp-blue); }
+  .erp-tab:hover:not(.active) { background: #dde; color: #333; }
+
+  /* Grid form */
+  .tab-content-panel {
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+  }
+  .form-grid { border-top: 1px solid #ccc; border-left: 1px solid #ccc; }
+  .form-grid-row { display: flex; border-bottom: 1px solid #ccc; flex-wrap: nowrap; }
+  .form-grid-cell {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .form-grid-cell.narrow { flex: 0 0 90px; }
+  .fgc-label {
+    background: var(--erp-label-bg);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .fgc-input {
+    padding: 4px 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+  }
+  .fgc-input input[type="text"],
+  .fgc-input input[type="date"],
+  .fgc-input input[type="number"],
+  .fgc-input select {
+    width: 100%;
+    font-size: 11px;
+    height: 26px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 2px 6px;
+    background: #fff;
+  }
+  .fgc-input input[type="checkbox"] {
+    width: 18px; height: 18px; cursor: pointer;
+    accent-color: var(--erp-blue);
+  }
+  .checkbox-cell .fgc-input { justify-content: center; }
+
+  /* Save bar */
+  .save-bar {
+    padding: 12px 14px;
+    border-top: 1px solid var(--erp-border);
+    background: #f8f9fa;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn-save {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-save:hover { background: #1a6aa0; }
+  .btn-cancel {
+    background: #6c757d; color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-cancel:hover { background: #5a6268; }
+
+  /* Scroll indicator on right side (ERP style) */
+  .form-grid-wrapper { position: relative; overflow: hidden; }
+  .scroll-up {
+    position: absolute; right: 0; top: 0; width: 14px;
+    background: #e0e0e0; display: flex; align-items: center;
+    justify-content: center; height: 20px; border: 1px solid #ccc;
+    font-size: 10px; cursor: pointer; color: #555;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<!-- <div class="top-navbar">
+  <span class="user-info"><i class="fa fa-user-circle"></i> temp user <i class="fa fa-caret-down"></i></span>
+</div> -->
+
+<div class="main-content">
+
+  <div class="page-heading">
+    <h1>Add Local Clearance Cargo Consignment</h1>
+    <button class="view-btn" onclick="location.href='cargo-position-local.html'">View Consignments</button>
+  </div>
+
+  <div class="erp-card">
+    <div class="erp-card-header">
+      Cargo details <i class="fa fa-sync refresh-icon"></i>
+    </div>
+
+    <!-- Declarant / Port Agent -->
+    <div class="top-fields">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="field-label-top">DECLARANT</div>
+          <select class="form-select-erp">
+            <option value="">select...</option>
+            <option>JOHN MWANGI (JM/001)</option>
+            <option>SARAH KIMANI (SK/002)</option>
+            <option>PETER ODHIAMBO (PO/003)</option>
+            <option>GRACE ACHIENG (GA/004)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <div class="field-label-top">PORT AGENT</div>
+          <select class="form-select-erp">
+            <option value="">select...</option>
+            <option>FREIGHT MASTERS LTD</option>
+            <option>SEA BRIDGE AGENCIES</option>
+            <option>GLOBAL SHIPPING AGENTS</option>
+            <option>TRANS OCEAN SERVICES</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="erp-tabs">
+      <a href="consignment-file-local.html" class="erp-tab">FILE</a>
+      <a href="consignment-vessel-local.html" class="erp-tab active">VESSEL</a>
+      <a href="consignment-duty-local.html" class="erp-tab">DUTY PAYMENT</a>
+    </div>
+
+    <!-- Vessel Tab Content -->
+    <div class="tab-content-panel">
+      <div class="form-grid-wrapper">
+
+        <div class="form-grid">
+
+          <!-- Row 1: S/Line | Vessel | Voyage | Copy Docs Recv Date | Orig Doc Recv Date -->
+          <div class="form-grid-row">
+            <div class="form-grid-cell">
+              <div class="fgc-label">S/Line</div>
+              <div class="fgc-input">
+                <select>
+                  <option value="">select...</option>
+                  <option>MAERSK LINE</option>
+                  <option>MSC</option>
+                  <option>CMA CGM</option>
+                  <option>HAPAG-LLOYD</option>
+                  <option>COSCO SHIPPING</option>
+                  <option>EVERGREEN</option>
+                  <option>ONE (OCEAN NETWORK EXPRESS)</option>
+                  <option>YANG MING</option>
+                  <option>PIL (PACIFIC INTL LINES)</option>
+                  <option>DHL EXPRESS</option>
+                  <option>FEDEX CARGO</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">Vessel</div>
+              <div class="fgc-input"><input type="text" placeholder="e.g. MSC AURORA"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">Voyage</div>
+              <div class="fgc-input"><input type="text" placeholder="e.g. 026W"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">Copy Docs Recv Date</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">Org Doc Recv Date</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: ETD | ETA | ATB | S/L Inv Date | Manifest (checkbox) -->
+          <div class="form-grid-row">
+            <div class="form-grid-cell">
+              <div class="fgc-label">ETD</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">ETA</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">ATB</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">S/L Inv Date</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell checkbox-cell narrow">
+              <div class="fgc-label">Manifest</div>
+              <div class="fgc-input justify-content-center">
+                <input type="checkbox">
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: S/L Pay Date | S/L DO Date | Exemption (checkbox) | ICD (dropdown) | DG Cargo (checkbox) -->
+          <div class="form-grid-row">
+            <div class="form-grid-cell">
+              <div class="fgc-label">S/L Pay Date</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">S/L DO Date</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <div class="form-grid-cell checkbox-cell narrow">
+              <div class="fgc-label">Exemption</div>
+              <div class="fgc-input justify-content-center">
+                <input type="checkbox" id="exemptionChk">
+              </div>
+            </div>
+            <div class="form-grid-cell">
+              <div class="fgc-label">ICD</div>
+              <div class="fgc-input">
+                <select>
+                  <option value="">select...</option>
+                  <option>MWENGE ICD</option>
+                  <option>KISARAWE ICD</option>
+                  <option>UBUNGO ICD</option>
+                  <option>KURASINI ICD</option>
+                  <option>MOSHI ICD</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid-cell checkbox-cell narrow">
+              <div class="fgc-label">DG Cargo?</div>
+              <div class="fgc-input justify-content-center">
+                <input type="checkbox" id="dgCargoChk">
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: SO Valid Till (single field) -->
+          <div class="form-grid-row">
+            <div class="form-grid-cell" style="flex: 0 0 20%; max-width: 20%;">
+              <div class="fgc-label">SO Valid Till</div>
+              <div class="fgc-input"><input type="date"></div>
+            </div>
+            <!-- Empty cells to fill row -->
+            <div class="form-grid-cell" style="flex: 0 0 80%; max-width: 80%; border-right: none; background: #fafafa;"></div>
+          </div>
+
+        </div><!-- /form-grid -->
+
+      </div><!-- /form-grid-wrapper -->
+
+      <!-- Save Bar -->
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="location.href='cargo-position-local.html'">Cancel</button>
+        <button class="btn-save" onclick="saveVessel()">
+          <i class="fa fa-save me-1"></i>Save
+        </button>
+      </div>
+    </div><!-- /tab-content-panel -->
+
+  </div><!-- /erp-card -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function saveVessel() {
+  const vessel = document.querySelector('input[placeholder="e.g. MSC AURORA"]').value;
+  const voyage = document.querySelector('input[placeholder="e.g. 026W"]').value;
+  if (!vessel.trim()) {
+    alert('Please enter the Vessel name before saving.');
+    return;
+  }
+  alert('Vessel details saved successfully!');
+}
+
+// DG Cargo warning
+document.getElementById('dgCargoChk').addEventListener('change', function() {
+  if (this.checked) {
+    if (!confirm('This shipment contains Dangerous Goods. Ensure all DG documentation is prepared. Continue?')) {
+      this.checked = false;
+    }
+  }
+});
+</script>
+</body>
+</html>

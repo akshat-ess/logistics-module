@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Local Clearance Cargo Consignment - File</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-blue: #2a7ab5;
+    --erp-border: #dee2e6;
+    --erp-field-bg: #fff;
+    --erp-label-bg: #e8e8e8;
+  }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+
+  .top-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .top-navbar .user-info { color: var(--erp-blue); font-size: 13px; }
+
+  .main-content { padding: 16px 20px; }
+
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 22px; font-weight: 600; color: #222; margin: 0; }
+  .view-btn {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 4px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+  }
+  .view-btn:hover { background: #1a6aa0; color:#fff; }
+
+  /* Card */
+  .erp-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+    margin-bottom: 0;
+  }
+  .erp-card-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .erp-card-body { padding: 14px 14px 0; }
+
+  /* Declarant / Port Agent row */
+  .top-fields { padding: 14px 14px 10px; }
+  .field-label-top { font-size: 11px; font-weight: 700; color: #444; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .form-select-erp, .form-control-erp {
+    font-size: 12px; height: 32px;
+    border: 1px solid #ccc; border-radius: 3px;
+    padding: 4px 8px;
+  }
+
+  /* Tabs */
+  .erp-tabs {
+    display: flex;
+    border-bottom: none;
+    margin: 0 14px;
+    gap: 0;
+  }
+  .erp-tab {
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f0f0f0;
+    color: #555;
+    margin-right: 2px;
+    border-radius: 3px 3px 0 0;
+    transition: background 0.15s;
+    text-decoration: none;
+  }
+  .erp-tab.active { background: var(--erp-blue); color: #fff; border-color: var(--erp-blue); }
+  .erp-tab:hover:not(.active) { background: #dde; color: #333; }
+
+  /* Grid form table */
+  .form-grid {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+  }
+  .form-grid-row { display: flex; border-bottom: 1px solid #ccc; }
+  .form-grid-cell {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+  }
+  .form-grid-cell.flex-2 { flex: 2; }
+  .fgc-label {
+    background: var(--erp-label-bg);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+  }
+  .fgc-input {
+    padding: 4px 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+  }
+  .fgc-input input, .fgc-input select {
+    width: 100%; font-size: 11px; height: 26px;
+    border: 1px solid #ddd; border-radius: 2px;
+    padding: 2px 6px; background: #fff;
+  }
+  .fgc-input select { height: 26px; }
+
+  .tab-content-panel {
+    border: 1px solid #ccc;
+    border-top: none;
+    margin: 0 0 0 0;
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* Scroll indicator */
+  .scroll-bar { position: absolute; right: 0; top: 0; width: 12px; background: #f0f0f0; height: 100%; border-left: 1px solid #ddd; }
+
+  /* Save bar */
+  .save-bar {
+    padding: 12px 14px;
+    border-top: 1px solid var(--erp-border);
+    background: #f8f9fa;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn-save { background: var(--erp-blue); color:#fff; border:none; border-radius:3px; padding:6px 20px; font-size:13px; font-weight:600; }
+  .btn-cancel { background: #6c757d; color:#fff; border:none; border-radius:3px; padding:6px 20px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<!-- <div class="top-navbar">
+  <span class="user-info"><i class="fa fa-user-circle"></i> temp user <i class="fa fa-caret-down"></i></span>
+</div> -->
+
+<div class="main-content">
+
+  <div class="page-heading">
+    <h1>Add Local Clearance Cargo Consignment</h1>
+    <button class="view-btn" onclick="location.href='cargo-position-local.html'">View Consignments</button>
+  </div>
+
+  <div class="erp-card">
+    <div class="erp-card-header">
+      Cargo details <i class="fa fa-sync refresh-icon" style="color:var(--erp-blue);cursor:pointer;font-size:12px;"></i>
+    </div>
+
+    <!-- Declarant / Port Agent -->
+    <div class="top-fields">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="field-label-top">DECLARANT</div>
+          <select class="form-select form-select-erp w-100">
+            <option value="">select...</option>
+            <option>JOHN MWANGI (JM/001)</option>
+            <option>SARAH KIMANI (SK/002)</option>
+            <option>PETER ODHIAMBO (PO/003)</option>
+            <option>GRACE ACHIENG (GA/004)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <div class="field-label-top">PORT AGENT</div>
+          <select class="form-select form-select-erp w-100">
+            <option value="">select...</option>
+            <option>FREIGHT MASTERS LTD</option>
+            <option>SEA BRIDGE AGENCIES</option>
+            <option>GLOBAL SHIPPING AGENTS</option>
+            <option>TRANS OCEAN SERVICES</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="erp-tabs">
+      <a href="consignment-file-local.html" class="erp-tab active">FILE</a>
+      <a href="consignment-vessel-local.html" class="erp-tab">VESSEL</a>
+      <a href="consignment-duty-local.html" class="erp-tab">DUTY PAYMENT</a>
+    </div>
+
+    <!-- Tab Content: FILE -->
+    <div class="tab-content-panel">
+      <div class="form-grid" style="margin:0;">
+
+        <!-- Row 1: UIN | Billing Customer | Customer Ref | Consignee | Refer Number -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">UIN</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>HRD</option><option>DIL</option><option>TNG</option><option>NSS</option><option>VCM</option><option>KLM</option><option>SAF</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Billing Customer</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>HYATT REGENCY DAR ES SALAAM</option>
+                <option>DARSH INDUSTRIES LTD</option>
+                <option>TANGA CEMENT PLC</option>
+                <option>NSSF TANZANIA</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Customer Ref</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Consignee</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>HYATT REGENCY DAR ES SALAAM</option>
+                <option>DARSH INDUSTRIES LTD</option>
+                <option>TANGA CEMENT PLC</option>
+                <option>NSSF TANZANIA</option>
+                <option>VODACOM TANZANIA</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Refer. Number</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Tansad No | Assmnt Type | PI/Invoice No | Supplier | B/L Number -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">Tansad No.</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Assmnt Type</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>IMPORT</option>
+                <option>TRANSIT</option>
+                <option>RE-EXPORT</option>
+                <option>WAREHOUSE</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">P/Invoice No</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Supplier</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>CHINA HARBOUR ENG CO</option>
+                <option>SIEMENS AG GERMANY</option>
+                <option>TOYOTA JAPAN</option>
+                <option>UNILEVER UK</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">B/L Number</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+        </div>
+
+        <!-- Row 3: POL/Country | Material Descr. | Invoice Value | Cargo Type | Tonnage -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">POL/Country</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>CHINA (CN)</option>
+                <option>GERMANY (DE)</option>
+                <option>JAPAN (JP)</option>
+                <option>UNITED KINGDOM (GB)</option>
+                <option>INDIA (IN)</option>
+                <option>UNITED STATES (US)</option>
+                <option>SOUTH AFRICA (ZA)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Material Descr.</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Invoice Value</div>
+            <div class="fgc-input"><input type="number" placeholder="" step="0.01"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Cargo Type</div>
+            <div class="fgc-input">
+              <select>
+                <option value="">select...</option>
+                <option>GENERAL CARGO</option>
+                <option>BULK DRY</option>
+                <option>BULK LIQUID</option>
+                <option>REFRIGERATED</option>
+                <option>HAZARDOUS</option>
+                <option>OVERSIZED</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Tonnage</div>
+            <div class="fgc-input"><input type="number" placeholder="" step="0.001"></div>
+          </div>
+        </div>
+
+        <!-- Row 4: Packages | LCL/AIR | Size 20 | Size 40 | Ex Bond -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">Packages</div>
+            <div class="fgc-input"><input type="number" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">LCL/AIR</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Size 20</div>
+            <div class="fgc-input"><input type="number" placeholder="" min="0"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Size 40</div>
+            <div class="fgc-input"><input type="number" placeholder="" min="0"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Ex Bond</div>
+            <div class="fgc-input"><input type="text" placeholder=""></div>
+          </div>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="location.href='cargo-position-local.html'">Cancel</button>
+        <button class="btn-save" onclick="savePage()">
+          <i class="fa fa-save me-1"></i>Save
+        </button>
+      </div>
+    </div><!-- /tab-content-panel -->
+
+  </div><!-- /erp-card -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function savePage() {
+  // Basic validation
+  const selects = document.querySelectorAll('select');
+  let valid = true;
+  // Just show success for demo
+  alert('Record saved successfully!');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Clearance Cargo Position</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-blue: #2a7ab5;
+    --erp-blue-light: #d6eaf8;
+    --erp-border: #dee2e6;
+    --erp-row-hover: #f0f7ff;
+  }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+
+  .top-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .top-navbar .user-info { color: var(--erp-blue); font-size: 13px; cursor: pointer; }
+
+  .main-content { padding: 16px 20px; }
+
+  /* Page heading row */
+  .page-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 22px; font-weight: 600; color: #222; margin: 0 14px 0 0; white-space: nowrap; }
+
+  .btn-erp { font-size: 12px; padding: 4px 10px; border-radius: 3px; font-weight: 500; }
+  .btn-blue   { background: var(--erp-blue); color: #fff; border: 1px solid #1a5f94; }
+  .btn-blue:hover { background: #1a6aa0; color: #fff; }
+  .btn-green  { background: #28a745; color: #fff; border: 1px solid #1e7e34; }
+  .btn-green:hover { background: #218838; color:#fff; }
+  .btn-orange { background: #e07b1f; color: #fff; border: 1px solid #c56a10; }
+  .btn-orange:hover { background: #c56a10; color:#fff; }
+  .btn-teal   { background: #17a2b8; color: #fff; border: 1px solid #138496; }
+  .btn-teal:hover { background: #138496; color:#fff; }
+
+  .create-btn {
+    margin-left: auto;
+    background: var(--erp-blue);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .create-btn:hover { background: #1a6aa0; color:#fff; }
+
+  /* Filter card */
+  .filter-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .filter-card .filter-label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+  .filter-card select, .filter-card input { font-size: 12px; height: 30px; }
+  .filter-card .btn { font-size: 12px; height: 30px; padding: 0 14px; }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .stats-text { font-size: 12px; color: #555; font-weight: 500; }
+
+  /* Table card */
+  .table-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .table-controls {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--erp-border);
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .table-controls label { font-size: 12px; color: #555; margin: 0; }
+  .table-controls select { font-size: 12px; height: 28px; width: 65px; padding: 2px 6px; }
+  .table-controls input[type="search"] {
+    font-size: 12px; height: 28px; padding: 2px 8px;
+    border: 1px solid #ccc; border-radius: 3px; width: 180px;
+  }
+  .search-label { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+  /* Table styles */
+  .erp-table { font-size: 11px; margin: 0; }
+  .erp-table thead th {
+    background: #fff;
+    color: #333;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 6px 8px;
+    border-bottom: 2px solid #ccc;
+    border-right: 1px solid #e0e0e0;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .erp-table thead th:last-child { border-right: none; }
+  .erp-table thead th .sort-icon { color: #aaa; font-size: 9px; margin-left: 3px; }
+  .erp-table tbody td {
+    padding: 5px 8px;
+    vertical-align: middle;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    font-size: 11px;
+  }
+  .erp-table tbody td:last-child { border-right: none; }
+  .erp-table tbody tr:hover { background: var(--erp-row-hover); }
+  .erp-table tbody tr:nth-child(even) { background: #fafafa; }
+  .erp-table tbody tr:nth-child(even):hover { background: var(--erp-row-hover); }
+
+  .cell-yellow { background: #fffb8c !important; }
+  .cell-green  { background: #b7f0b7 !important; }
+
+  .badge-air  { background: #28a745; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+  .badge-sea  { background: var(--erp-blue); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+  .badge-status-orange { background: #fd7e14; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+
+  .action-col { white-space: nowrap; min-width: 160px; }
+  .btn-action { font-size: 10px; padding: 2px 7px; border-radius: 3px; margin: 1px 1px; font-weight: 500; display: inline-block; }
+  .btn-act-blue    { background: var(--erp-blue); color: #fff; border: none; }
+  .btn-act-green   { background: #28a745; color: #fff; border: none; }
+  .btn-act-orange  { background: #e07b1f; color: #fff; border: none; }
+  .btn-act-purple  { background: #6f42c1; color: #fff; border: none; }
+  .btn-act-teal    { background: #17a2b8; color: #fff; border: none; }
+  .btn-act-grey    { background: #6c757d; color: #fff; border: none; }
+
+  .send-to-accounts { background: #28a745; color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 500; display: inline-block; }
+  .dot-orange { color: #e07b1f; font-size: 18px; line-height: 1; }
+  .dot-green  { color: #28a745; font-size: 18px; line-height: 1; }
+
+  /* Pagination */
+  .pagination-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-top: 1px solid var(--erp-border);
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .page-info { color: #555; }
+  .pagination .page-link { font-size: 11px; padding: 3px 8px; color: var(--erp-blue); }
+  .pagination .page-item.active .page-link { background: var(--erp-blue); border-color: var(--erp-blue); }
+
+  .all-jobs-label { font-size: 13px; font-weight: 600; color: #333; margin-right: 6px; }
+  .refresh-icon { color: var(--erp-blue); cursor: pointer; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<!-- <div class="top-navbar">
+  <span class="user-info"><i class="fa fa-user-circle"></i> temp user <i class="fa fa-caret-down"></i></span>
+</div> -->
+
+<div class="main-content">
+
+  <!-- Page Heading -->
+  <div class="page-heading">
+    <h1>Local Clearance Cargo Position</h1>
+    <button class="btn btn-erp btn-blue"><i class="fa fa-paper-plane me-1"></i>Sent to Accounts</button>
+    <button class="btn btn-erp btn-green"><i class="fa fa-box me-1"></i>Containers</button>
+    <button class="btn btn-erp btn-blue"><i class="fa fa-print me-1"></i>Print</button>
+    <button class="btn btn-erp btn-teal">Active</button>
+    <button class="btn btn-erp btn-orange">Lodged Docs</button>
+    <button class="btn btn-erp btn-green">Delivered</button>
+    <button class="btn btn-erp btn-orange">No Change in Status</button>
+    <button class="create-btn" onclick="location.href='consignment-file-local.html'">Create Consignment</button>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card">
+    <div class="filter-label">
+      <span class="all-jobs-label">All Jobs</span>
+      <i class="fa fa-sync refresh-icon"></i>
+    </div>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <select class="form-select form-select-sm">
+          <option value="">Search Consignee...</option>
+          <option>HYATT REGENCY DAR ES SALAAM</option>
+          <option>DARSH INDUSTRIES LTD</option>
+          <option>KILIMO TRUST</option>
+          <option>TANGA CEMENT PLC</option>
+          <option>NSSF TANZANIA</option>
+          <option>VODACOM TANZANIA</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-erp btn-blue" onclick="filterTable()"><i class="fa fa-search me-1"></i>Search</button>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select form-select-sm">
+          <option value="">Search UIN...</option>
+          <option>HRD</option>
+          <option>DIL</option>
+          <option>KLM</option>
+          <option>TNG</option>
+          <option>NSS</option>
+          <option>VCM</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-erp btn-blue" onclick="filterTable()"><i class="fa fa-search me-1"></i>Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-controls">
+      <div class="stats-text">Total items: <strong>473</strong> / Total Containers: <strong>1.03K</strong></div>
+      <div class="ms-3 d-flex align-items-center gap-2">
+        <select class="form-select" id="perPageSelect" onchange="changePerPage()">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
+        <label>records per page</label>
+      </div>
+      <div class="search-label">
+        <label>Search:</label>
+        <input type="search" id="tableSearch" placeholder="" oninput="filterTable()">
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table erp-table" id="cargoTable">
+        <thead>
+          <tr>
+            <th>UIN <span class="sort-icon">⇅</span></th>
+            <th>File No <span class="sort-icon">⇅</span></th>
+            <th>Refer.<br>Number <span class="sort-icon">⇅</span></th>
+            <th>Tansad No <span class="sort-icon">⇅</span></th>
+            <th>Consignee <span class="sort-icon">⇅</span></th>
+            <th>Vessel <span class="sort-icon">⇅</span></th>
+            <th>B/L Number <span class="sort-icon">⇅</span></th>
+            <th>Size20 <span class="sort-icon">⇅</span></th>
+            <th>size40 <span class="sort-icon">⇅</span></th>
+            <th>Containers <span class="sort-icon">⇅</span></th>
+            <th>S/L<br>DO/Date <span class="sort-icon">⇅</span></th>
+            <th>ETA <span class="sort-icon">⇅</span></th>
+            <th>ETB <span class="sort-icon">⇅</span></th>
+            <th>Remarks <span class="sort-icon">⇅</span></th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-row">
+      <div class="page-info" id="pageInfo">Showing 1 to 10 of 15 entries</div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+      </nav>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Sample data – realistic logistics records
+const allData = [
+  { uin:'HRD', fileNo:'HRD(DHL)2025/2047', refer:'', tansad:'', consignee:'HYATT REGENCY DAR ES SALAAM', vessel:'DHL', bl:'TO BE UPDATED', blType:'AIR', size20:0, size40:0, containers:0, slDate:'', eta:'', etb:'', remarks:'AWAIT BL/TO LODGE DOCUMENTS', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'DIL', fileNo:'IMP/DIL/2026/0300', refer:'1', tansad:'1', consignee:'DARSH INDUSTRIES LTD', vessel:'', bl:'FOR KILIMO PERMIT ONLY', blType:'SEA', size20:0, size40:0, containers:0, slDate:'', eta:'', etb:'', remarks:'FOR KILIMO PERMIT ONLY', flagColor:'green', sendToAccounts:true, referYellow:false },
+  { uin:'TNG', fileNo:'IMP/TNG/2026/0158', refer:'3', tansad:'3', consignee:'TANGA CEMENT PLC', vessel:'EVER GIVEN', bl:'BL/TNG/2026/0045', blType:'SEA', size20:2, size40:1, containers:3, slDate:'15-Mar-26', eta:'18-Mar-26', etb:'20-Mar-26', remarks:'DOCS RECEIVED', flagColor:'green', sendToAccounts:false, referYellow:false },
+  { uin:'NSS', fileNo:'IMP/NSS/2026/0201', refer:'5', tansad:'5', consignee:'NSSF TANZANIA', vessel:'MSC AURORA', bl:'BL/NSS/2026/0032', blType:'SEA', size20:0, size40:2, containers:2, slDate:'10-Mar-26', eta:'14-Mar-26', etb:'15-Mar-26', remarks:'PENDING DUTY PAYMENT', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'VCM', fileNo:'IMP/VCM/2026/0099', refer:'2', tansad:'2', consignee:'VODACOM TANZANIA', vessel:'DHL EXPRESS', bl:'AWB/VCM/2026/0011', blType:'AIR', size20:0, size40:0, containers:0, slDate:'', eta:'05-Apr-26', etb:'', remarks:'CLEARED FOR DELIVERY', flagColor:'green', sendToAccounts:true, referYellow:false },
+  { uin:'KLM', fileNo:'IMP/KLM/2026/0412', refer:'8', tansad:'7', consignee:'KILIMO TRUST', vessel:'APL LION CITY', bl:'BL/KLM/2026/0078', blType:'SEA', size20:1, size40:0, containers:1, slDate:'20-Mar-26', eta:'22-Mar-26', etb:'24-Mar-26', remarks:'AWAITING MANIFEST', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'SAF', fileNo:'IMP/SAF/2026/0310', refer:'4', tansad:'4', consignee:'SAFARI BREWERIES LTD', vessel:'MAERSK SEVILLE', bl:'BL/SAF/2026/0063', blType:'SEA', size20:3, size40:2, containers:5, slDate:'25-Mar-26', eta:'28-Mar-26', etb:'30-Mar-26', remarks:'IN TRANSIT', flagColor:'green', sendToAccounts:false, referYellow:false },
+  { uin:'TEL', fileNo:'IMP/TEL/2026/0188', refer:'6', tansad:'6', consignee:'TELKOM TANZANIA', vessel:'CMA CGM MARCO POLO', bl:'BL/TEL/2026/0054', blType:'SEA', size20:0, size40:3, containers:3, slDate:'01-Apr-26', eta:'04-Apr-26', etb:'06-Apr-26', remarks:'LODGED – AWAITING ASSESSMENT', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'AGR', fileNo:'IMP/AGR/2026/0522', refer:'9', tansad:'9', consignee:'AGRI SEED CO LTD', vessel:'FedEx CARGO', bl:'AWB/AGR/2026/0020', blType:'AIR', size20:0, size40:0, containers:0, slDate:'', eta:'10-Apr-26', etb:'', remarks:'FUMIGATION REQUIRED', flagColor:'green', sendToAccounts:false, referYellow:false },
+  { uin:'MED', fileNo:'IMP/MED/2026/0640', refer:'11', tansad:'10', consignee:'MEDICAL STORES DEPT', vessel:'COSCO SHIPPING', bl:'BL/MED/2026/0091', blType:'SEA', size20:4, size40:0, containers:4, slDate:'05-Apr-26', eta:'08-Apr-26', etb:'10-Apr-26', remarks:'PRIORITY CLEARANCE', flagColor:'green', sendToAccounts:true, referYellow:false },
+  { uin:'PWR', fileNo:'IMP/PWR/2026/0701', refer:'12', tansad:'11', consignee:'POWER SYSTEMS LTD', vessel:'EVER GLORY', bl:'BL/PWR/2026/0103', blType:'SEA', size20:2, size40:2, containers:4, slDate:'12-Apr-26', eta:'15-Apr-26', etb:'17-Apr-26', remarks:'AWAITING WHARFAGE PAYMENT', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'FOD', fileNo:'IMP/FOD/2026/0450', refer:'7', tansad:'8', consignee:'FOOD AFRICA GROUP', vessel:'MAERSK ESSEN', bl:'BL/FOD/2026/0071', blType:'SEA', size20:1, size40:1, containers:2, slDate:'18-Apr-26', eta:'21-Apr-26', etb:'23-Apr-26', remarks:'DOCS VERIFICATION PENDING', flagColor:'orange', sendToAccounts:false, referYellow:false },
+  { uin:'CON', fileNo:'IMP/CON/2026/0355', refer:'10', tansad:'12', consignee:'CONCRETE INDUSTRIES', vessel:'HMM ALGECIRAS', bl:'BL/CON/2026/0081', blType:'SEA', size20:5, size40:3, containers:8, slDate:'22-Apr-26', eta:'25-Apr-26', etb:'27-Apr-26', remarks:'RO RECEIVED', flagColor:'green', sendToAccounts:false, referYellow:false },
+  { uin:'PHM', fileNo:'IMP/PHM/2026/0278', refer:'13', tansad:'13', consignee:'PHARMA DISTRIBUTORS TZ', vessel:'MSC ZINA', bl:'BL/PHM/2026/0048', blType:'SEA', size20:0, size40:1, containers:1, slDate:'28-Apr-26', eta:'01-May-26', etb:'03-May-26', remarks:'COLD CHAIN – PRIORITY', flagColor:'orange', sendToAccounts:false, referYellow:true },
+  { uin:'OIL', fileNo:'IMP/OIL/2026/0890', refer:'14', tansad:'14', consignee:'OIL COM LTD', vessel:'ENERGY TITAN', bl:'BL/OIL/2026/0120', blType:'SEA', size20:0, size40:6, containers:6, slDate:'02-May-26', eta:'05-May-26', etb:'07-May-26', remarks:'BULK LIQUID – SPECIAL HANDLING', flagColor:'green', sendToAccounts:false, referYellow:false }
+];
+
+let currentPage = 1;
+let perPage = 10;
+let filtered = [...allData];
+
+function filterTable() {
+  const q = document.getElementById('tableSearch').value.toLowerCase();
+  filtered = allData.filter(r =>
+    Object.values(r).some(v => String(v).toLowerCase().includes(q))
+  );
+  currentPage = 1;
+  renderTable();
+}
+
+function changePerPage() {
+  perPage = parseInt(document.getElementById('perPageSelect').value);
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const start = (currentPage - 1) * perPage;
+  const end   = Math.min(start + perPage, filtered.length);
+  const rows  = filtered.slice(start, end);
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.uin}</td>
+      <td>
+        <a href="#" class="text-primary text-decoration-none">${r.fileNo}</a>
+        ${r.sendToAccounts ? '<br><span class="send-to-accounts">Send To Accounts</span>' : ''}
+      </td>
+      <td class="${r.referYellow ? 'cell-yellow' : ''}">${r.refer}</td>
+      <td class="${r.referYellow ? 'cell-yellow' : ''}">${r.tansad}</td>
+      <td>${r.consignee}</td>
+      <td>${r.vessel}</td>
+      <td>
+        ${r.bl}<br>
+        ${r.blType === 'AIR' ? '<span class="badge-air">AIR</span>' : r.blType === 'SEA' ? '<span class="badge-sea">SEA</span>' : ''}
+      </td>
+      <td class="text-center">${r.size20}</td>
+      <td class="text-center">${r.size40}</td>
+      <td class="text-center">${r.containers}</td>
+      <td class="text-center"><span class="${r.flagColor === 'orange' ? 'dot-orange' : 'dot-green'}">—</span></td>
+      <td>${r.eta}</td>
+      <td>${r.etb}</td>
+      <td style="max-width:130px;">${r.remarks}</td>
+      <td class="action-col">
+        <div class="d-flex align-items-center gap-1 mb-1">
+          <button class="btn btn-action btn-act-blue" title="View"><i class="fa fa-eye"></i></button>
+          <button class="btn btn-action btn-act-teal" title="Edit"><i class="fa fa-edit"></i></button>
+          <span style="font-size:10px;color:#888;">0</span>
+          <button class="btn btn-action btn-act-blue">Cover Page</button>
+        </div>
+        <div class="mb-1"><button class="btn btn-action btn-act-blue">Delivery Note</button></div>
+        <div class="mb-1"><button class="btn btn-action btn-act-green" onclick="location.href='container.html'">+Containers</button></div>
+        <div><button class="btn btn-action btn-act-orange">+More</button></div>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('pageInfo').textContent =
+    `Showing ${start+1} to ${end} of ${filtered.length} entries`;
+  renderPagination();
+}
+
+function renderPagination() {
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const ul = document.getElementById('pagination');
+  let html = '';
+  html += `<li class="page-item ${currentPage===1?'disabled':''}"><a class="page-link" href="#" onclick="goPage(${currentPage-1});return false;">«</a></li>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" href="#" onclick="goPage(${i});return false;">${i}</a></li>`;
+  }
+  html += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><a class="page-link" href="#" onclick="goPage(${currentPage+1});return false;">»</a></li>`;
+  ul.innerHTML = html;
+}
+
+function goPage(p) {
+  const totalPages = Math.ceil(filtered.length / perPage);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable();
+}
+
+// Init
+renderTable();
+
+// Column sort
+document.querySelectorAll('.erp-table thead th').forEach((th, idx) => {
+  th.addEventListener('click', () => {
+    const keys = ['uin','fileNo','refer','tansad','consignee','vessel','bl','size20','size40','containers','slDate','eta','etb','remarks'];
+    if (idx >= keys.length) return;
+    filtered.sort((a, b) => String(a[keys[idx]]).localeCompare(String(b[keys[idx]])));
+    renderTable();
+  });
+});
+</script>
+</body>
+</html>
