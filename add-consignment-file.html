@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Return Cargo Consignment</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f4f6f9;
+    --erp-primary: #3498db;
+    --erp-success: #27ae60;
+    --erp-danger: #e74c3c;
+    --erp-text: #2c3e50;
+    --erp-border: #dee2e6;
+  }
+  body { background: var(--erp-bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--erp-text); margin: 0; }
+  .top-nav { background: #2c3e50; color: #fff; padding: 0 20px; height: 50px; display: flex; align-items: center; justify-content: space-between; }
+  .top-nav .brand { font-size: 16px; font-weight: 600; }
+  .top-nav .nav-right { display: flex; align-items: center; gap: 15px; font-size: 13px; }
+  .sidebar { width: 220px; background: #fff; height: calc(100vh - 50px); border-right: 1px solid var(--erp-border); position: fixed; top: 50px; left: 0; overflow-y: auto; z-index: 100; }
+  .sidebar .menu-label { font-size: 10px; font-weight: 700; color: #999; padding: 8px 16px 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .sidebar .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #555; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .sidebar .menu-item:hover, .sidebar .menu-item.active { background: #e8f4fd; color: var(--erp-primary); }
+  .sidebar .menu-item i { width: 18px; font-size: 14px; }
+  .main-content { margin-left: 220px; padding: 24px; min-height: calc(100vh - 50px); }
+  .breadcrumb { font-size: 13px; background: none; padding: 0; margin-bottom: 12px; }
+  .breadcrumb-item a { color: var(--erp-primary); text-decoration: none; }
+
+  /* PAGE HEADER */
+  .page-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .page-title { font-size: 22px; font-weight: 700; }
+  .btn-view-consignments { background: #2980b9; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-view-consignments:hover { background: #2471a3; }
+
+  /* CARGO DETAILS CARD */
+  .cargo-card { background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .cargo-card-header { padding: 10px 16px; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; background: #fff; border-radius: 6px 6px 0 0; }
+  .cargo-card-header .refresh-btn { cursor: pointer; color: var(--erp-primary); }
+
+  /* TABS - matching screenshot (blue active tab bar) */
+  .erp-tabs { display: flex; background: #3498db; border-radius: 0; }
+  .erp-tab { padding: 10px 24px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); cursor: pointer; border: none; background: transparent; letter-spacing: 0.5px; transition: color 0.15s; }
+  .erp-tab.active { color: #fff; border-bottom: 3px solid #fff; }
+  .erp-tab:hover { color: #fff; }
+
+  /* FORM GRID - matching screenshot layout */
+  .tab-pane-content { padding: 0; display: none; }
+  .tab-pane-content.active { display: block; }
+
+  .form-grid-row { display: grid; border-bottom: 1px solid #e8e8e8; }
+  .form-grid-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .form-grid-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .form-grid-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .form-grid-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .form-cell { border-right: 1px solid #e8e8e8; }
+  .form-cell:last-child { border-right: none; }
+  .form-cell-label { background: #e8e8e8; padding: 6px 12px; font-size: 12px; font-weight: 600; color: #333; border-bottom: 1px solid #ddd; }
+  .form-cell-input { padding: 8px 10px; }
+  .form-cell-input input,
+  .form-cell-input select,
+  .form-cell-input textarea { width: 100%; border: 1px solid #ccc; border-radius: 3px; padding: 5px 8px; font-size: 13px; color: #333; background: #fff; }
+  .form-cell-input select { appearance: auto; }
+  .form-cell-input input:focus,
+  .form-cell-input select:focus,
+  .form-cell-input textarea:focus { outline: none; border-color: var(--erp-primary); box-shadow: 0 0 0 2px rgba(52,152,219,0.15); }
+  .form-cell-input textarea { resize: vertical; min-height: 80px; }
+  .form-cell-input input[type="checkbox"] { width: auto; margin-right: 6px; transform: scale(1.3); cursor: pointer; }
+
+  /* VALIDATION */
+  .field-error { border-color: var(--erp-danger) !important; }
+  .error-msg { color: var(--erp-danger); font-size: 11px; margin-top: 2px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* FORM ACTIONS */
+  .form-actions { padding: 16px; border-top: 1px solid var(--erp-border); display: flex; gap: 10px; background: #fff; border-radius: 0 0 6px 6px; }
+  .btn-save { background: var(--erp-primary); color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-cancel { background: #95a5a6; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+  .btn-save:hover { background: #2980b9; }
+  .btn-cancel:hover { background: #7f8c8d; }
+
+  /* SCROLLBAR INDICATOR (matching screenshot) */
+  .scroll-indicator { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #999; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="brand"><i class="fas fa-shipping-fast me-2"></i>Transit Return</div>
+  <!-- <div class="nav-right">
+    <span><i class="fas fa-bell"></i></span>
+    <span><i class="fas fa-user-circle me-1"></i>Admin User</span>
+  </div> -->
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="menu-label">Main</div>
+  <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+  <a href="consignment-list.html" class="menu-item"><i class="fas fa-list-alt"></i>Consignments</a>
+  <a href="add-consignment-file.html" class="menu-item active"><i class="fas fa-plus-circle"></i>New Return Cargo</a>
+  <div class="menu-label mt-2">Reports</div>
+  <a href="#" class="menu-item"><i class="fas fa-print"></i>Print Reports</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="dashboard.html">Home</a></li><li class="breadcrumb-item"><a href="consignment-list.html">Consignments</a></li><li class="breadcrumb-item active">Add Return Cargo Consignment</li></ol></nav>
+
+  <div class="page-header-row">
+    <div class="page-title">Add Return Cargo Consignment</div>
+    <button class="btn-view-consignments" onclick="window.location.href='consignment-list.html'">View Consignments</button>
+  </div>
+
+  <div class="cargo-card">
+    <div class="cargo-card-header">
+      Cargo details &nbsp;<i class="fas fa-sync-alt refresh-btn" title="Refresh"></i>
+    </div>
+
+    <!-- TABS -->
+    <div class="erp-tabs">
+      <button class="erp-tab active" onclick="switchTab('file', this)">FILE</button>
+      <button class="erp-tab" onclick="switchTab('cargo', this)">CARGO</button>
+      <button class="erp-tab" onclick="switchTab('transportation', this)">TRANSPORTATION</button>
+    </div>
+
+    <!-- ======================== FILE TAB ======================== -->
+    <div id="tab-file" class="tab-pane-content active">
+      <!-- Row 1: Source, Billing, Client, UIN, Material -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Source of Business</div>
+          <div class="form-cell-input"><select id="sourceOfBusiness"><option value="">select...</option><option>Direct</option><option>Agent</option><option>Broker</option><option>Partner</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Billing Customer</div>
+          <div class="form-cell-input"><select id="billingCustomer"><option value="">select...</option><option>BRIDGE SHIPPING</option><option>SIMBA SUPPLY CHAIN</option><option>VS CARGO</option><option>QUICKMAX LOGISTICS</option><option>IMPERIAL ROAD HAULAGE</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Client/consignee</div>
+          <div class="form-cell-input"><select id="clientConsignee"><option value="">select...</option><option>BRIDGE SHIPPING</option><option>SIMBA SUPPLY CHAIN</option><option>VS CARGO</option><option>QUICKMAX LOGISTICS</option><option>IMPERIAL ROAD HAULAGE</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">UIN</div>
+          <div class="form-cell-input"><select id="uin"><option value="">select...</option><option>BRIDGE</option><option>SIMBA</option><option>IMP</option><option>VSCG</option><option>QMAX</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Material Descr.</div>
+          <div class="form-cell-input"><select id="materialDesc"><option value="">select...</option><option>General Cargo</option><option>Perishables</option><option>Hazardous</option><option>Machinery</option><option>Textiles</option></select></div>
+        </div>
+      </div>
+
+      <!-- Row 2: SO Valid Date, Empty Offload, Country, Border, Destination -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">SO Valid Date</div>
+          <div class="form-cell-input"><input type="date" id="soValidDate"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Empty Offload location</div>
+          <div class="form-cell-input"><input type="text" id="emptyOffload" placeholder="Enter location"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Country</div>
+          <div class="form-cell-input"><select id="country"><option value="">select...</option><option>Tanzania</option><option>Kenya</option><option>Uganda</option><option>Zambia</option><option>Mozambique</option><option>Zimbabwe</option><option>Malawi</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border</div>
+          <div class="form-cell-input"><select id="border"><option value="">select...</option><option>Chirundu</option><option>Beit Bridge</option><option>Kazungula</option><option>Malaba</option><option>Dar Port</option><option>Beira Port</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Destination</div>
+          <div class="form-cell-input"><select id="destination"><option value="">select...</option><option>IRINGA, TANZANIA</option><option>DAR ES SALAAM, TANZANIA</option><option>NAIROBI, KENYA</option><option>LUSAKA, ZAMBIA</option><option>KAMPALA, UGANDA</option><option>BEIRA, MOZAMBIQUE</option></select></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Booking Date, Delivery Date, File Closed, Booking Status, Notes -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Booking Date</div>
+          <div class="form-cell-input"><input type="date" id="bookingDate"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Delivery Date</div>
+          <div class="form-cell-input"><input type="date" id="deliveryDate"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">File Closed</div>
+          <div class="form-cell-input"><input type="date" id="fileClosed"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Booking Status</div>
+          <div class="form-cell-input"><select id="bookingStatus"><option value="">Select...</option><option>Confirmed</option><option>Pending</option><option>No Return Given</option><option>Delivered</option><option>Cancelled</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Notes</div>
+          <div class="form-cell-input"><textarea id="notes" rows="4" placeholder="Enter notes..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- Row 4: S/Line, LoadCon Number -->
+      <div class="form-grid-row cols-2" style="max-width:460px;">
+        <div class="form-cell">
+          <div class="form-cell-label">S/Line</div>
+          <div class="form-cell-input"><select id="sLine"><option value="">select...</option><option>MSC</option><option>Maersk</option><option>CMA CGM</option><option>Evergreen</option><option>COSCO</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">LoadCon Number</div>
+          <div class="form-cell-input"><input type="text" id="loadconNo" placeholder="Enter LoadCon No."></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== CARGO TAB ======================== -->
+    <div id="tab-cargo" class="tab-pane-content">
+      <!-- Row 1: Container No, Size20, Size40, Container Type, Gross Weight -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Container No.</div>
+          <div class="form-cell-input"><input type="text" id="containerNo" placeholder="e.g. CAC1880ZM"></div>
+        </div>
+        <div class="form-cell" style="text-align:center;">
+          <div class="form-cell-label">Size20</div>
+          <div class="form-cell-input" style="padding-top:10px;"><input type="checkbox" id="size20"></div>
+        </div>
+        <div class="form-cell" style="text-align:center;">
+          <div class="form-cell-label">Size40</div>
+          <div class="form-cell-input" style="padding-top:10px;"><input type="checkbox" id="size40"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Container Type</div>
+          <div class="form-cell-input"><select id="containerType"><option value="">select...</option><option>Dry Van</option><option>Reefer</option><option>Open Top</option><option>Flat Rack</option><option>Tank</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Gross Weight (KGS)</div>
+          <div class="form-cell-input"><input type="number" id="grossWeight" placeholder="e.g. 24000"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Transporter, Truck Details, Driver Details, Current Location, Remarks -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Transporter</div>
+          <div class="form-cell-input"><select id="transporter"><option value="">Select...</option><option>BRIDGE HAULAGE</option><option>SIMBA TRANSPORT</option><option>IMPERIAL LOGISTICS</option><option>QUICKMAX TRUCKS</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Truck Details</div>
+          <div class="form-cell-input"><input type="text" id="truckDetails" placeholder="e.g. T254DWU"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Driver Details</div>
+          <div class="form-cell-input"><input type="text" id="driverDetails" placeholder="Name & ID"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Current Location</div>
+          <div class="form-cell-input"><select id="currentLocation"><option value="">Select...</option><option>Dar es Salaam Port</option><option>Chirundu Border</option><option>Beit Bridge</option><option>Lusaka Depot</option><option>In Transit</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Remarks</div>
+          <div class="form-cell-input"><select id="cargoRemarks"><option value="">select...</option><option>Offloaded</option><option>In Transit</option><option>Delivered</option><option>Offloading</option><option>Cancelled</option></select></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Loading Point, ETA, Reporting Date, Loading Date, Documents Received -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Loading Point</div>
+          <div class="form-cell-input"><select id="loadingPoint"><option value="">select...</option><option>Dar Port</option><option>Beira Port</option><option>Mombasa Port</option><option>Durban Port</option></select></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">ETA</div>
+          <div class="form-cell-input">
+            <input type="date" id="eta" class="">
+            <div class="error-msg" id="etaError">ETA should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Reporting date</div>
+          <div class="form-cell-input">
+            <input type="date" id="reportingDate">
+            <div class="error-msg" id="reportingDateError">Reporting date should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Loading Date</div>
+          <div class="form-cell-input">
+            <input type="date" id="loadingDate">
+            <div class="error-msg" id="loadingDateError">Loading date should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Documents Received</div>
+          <div class="form-cell-input">
+            <input type="date" id="docsReceived">
+            <div class="error-msg" id="docsReceivedError">Loading date should not be blank</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Departure Date, Border 1 Arrival, Border 1 Departure, Border 2 Arrival, Border 2 Departure -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Departure Date</div>
+          <div class="form-cell-input">
+            <input type="date" id="departureDate">
+            <div class="error-msg" id="departureDateError">Documents Received should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 1 Arrival</div>
+          <div class="form-cell-input">
+            <input type="date" id="border1Arrival">
+            <div class="error-msg" id="border1ArrivalError">Departure should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 1 Departure</div>
+          <div class="form-cell-input"><input type="date" id="border1Departure"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 2 Arrival</div>
+          <div class="form-cell-input">
+            <input type="date" id="border2Arrival">
+            <div class="error-msg" id="border2ArrivalError">Border 1 arrival should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 2 Departure</div>
+          <div class="form-cell-input"><input type="date" id="border2Departure"></div>
+        </div>
+      </div>
+
+      <!-- Row 5: Border 3 Arrival, Border 3 Departure, Border 4 Arrival, Border 4 Departure, Destination Date -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell">
+          <div class="form-cell-label">Border 3 Arrival</div>
+          <div class="form-cell-input">
+            <input type="date" id="border3Arrival">
+            <div class="error-msg" id="border3ArrivalError">Border 2 should not be blank</div>
+          </div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 3 Departure</div>
+          <div class="form-cell-input"><input type="date" id="border3Departure"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 4 Arrival</div>
+          <div class="form-cell-input"><input type="date" id="border4Arrival"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Border 4 Departure</div>
+          <div class="form-cell-input"><input type="date" id="border4Departure"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Destination Date</div>
+          <div class="form-cell-input">
+            <input type="date" id="destinationDate">
+            <div class="error-msg" id="destinationDateError">Border 3 should not be blank</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 6: Offload Date -->
+      <div class="form-grid-row cols-5">
+        <div class="form-cell" style="border-right:none;">
+          <div class="form-cell-label">Offload Date</div>
+          <div class="form-cell-input"><input type="date" id="offloadDate"></div>
+        </div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+      </div>
+    </div>
+
+    <!-- ======================== TRANSPORTATION TAB ======================== -->
+    <div id="tab-transportation" class="tab-pane-content">
+      <!-- Row 1: Invoice, Rate, Advance, Fuel, GIT, Drop Off -->
+      <div class="form-grid-row cols-6" style="grid-template-columns:repeat(6,1fr);">
+        <div class="form-cell">
+          <div class="form-cell-label">Transporter Invoice No.</div>
+          <div class="form-cell-input"><input type="text" id="invoiceNo" placeholder="e.g. INV-2026-001"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Transportation Rate</div>
+          <div class="form-cell-input"><input type="number" id="transRate" placeholder="0.00"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Transporter Advance</div>
+          <div class="form-cell-input"><input type="number" id="transAdvance" placeholder="0.00" oninput="calcBalance()"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Fuel Amount</div>
+          <div class="form-cell-input"><input type="number" id="fuelAmount" placeholder="0.00" oninput="calcBalance()"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">GIT Amount</div>
+          <div class="form-cell-input"><input type="number" id="gitAmount" placeholder="0.00" oninput="calcBalance()"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Drop Off Charges</div>
+          <div class="form-cell-input"><input type="number" id="dropOff" placeholder="0.00" oninput="calcBalance()"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Others, Balance, Empty Gate In, Free Days, S/L Det., Destination Point -->
+      <div class="form-grid-row cols-6" style="grid-template-columns:repeat(6,1fr);">
+        <div class="form-cell">
+          <div class="form-cell-label">Others (if Any)</div>
+          <div class="form-cell-input"><input type="number" id="others" placeholder="0.00" oninput="calcBalance()"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Balance</div>
+          <div class="form-cell-input"><input type="number" id="balance" placeholder="0.00" readonly style="background:#f8f9fa;"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Empty Gate In Date</div>
+          <div class="form-cell-input"><input type="date" id="emptyGateIn"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Free Days</div>
+          <div class="form-cell-input"><input type="number" id="freeDays" placeholder="e.g. 7"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">S/L Det. Charges</div>
+          <div class="form-cell-input"><input type="number" id="slDetCharges" placeholder="0.00"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Destination Point</div>
+          <div class="form-cell-input"><select id="destPoint"><option value="">select...</option><option>IRINGA, TANZANIA</option><option>DAR ES SALAAM, TANZANIA</option><option>NAIROBI, KENYA</option><option>LUSAKA, ZAMBIA</option><option>KAMPALA, UGANDA</option></select></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Client Rate, Booking Tonnage -->
+      <div class="form-grid-row cols-6" style="grid-template-columns:repeat(6,1fr);">
+        <div class="form-cell">
+          <div class="form-cell-label">Client Rate</div>
+          <div class="form-cell-input"><input type="number" id="clientRate" placeholder="0.00"></div>
+        </div>
+        <div class="form-cell">
+          <div class="form-cell-label">Booking Tonnage</div>
+          <div class="form-cell-input"><input type="number" id="bookingTonnage" placeholder="e.g. 28.5"></div>
+        </div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+        <div class="form-cell" style="border-right:none;"></div>
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveForm()"><i class="fas fa-save me-1"></i>Save</button>
+      <button class="btn-save" style="background:#27ae60;" onclick="saveForm()"><i class="fas fa-check me-1"></i>Save & New</button>
+      <button class="btn-cancel" onclick="window.location.href='consignment-list.html'"><i class="fas fa-times me-1"></i>Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pane-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.erp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function calcBalance() {
+  const rate = parseFloat(document.getElementById('transRate').value) || 0;
+  const advance = parseFloat(document.getElementById('transAdvance').value) || 0;
+  const fuel = parseFloat(document.getElementById('fuelAmount').value) || 0;
+  const git = parseFloat(document.getElementById('gitAmount').value) || 0;
+  const drop = parseFloat(document.getElementById('dropOff').value) || 0;
+  const others = parseFloat(document.getElementById('others').value) || 0;
+  const balance = rate - (advance + fuel + git + drop + others);
+  document.getElementById('balance').value = balance.toFixed(2);
+}
+
+function saveForm() {
+  let valid = true;
+  // Cargo tab validation
+  const eta = document.getElementById('eta');
+  const etaErr = document.getElementById('etaError');
+  if (!eta.value) { eta.classList.add('field-error'); etaErr.classList.add('show'); valid = false; }
+  else { eta.classList.remove('field-error'); etaErr.classList.remove('show'); }
+
+  if (valid) {
+    alert('Record saved successfully!');
+    window.location.href = 'consignment-list.html';
+  } else {
+    // Switch to cargo tab to show errors
+    document.querySelectorAll('.tab-pane-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.erp-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-cargo').classList.add('active');
+    document.querySelectorAll('.erp-tab')[1].classList.add('active');
+  }
+}
+</script>
+</body>
+</html>

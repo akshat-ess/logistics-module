@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Vehicle — Fleet Management</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface-alt: #f7f8fa;
+    --border: #e2e6ea;
+    --border-strong: #cdd2d8;
+    --text-primary: #1a202c;
+    --text-secondary: #5a6578;
+    --text-muted: #8b95a3;
+    --accent-blue: #2563eb;
+    --accent-blue-light: #dbeafe;
+    --accent-green: #16a34a;
+    --accent-green-light: #dcfce7;
+    --accent-orange: #d97706;
+    --accent-orange-light: #fef3c7;
+    --accent-red: #dc2626;
+    --accent-red-light: #fee2e2;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+    --radius: 8px;
+    --radius-sm: 5px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    min-height: 100vh;
+  }
+
+  /* TOP NAV */
+  .top-nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 28px; height: 52px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: var(--shadow-sm);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--accent-blue); letter-spacing: -0.3px; }
+  .nav-brand i { font-size: 18px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; color: var(--text-secondary); font-size: 13px; }
+  .nav-right i { font-size: 15px; cursor: pointer; transition: color .2s; }
+  .nav-right i:hover { color: var(--accent-blue); }
+  .nav-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue) 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  /* BREADCRUMB */
+  .breadcrumb-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 28px; height: 38px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+  .breadcrumb-bar a { color: var(--accent-blue); text-decoration: none; }
+  .breadcrumb-bar a:hover { text-decoration: underline; }
+
+  /* MAIN */
+  .main-wrapper { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .page-header-left { display: flex; align-items: center; gap: 14px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+  .edit-badge { background: var(--accent-orange-light); color: var(--accent-orange); border: 1px solid #fde68a; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; display: none; }
+
+  /* BTN */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 18px; border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all .18s; text-decoration: none; line-height: 1;
+  }
+  .btn-primary { background: var(--accent-blue); color: white; box-shadow: 0 2px 6px rgba(37,99,235,.3); }
+  .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,.4); transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface-alt); }
+  .btn-success { background: var(--accent-green); color: white; box-shadow: 0 2px 6px rgba(22,163,74,.3); }
+  .btn-success:hover { background: #15803d; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid transparent; }
+  .btn-ghost:hover { border-color: var(--border-strong); background: var(--surface-alt); }
+  .btn-outline-red { background: var(--accent-red-light); color: var(--accent-red); border: 1px solid #fca5a5; }
+  .btn-outline-red:hover { background: var(--accent-red); color: white; }
+
+  /* FORM CARD */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 18px; overflow: hidden; }
+  .form-card-header {
+    background: var(--surface-alt); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .form-card-header i { color: var(--accent-blue); font-size: 13px; }
+  .form-card-header .refresh-btn { margin-left: auto; color: var(--accent-blue); cursor: pointer; font-size: 13px; }
+  .form-card-header .refresh-btn:hover { opacity: 0.7; }
+  .form-card-body { padding: 22px 20px; }
+
+  /* FORM GRID */
+  .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 24px; }
+  .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 24px; }
+  .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 24px; }
+  .span-2 { grid-column: span 2; }
+
+  /* FORM FIELD */
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-label {
+    font-size: 11.5px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .form-label .required { color: var(--accent-red); margin-left: 2px; }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 12px; pointer-events: none;
+    transition: color .15s;
+  }
+  .form-control {
+    width: 100%; padding: 9px 12px; border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm); font-family: inherit; font-size: 13px;
+    color: var(--text-primary); background: var(--surface);
+    outline: none; transition: border .15s, box-shadow .15s, background .15s;
+    appearance: none;
+  }
+  .form-control.has-icon { padding-left: 32px; }
+  .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); background: #fafcff; }
+  .form-control:focus + .input-icon, .input-wrap:focus-within .input-icon { color: var(--accent-blue); }
+  .form-control.error { border-color: var(--accent-red); background: #fff8f8; }
+  .form-control.error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+  .error-msg { font-size: 11px; color: var(--accent-red); margin-top: 2px; display: none; }
+  .error-msg.show { display: block; }
+
+  select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6578' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px; cursor: pointer;
+  }
+
+  /* DIVIDER */
+  .section-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* FORM ACTIONS */
+  .form-actions { display: flex; align-items: center; gap: 10px; padding: 18px 20px; border-top: 1px solid var(--border); background: var(--surface-alt); }
+  .form-actions-right { margin-left: auto; }
+
+  /* PROGRESS INDICATOR */
+  .form-progress {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 14px 20px; box-shadow: var(--shadow-sm);
+  }
+  .progress-step { display: flex; align-items: center; flex: 1; }
+  .step-dot {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+    font-weight: 700; background: var(--surface); color: var(--text-muted);
+    flex-shrink: 0; transition: all .2s; position: relative; z-index: 1;
+  }
+  .step-dot.active { border-color: var(--accent-blue); background: var(--accent-blue); color: white; }
+  .step-dot.done { border-color: var(--accent-green); background: var(--accent-green); color: white; }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
+  .step-line.done { background: var(--accent-green); }
+  .step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-left: 8px; white-space: nowrap; }
+  .step-label.active { color: var(--accent-blue); }
+  .step-label.done { color: var(--accent-green); }
+
+  /* TOAST */
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-md); padding: 12px 16px; min-width: 280px;
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    transform: translateX(120%); transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .toast.show { transform: translateX(0); }
+  .toast-icon { font-size: 17px; flex-shrink: 0; }
+  .toast-success .toast-icon { color: var(--accent-green); }
+  .toast-error .toast-icon { color: var(--accent-red); }
+  .toast-body strong { display: block; font-weight: 600; color: var(--text-primary); }
+  .toast-body span { color: var(--text-secondary); font-size: 12px; }
+  .toast-close { margin-left: auto; cursor: pointer; color: var(--text-muted); }
+  .toast-close:hover { color: var(--text-primary); }
+
+  /* SUCCESS OVERLAY */
+  .success-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .success-overlay.active { opacity: 1; pointer-events: all; }
+  .success-box {
+    background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 40px 48px; text-align: center; max-width: 420px;
+    transform: scale(0.9) translateY(10px); transition: transform .25s;
+  }
+  .success-overlay.active .success-box { transform: scale(1) translateY(0); }
+  .success-icon {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--accent-green-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-green); font-size: 28px; margin: 0 auto 18px;
+    animation: pulse 0.5s ease-out;
+  }
+  @keyframes pulse { 0% { transform: scale(0); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  .success-box h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+  .success-box p { color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 24px; }
+  .success-reg { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: var(--accent-blue); background: var(--accent-blue-light); padding: 6px 14px; border-radius: 6px; display: inline-block; margin-bottom: 20px; }
+  .success-actions { display: flex; gap: 10px; justify-content: center; }
+
+  /* CHARACTER COUNTER */
+  .char-counter { font-size: 10.5px; color: var(--text-muted); text-align: right; margin-top: 2px; }
+
+  @media (max-width: 1024px) { .form-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) {
+    .main-wrapper { padding: 16px; }
+    .form-grid, .form-grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: span 1; }
+    .form-progress { display: none; }
+  }
+  @media (max-width: 480px) { .form-grid, .form-grid-3, .form-grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<!-- <nav class="top-nav">
+  <div class="nav-brand"><i class="fas fa-truck-fast"></i>FleetERP</div>
+  <div class="nav-right">
+    <i class="fas fa-bell"></i>
+    <i class="fas fa-cog"></i>
+    <i class="fas fa-question-circle"></i>
+    <div class="nav-avatar">A</div>
+  </div>
+</nav> -->
+
+<!-- BREADCRUMB -->
+<!-- <div class="breadcrumb-bar">
+  <a href="#">Home</a>
+  <i class="fas fa-chevron-right" style="font-size:9px"></i>
+  <a href="#">Fleet Management</a>
+  <i class="fas fa-chevron-right" style="font-size:9px"></i>
+  <a href="vehicles_list.html">Vehicles</a>
+  <i class="fas fa-chevron-right" style="font-size:9px"></i>
+  <span id="breadcrumb-action">Add Vehicle</span>
+</div> -->
+
+<div class="main-wrapper">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title" id="pageTitle">Add Vehicle</h1>
+      <span class="edit-badge" id="editBadge"><i class="fas fa-pen-to-square"></i> Editing</span>
+    </div>
+    <button class="btn btn-secondary" onclick="window.location.href='vehicles_list.html'">
+      <i class="fas fa-list"></i> View Vehicles
+    </button>
+  </div>
+
+  <!-- PROGRESS STEPS -->
+  <div class="form-progress">
+    <div class="progress-step">
+      <div class="step-dot active" id="step1">1</div>
+      <span class="step-label active">Vehicle Details</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="progress-step">
+      <div class="step-dot" id="step2">2</div>
+      <span class="step-label">Purchase Info</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="progress-step">
+      <div class="step-dot" id="step3">3</div>
+      <span class="step-label">Technical Details</span>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="progress-step">
+      <div class="step-dot" id="step4">4</div>
+      <span class="step-label">Review & Save</span>
+    </div>
+  </div>
+
+  <form id="vehicleForm" novalidate>
+
+    <!-- SECTION 1: VEHICLE DETAILS -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <i class="fas fa-car"></i>
+        Vehicle Details
+        <i class="fas fa-rotate-right refresh-btn" title="Reset section" onclick="resetSection('sec1')"></i>
+      </div>
+      <div class="form-card-body" id="sec1">
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label class="form-label">Vehicle Type <span class="required">*</span></label>
+            <div class="input-wrap">
+              <select class="form-control has-icon" id="vehicleType" required>
+                <option value="">Select type…</option>
+                <option>Sedan</option>
+                <option>SUV</option>
+                <option>MPV</option>
+                <option>Van</option>
+                <option>Pickup</option>
+                <option>Light CV</option>
+                <option>HCV</option>
+                <option>Tractor</option>
+                <option>Two Wheeler</option>
+              </select>
+              <i class="fas fa-tag input-icon" style="left:11px; z-index:1"></i>
+            </div>
+            <span class="error-msg" id="err-vehicleType">Please select a vehicle type.</span>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Make / Model <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="makeModel" placeholder="e.g. Mahindra Scorpio-N" required maxlength="80">
+              <i class="fas fa-car-side input-icon"></i>
+            </div>
+            <span class="error-msg" id="err-makeModel">Make/Model is required.</span>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Registration No. <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="regNo" placeholder="e.g. DL01CA2023" required maxlength="20" style="text-transform:uppercase">
+              <i class="fas fa-hashtag input-icon"></i>
+            </div>
+            <span class="error-msg" id="err-regNo">Registration number is required.</span>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Registration Date <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input type="date" class="form-control has-icon" id="regDate" required>
+              <i class="fas fa-calendar input-icon"></i>
+            </div>
+            <span class="error-msg" id="err-regDate">Registration date is required.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: PURCHASE INFO -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <i class="fas fa-receipt"></i>
+        Purchase Information
+        <i class="fas fa-rotate-right refresh-btn" title="Reset section" onclick="resetSection('sec2')"></i>
+      </div>
+      <div class="form-card-body" id="sec2">
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label class="form-label">Purchase Date</label>
+            <div class="input-wrap">
+              <input type="date" class="form-control has-icon" id="purchaseDate">
+              <i class="fas fa-calendar-check input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Purchase Cost (₹)</label>
+            <div class="input-wrap">
+              <input type="number" class="form-control has-icon" id="purchaseCost" placeholder="e.g. 850000" min="0" step="1000">
+              <i class="fas fa-indian-rupee-sign input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Purchase Dealer</label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="purchaseDealer" placeholder="e.g. Maruti Suzuki Delhi" maxlength="100">
+              <i class="fas fa-store input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Office <span class="required">*</span></label>
+            <div class="input-wrap">
+              <select class="form-control has-icon" id="office" required>
+                <option value="">Select office…</option>
+                <option value="HLL">HLL — Head Office</option>
+                <option value="CFS">CFS — Container Freight</option>
+                <option value="TRS">TRS — Transport</option>
+                <option value="WH">WH — Warehouse</option>
+                <option value="LGS">LGS — Logistics</option>
+              </select>
+              <i class="fas fa-building input-icon" style="left:11px;z-index:1"></i>
+            </div>
+            <span class="error-msg" id="err-office">Please select an office.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: TECHNICAL DETAILS -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <i class="fas fa-gears"></i>
+        Technical Details
+        <i class="fas fa-rotate-right refresh-btn" title="Reset section" onclick="resetSection('sec3')"></i>
+      </div>
+      <div class="form-card-body" id="sec3">
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label class="form-label">Engine Size</label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="engineSize" placeholder="e.g. 2.2L / 1498cc">
+              <i class="fas fa-gear input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Chassis No.</label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="chassisNo" placeholder="17-char VIN…" maxlength="30" style="font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase">
+              <i class="fas fa-barcode input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Initial Mileage</label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="initialMileage" placeholder="e.g. 0 km">
+              <i class="fas fa-gauge-high input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Next Service Date</label>
+            <div class="input-wrap">
+              <input type="date" class="form-control has-icon" id="nextService">
+              <i class="fas fa-wrench input-icon"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Insurance Policy No.</label>
+            <div class="input-wrap">
+              <input type="text" class="form-control has-icon" id="insuranceNo" placeholder="Policy number…">
+              <i class="fas fa-shield-halved input-icon"></i>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Insurance Expiry</label>
+            <div class="input-wrap">
+              <input type="date" class="form-control has-icon" id="insuranceExpiry">
+              <i class="fas fa-calendar-xmark input-icon"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="form-field">
+          <label class="form-label">Remarks / Notes</label>
+          <textarea class="form-control" id="remarks" rows="3" placeholder="Any additional notes about this vehicle…" maxlength="500" oninput="updateCounter()"></textarea>
+          <div class="char-counter"><span id="charCount">0</span> / 500</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="form-card">
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="saveBtn">
+          <i class="fas fa-floppy-disk"></i> Save Vehicle
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+          <i class="fas fa-rotate-left"></i> Reset
+        </button>
+        <button type="button" class="btn btn-ghost" onclick="window.location.href='vehicles_list.html'">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <div class="form-actions-right">
+          <span style="font-size:11.5px; color:var(--text-muted)"><span class="required" style="margin:0">*</span> Required fields</span>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon"><i class="fas fa-check"></i></div>
+    <h3 id="successTitle">Vehicle Saved!</h3>
+    <p>Your vehicle has been successfully registered in the system.</p>
+    <div class="success-reg" id="successRegNo">DL01CA2023</div>
+    <div class="success-actions">
+      <button class="btn btn-secondary" onclick="addAnother()"><i class="fas fa-plus"></i> Add Another</button>
+      <button class="btn btn-primary" onclick="window.location.href='vehicles_list.html'"><i class="fas fa-list"></i> View List</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ──────────────────────────────────────────────
+// EDIT MODE (check URL params)
+// ──────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('id');
+
+const sampleData = {
+  1: { vehicleType:'SUV', makeModel:'Maruti Ertiga', regNo:'DL01CA2023', regDate:'2023-03-15', purchaseDate:'2023-02-20', purchaseCost:'850000', purchaseDealer:'Maruti Suzuki Delhi', office:'HLL', engineSize:'1.5L', chassisNo:'MA3EYE81S00310456', initialMileage:'0 km', nextService:'2024-02-20', insuranceNo:'INS-DL-00234', insuranceExpiry:'2025-03-14', remarks:'' },
+  2: { vehicleType:'Pickup', makeModel:'Tata Xenon', regNo:'HR26DN4821', regDate:'2022-07-10', purchaseDate:'2022-06-05', purchaseCost:'1250000', purchaseDealer:'Tata Motors Gurugram', office:'CFS', engineSize:'2.2L', chassisNo:'MAT612154N6H00234', initialMileage:'500 km', nextService:'2024-06-05', insuranceNo:'', insuranceExpiry:'', remarks:'' },
+  4: { vehicleType:'Van', makeModel:'Force Traveller', regNo:'T465DFN', regDate:'2015-11-04', purchaseDate:'', purchaseCost:'', purchaseDealer:'', office:'HLL', engineSize:'2.6L', chassisNo:'MA1PX2GCKFB320091', initialMileage:'10000 km', nextService:'2024-05-01', insuranceNo:'', insuranceExpiry:'', remarks:'Original fleet vehicle' },
+};
+
+if (editId && sampleData[editId]) {
+  const d = sampleData[editId];
+  document.getElementById('pageTitle').textContent = 'Edit Vehicle';
+  document.getElementById('breadcrumb-action').textContent = 'Edit Vehicle';
+  document.getElementById('editBadge').style.display = 'inline-flex';
+  document.getElementById('saveBtn').innerHTML = '<i class="fas fa-floppy-disk"></i> Update Vehicle';
+
+  Object.keys(d).forEach(key => {
+    const el = document.getElementById(key);
+    if (el) el.value = d[key];
+  });
+}
+
+// ──────────────────────────────────────────────
+// VALIDATION
+// ──────────────────────────────────────────────
+const requiredFields = [
+  { id: 'vehicleType', errId: 'err-vehicleType' },
+  { id: 'makeModel',   errId: 'err-makeModel'   },
+  { id: 'regNo',       errId: 'err-regNo'       },
+  { id: 'regDate',     errId: 'err-regDate'     },
+  { id: 'office',      errId: 'err-office'      },
+];
+
+function validate() {
+  let valid = true;
+  requiredFields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.errId);
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      err.classList.add('show');
+      valid = false;
+    } else {
+      el.classList.remove('error');
+      err.classList.remove('show');
+    }
+  });
+  return valid;
+}
+
+requiredFields.forEach(f => {
+  document.getElementById(f.id)?.addEventListener('input', () => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.errId);
+    if (el.value.trim()) { el.classList.remove('error'); err.classList.remove('show'); }
+  });
+});
+
+// ──────────────────────────────────────────────
+// FORM SUBMIT
+// ──────────────────────────────────────────────
+document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!validate()) {
+    showToast('error', 'Validation Error', 'Please fill in all required fields.');
+    // Scroll to first error
+    const firstErr = document.querySelector('.form-control.error');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const regNo = document.getElementById('regNo').value.toUpperCase();
+
+  // Simulate save
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+  saveBtn.disabled = true;
+
+  setTimeout(() => {
+    saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> ' + (editId ? 'Update Vehicle' : 'Save Vehicle');
+    saveBtn.disabled = false;
+
+    document.getElementById('successTitle').textContent = editId ? 'Vehicle Updated!' : 'Vehicle Saved!';
+    document.getElementById('successRegNo').textContent = regNo;
+    document.getElementById('successOverlay').classList.add('active');
+
+    updateProgressSteps(4);
+
+    const data = {};
+    ['vehicleType','makeModel','regNo','regDate','purchaseDate','purchaseCost','purchaseDealer','office','engineSize','chassisNo','initialMileage','nextService','insuranceNo','insuranceExpiry','remarks'].forEach(id => {
+      data[id] = document.getElementById(id)?.value || '';
+    });
+    console.log('[FleetERP] Vehicle data saved:', data);
+  }, 900);
+});
+
+function addAnother() {
+  document.getElementById('successOverlay').classList.remove('active');
+  document.getElementById('vehicleForm').reset();
+  document.getElementById('charCount').textContent = '0';
+  updateProgressSteps(1);
+}
+
+// ──────────────────────────────────────────────
+// PROGRESS STEPS
+// ──────────────────────────────────────────────
+function updateProgressSteps(active) {
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('step' + i);
+    const label = dot.nextElementSibling;
+    dot.classList.remove('active', 'done');
+    label.classList.remove('active', 'done');
+    if (i < active) { dot.classList.add('done'); dot.innerHTML = '<i class="fas fa-check" style="font-size:10px"></i>'; label.classList.add('done'); }
+    else if (i === active) { dot.classList.add('active'); dot.textContent = i; label.classList.add('active'); }
+    else { dot.textContent = i; }
+    if (i < 4) {
+      const line = document.getElementById('line' + i);
+      if (line) line.classList.toggle('done', i < active);
+    }
+  }
+}
+
+// Scroll-based progress update
+window.addEventListener('scroll', () => {
+  const cards = document.querySelectorAll('.form-card');
+  let active = 1;
+  cards.forEach((c, i) => {
+    const rect = c.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.6) active = Math.min(i + 1, 4);
+  });
+  updateProgressSteps(active);
+});
+
+// ──────────────────────────────────────────────
+// RESET
+// ──────────────────────────────────────────────
+function resetForm() {
+  if (!confirm('Reset all fields? Unsaved changes will be lost.')) return;
+  document.getElementById('vehicleForm').reset();
+  document.querySelectorAll('.form-control').forEach(el => { el.classList.remove('error'); });
+  document.querySelectorAll('.error-msg').forEach(el => { el.classList.remove('show'); });
+  document.getElementById('charCount').textContent = '0';
+  updateProgressSteps(1);
+  showToast('success', 'Form Reset', 'All fields have been cleared.');
+}
+
+function resetSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  section.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+    el.classList.remove('error');
+  });
+  section.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+}
+
+// ──────────────────────────────────────────────
+// CHAR COUNTER
+// ──────────────────────────────────────────────
+function updateCounter() {
+  document.getElementById('charCount').textContent = document.getElementById('remarks').value.length;
+}
+
+// REG NO auto-uppercase
+document.getElementById('regNo').addEventListener('input', function() {
+  const pos = this.selectionStart;
+  this.value = this.value.toUpperCase();
+  this.setSelectionRange(pos, pos);
+});
+document.getElementById('chassisNo').addEventListener('input', function() {
+  const pos = this.selectionStart;
+  this.value = this.value.toUpperCase();
+  this.setSelectionRange(pos, pos);
+});
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function showToast(type, title, msg) {
+  const tc = document.getElementById('toastContainer');
+  const id = 'toast-' + Date.now();
+  const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
+  tc.insertAdjacentHTML('beforeend', `<div class="toast toast-${type}" id="${id}">
+    <i class="fas ${icon} toast-icon"></i>
+    <div class="toast-body"><strong>${title}</strong><span>${msg}</span></div>
+    <i class="fas fa-xmark toast-close" onclick="removeToast('${id}')"></i>
+  </div>`);
+  setTimeout(() => document.getElementById(id)?.classList.add('show'), 10);
+  setTimeout(() => removeToast(id), 4500);
+}
+function removeToast(id) {
+  const t = document.getElementById(id);
+  if (t) { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }
+}
+
+// Set max date for registration and purchase date to today
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('regDate').max = today;
+document.getElementById('purchaseDate').max = today;
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Return Cargo Clearance Consignment - No Data</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root { --erp-bg:#f4f6f9; --erp-primary:#3498db; --erp-text:#2c3e50; --erp-border:#dee2e6; }
+  body { background:#fff; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; color:var(--erp-text); margin:0; }
+  .top-nav { background:#2c3e50; color:#fff; padding:0 20px; height:50px; display:flex; align-items:center; justify-content:space-between; }
+  .top-nav .brand { font-size:16px; font-weight:600; }
+  .sidebar { width:220px; background:#fff; height:calc(100vh - 50px); border-right:1px solid var(--erp-border); position:fixed; top:50px; left:0; overflow-y:auto; z-index:100; }
+  .sidebar .menu-label { font-size:10px; font-weight:700; color:#999; padding:8px 16px 4px; text-transform:uppercase; }
+  .sidebar .menu-item { display:flex; align-items:center; gap:10px; padding:9px 16px; font-size:13px; color:#555; text-decoration:none; transition:background .15s; }
+  .sidebar .menu-item:hover, .sidebar .menu-item.active { background:#e8f4fd; color:var(--erp-primary); }
+  .sidebar .menu-item i { width:18px; }
+  .main-content { margin-left:220px; padding:24px; }
+  .page-title { font-size:22px; font-weight:700; margin-bottom:16px; }
+  .breadcrumb { font-size:13px; background:none; padding:0; margin-bottom:12px; }
+  .breadcrumb-item a { color:var(--erp-primary); text-decoration:none; }
+
+  .action-btns { margin-bottom:14px; }
+  .search-create-row { display:flex; justify-content:flex-end; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .search-create-row input { font-size:12px; padding:5px 10px; border:1px solid #ccc; border-radius:3px; width:180px; }
+  .btn-create { background:#2980b9; color:#fff; border:none; padding:6px 16px; border-radius:3px; font-size:13px; font-weight:600; cursor:pointer; }
+
+  .table-card { background:#fff; border:1px solid #dee2e6; border-radius:4px; }
+  .table-card-header { padding:10px 16px; border-bottom:1px solid #dee2e6; font-size:14px; font-weight:600; display:flex; align-items:center; gap:6px; }
+  .table-controls { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid #f0f0f0; font-size:13px; }
+  .records-sel { display:flex; align-items:center; gap:6px; }
+  .records-sel select { padding:3px 6px; border:1px solid #ccc; border-radius:3px; font-size:13px; }
+  .table-search { display:flex; align-items:center; gap:6px; }
+  .table-search input { padding:4px 10px; border:1px solid #ccc; border-radius:3px; font-size:13px; width:200px; }
+
+  .erp-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .erp-table thead th { background:#f8f9fa; padding:10px 12px; font-weight:600; border-bottom:2px solid #dee2e6; white-space:nowrap; }
+  .erp-table tbody td { padding:10px 12px; color:#555; }
+  .no-data-row td { text-align:left; font-size:13px; color:#333; }
+
+  .pagination-row { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; font-size:13px; border-top:1px solid #f0f0f0; }
+  .pagination-btns { display:flex; gap:4px; }
+  .page-btn { padding:4px 12px; border:1px solid #ccc; background:#fff; border-radius:3px; cursor:pointer; font-size:12px; }
+  .page-btn:hover { background:#f0f0f0; }
+</style>
+</head>
+<body>
+<div class="top-nav">
+  <div class="brand"><i class="fas fa-shipping-fast me-2"></i>TransitERP &mdash; Cargo Management System</div>
+  <div class="nav-right" style="display:flex;align-items:center;gap:15px;font-size:13px;"><i class="fas fa-bell"></i><span><i class="fas fa-user-circle me-1"></i>Admin User</span></div>
+</div>
+<div class="sidebar">
+  <div class="menu-label">Main</div>
+  <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+  <a href="consignment-list.html" class="menu-item active"><i class="fas fa-list-alt"></i>Consignments</a>
+  <a href="add-consignment-file.html" class="menu-item"><i class="fas fa-plus-circle"></i>New Return Cargo</a>
+</div>
+<div class="main-content">
+  <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="dashboard.html">Home</a></li><li class="breadcrumb-item active">Transit Return Cargo Clearance Consignment</li></ol></nav>
+  <div class="page-title">Transit Return cargo Clearance Consignment</div>
+
+  <!-- Minimal action buttons (Coffee filter view - matches screenshot 6) -->
+  <div class="action-btns">
+    <button class="btn btn-primary btn-sm"><i class="fas fa-print me-1"></i>Print</button>
+  </div>
+
+  <!-- SEARCH + CREATE -->
+  <div class="search-create-row">
+    <input type="text" placeholder="Search File No▼">
+    <input type="text" placeholder="Enter Container No">
+    <button class="btn-create" onclick="window.location.href='add-consignment-file.html'">Create Return cargo</button>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="table-card">
+    <div class="table-card-header">
+      All Consignments &nbsp;<i class="fas fa-sync-alt" style="cursor:pointer;color:#3498db;font-size:15px;" title="Refresh"></i>
+    </div>
+    <div class="table-controls">
+      <div class="records-sel">
+        <select><option>10</option><option>25</option><option>50</option></select>
+        <span>records per page</span>
+      </div>
+      <div class="table-search">
+        <label>Search:</label>
+        <input type="text" id="emptySearch" placeholder="">
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="erp-table">
+        <thead>
+          <tr>
+            <th>UIN <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>File No <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>Client <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>Destination <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>Truck Details <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>Remarks <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>DETAILS <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+            <th>ACTION <i class="fas fa-sort" style="color:#aaa;font-size:11px;"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="no-data-row">
+            <td colspan="8">No data available in table</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-row">
+      <div>Showing 0 to 0 of 0 entries</div>
+      <div class="pagination-btns">
+        <button class="page-btn">Previous</button>
+        <button class="page-btn">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

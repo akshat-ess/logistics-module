@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add License — ERP License Management</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-spinner"></div>
+</div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a href="index.html" class="topbar-brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4da6ff" stroke-width="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    ERP Suite <span>v4.2</span>
+  </a>
+  <div class="topbar-divider"></div>
+  <span class="topbar-module">License Management</span>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-user">
+    <div class="topbar-avatar">AD</div>
+    Admin User
+  </div>
+</header>
+
+<!-- PAGE WRAPPER -->
+<main class="page-wrapper">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <!-- Breadcrumb -->
+      <nav style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--neutral-500)">
+        <a href="index.html" style="color:var(--primary);text-decoration:none;font-weight:500">Licenses</a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <span style="color:var(--neutral-700);font-weight:600">Add License</span>
+      </nav>
+    </div>
+    <a href="index.html" class="btn btn-outline">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      View Licenses
+    </a>
+  </div>
+
+  <!-- FORM TITLE ROW -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <div style="width:40px;height:40px;background:var(--primary-light);border-radius:var(--radius-md);display:grid;place-items:center;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2">
+        <rect x="2" y="3" width="20" height="18" rx="2"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="page-title" style="font-size:18px">Add License</h1>
+      <p style="font-size:12px;color:var(--neutral-500);margin-top:2px">Register a new license or certificate record</p>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card" id="addLicenseForm">
+    <div class="form-card-header">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span class="form-card-title">License Details</span>
+    </div>
+
+    <div class="form-body">
+
+      <!-- Row 1: Main Fields -->
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label" for="licenseNo">License No <span class="req">*</span></label>
+          <input type="text" id="licenseNo" class="form-control" placeholder="e.g. 0025375" maxlength="60" autocomplete="off" />
+          <span class="form-error" id="licenseNoErr"></span>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label class="form-label" for="description">Description <span class="req">*</span></label>
+          <input type="text" id="description" class="form-control" placeholder="e.g. FIRE SAFETY CERTIFICATE" maxlength="120" autocomplete="off" />
+          <span class="form-error" id="descriptionErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issueDate">Issue Date <span class="req">*</span></label>
+          <input type="date" id="issueDate" class="form-control" />
+          <span class="form-error" id="issueDateErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="expiryDate">Expiry Date <span class="req">*</span></label>
+          <input type="date" id="expiryDate" class="form-control" />
+          <span class="form-error" id="expiryDateErr"></span>
+        </div>
+
+      </div>
+
+      <!-- Row 2: Additional Fields -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+
+        <div class="form-group">
+          <label class="form-label" for="renewalDate">Renewal Date</label>
+          <input type="date" id="renewalDate" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="office">Office / Branch</label>
+          <select id="office" class="form-control">
+            <option value="">— Select Office —</option>
+            <option value="HLL">HLL</option>
+            <option value="CFS">CFS</option>
+            <option value="TRS">TRS</option>
+            <option value="INSURANCE">Insurance</option>
+            <option value="HEAD_OFFICE">Head Office</option>
+            <option value="REGIONAL">Regional Office</option>
+          </select>
+        </div>
+
+        <!-- Status indicator (auto) -->
+        <div class="form-group">
+          <label class="form-label">Status Preview</label>
+          <div id="statusPreview" style="padding:8px 12px;border:1.5px solid var(--neutral-200);border-radius:var(--radius-sm);font-size:13px;color:var(--neutral-400);background:var(--neutral-50);min-height:36px;display:flex;align-items:center;">
+            Set expiry date to preview
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Attachment -->
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label" for="attachmentFile">Attachment</label>
+        <div class="file-upload-area" id="fileDropArea">
+          <input type="file" id="attachmentFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" />
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--neutral-400)" stroke-width="1.8" style="margin:0 auto 8px;display:block">
+            <polyline points="16 16 12 12 8 16"/>
+            <line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          </svg>
+          <div style="font-size:13px;color:var(--neutral-600);font-weight:600">Drag & drop file here, or click to browse</div>
+          <div class="file-upload-hint">Supported: PDF, JPG, PNG, DOC, XLS &nbsp;|&nbsp; Max size: 10MB</div>
+        </div>
+
+        <!-- File Preview -->
+        <div class="file-preview" id="filePreview" style="display:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span class="file-preview-name">filename.pdf</span>
+          <span class="file-preview-size">0 KB</span>
+          <button class="file-preview-remove" title="Remove file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button class="btn btn-primary btn-lg" id="saveBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save License
+      </button>
+      <button class="btn btn-outline btn-lg" id="resetBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Reset Form
+      </button>
+      <a href="index.html" class="btn btn-ghost btn-lg" style="margin-left:auto">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Cancel
+      </a>
+    </div>
+  </div>
+
+  <!-- HELPER INFO CARD -->
+  <div style="background:var(--primary-light);border:1.5px solid #bee3f8;border-radius:var(--radius-md);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin-top:16px">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" style="flex-shrink:0;margin-top:1px">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--primary-dark);margin-bottom:4px">How dates are classified</div>
+      <div style="font-size:12.5px;color:var(--neutral-700);line-height:1.6">
+        <span style="background:#fde8d8;color:#d03801;padding:1px 7px;border-radius:100px;font-weight:700;font-size:11px">Upcoming</span> &nbsp;Expires within 90 days &nbsp;&nbsp;
+        <span style="background:#fde8e8;color:#e02424;padding:1px 7px;border-radius:100px;font-weight:700;font-size:11px">Expired</span> &nbsp;Past expiry date &nbsp;&nbsp;
+        <span style="background:#def7ec;color:#057a55;padding:1px 7px;border-radius:100px;font-weight:700;font-size:11px">Active</span> &nbsp;More than 90 days remaining
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="script.js"></script>
+<script>
+  // Status preview on expiry date change
+  document.getElementById('expiryDate')?.addEventListener('change', function() {
+    const preview = document.getElementById('statusPreview');
+    if (!preview) return;
+    const status = typeof dateStatus === 'function' ? dateStatus(this.value) : 'neutral';
+    const cfg = {
+      expired:  { bg: '#fde8e8', color: '#e02424', label: '🔴 Expired' },
+      active:   { bg: '#def7ec', color: '#057a55', label: '🟢 Active' },
+      upcoming: { bg: '#fde8d8', color: '#d03801', label: '🟠 Expiring Soon' },
+      neutral:  { bg: 'var(--neutral-50)', color: 'var(--neutral-500)', label: 'Unknown' },
+    };
+    const c = cfg[status] || cfg.neutral;
+    preview.style.background = c.bg;
+    preview.style.color = c.color;
+    preview.style.borderColor = c.bg;
+    preview.style.fontWeight = '700';
+    preview.textContent = c.label;
+  });
+</script>
+</body>
+</html>

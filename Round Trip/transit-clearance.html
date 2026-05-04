@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Clearance Consignment - Round Trip ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Spinner -->
+<div class="spinner-overlay"><div class="spinner"></div></div>
+
+<!-- Top Nav -->
+<nav class="erp-topnav">
+  <a href="index.html" class="brand"><i class="fas fa-sync-alt"></i> ROUND TRIP ERP</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="transit-clearance.html" class="active">Going</a>
+    <a href="return-clearance.html">Return</a>
+  </div>
+  <div class="user-info ms-auto"><i class="fas fa-user-circle"></i> Admin User &nbsp;|&nbsp; <i class="fas fa-building"></i> Mombasa</div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+  <a href="index.html"><i class="fas fa-home"></i></a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="index.html">Round Trip</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <span class="current">Transit Clearance Consignment</span>
+</div>
+
+<!-- Page Content -->
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-file-invoice" style="color:var(--blue-primary);font-size:18px;margin-right:8px"></i>Transit Clearance Consignment</h1>
+    <div class="header-actions">
+      <button class="btn btn-print btn-sm btn-info"><i class="fas fa-print"></i> Print</button>
+      <a href="add-consignment.html" class="btn btn-primary"><i class="fas fa-plus"></i> Create Consignment</a>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-list"></i> All Consignments
+      <button onclick="location.reload()" style="border:none;background:none;cursor:pointer;color:var(--blue-primary);margin-left:4px" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+      <span class="total-info ms-auto text-muted" id="totalInfo" style="font-size:11px;font-weight:400"></span>
+    </div>
+
+    <div class="table-toolbar">
+      <div class="records-control">
+        <select class="form-control per-page-sel" style="width:60px;height:26px">
+          <option>10</option><option>25</option><option>50</option><option>100</option>
+        </select>
+        <span>records per page</span>
+      </div>
+      <div class="search-control">
+        <label>Search:</label>
+        <input type="text" class="form-control table-search" placeholder="Search..." style="width:180px;height:26px">
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="erp-table" id="consignmentTable">
+        <thead>
+          <tr>
+            <th data-col="fileNo">File No <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="referNo">Refer. Number <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="tansadNo">Tansad No <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="consignee">Consignee <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="destination">Destination <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="containers">Containers <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="eta">ETA <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="etb">ETB <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="vessel">Vessel <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="blNumber">B/L Number <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="slDoDate">S/L DO/Date <i class="fas fa-sort sort-icon"></i></th>
+            <th>DETAILS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-bar">
+      <span class="page-info"></span>
+      <div class="pagination-btns">
+        <button class="btn-prev" disabled>Previous</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="erp-footer">&copy; 2024 Round Trip ERP &bull; Freight Management System &bull; All Rights Reserved</footer>
+
+<script src="app.js"></script>
+<script>
+function initPage() {
+  function renderRow(row) {
+    const statusMap = { active: 'badge-active', pending: 'badge-pending', draft: 'badge-draft' };
+    return `<tr>
+      <td><strong style="color:var(--blue-primary);font-family:var(--mono);font-size:11px">${row.fileNo}</strong></td>
+      <td>${row.referNo}</td>
+      <td><span style="font-family:var(--mono);font-size:11px">${row.tansadNo}</span></td>
+      <td>${row.consignee}</td>
+      <td><i class="fas fa-map-marker-alt" style="color:var(--orange-primary);font-size:10px"></i> ${row.destination}</td>
+      <td><span class="badge badge-active">${row.containers}</span></td>
+      <td>${row.eta}</td>
+      <td>${row.etb}</td>
+      <td style="font-size:11px">${row.vessel}</td>
+      <td><span style="font-family:var(--mono);font-size:11px">${row.blNumber}</span></td>
+      <td>${row.slDoDate}</td>
+      <td>
+        <button class="action-btn action-view" onclick="showToast('Viewing details for ${row.fileNo}', 'info')">
+          <i class="fas fa-eye"></i> View
+        </button>
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn action-edit" onclick="window.location='add-consignment.html'"><i class="fas fa-edit"></i></button>
+          <button class="action-btn action-delete" onclick="showToast('Delete ${row.fileNo}?', 'error')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  const columns = ['fileNo','referNo','tansadNo','consignee','destination','containers','eta','etb','vessel','blNumber','slDoDate','',''];
+  initTable('consignmentTable', MOCK_CONSIGNMENTS, renderRow, columns);
+
+  // Update total info in card header
+  const totalInfoEl = document.getElementById('totalInfo');
+  if (totalInfoEl) {
+    const total = MOCK_CONSIGNMENTS.length;
+    const containers = MOCK_CONSIGNMENTS.reduce((a, r) => a + parseInt(r.containers) || 1, 0);
+    totalInfoEl.textContent = `Total items: ${total} / Total Containers: ${containers}`;
+  }
+}
+</script>
+</body>
+</html>

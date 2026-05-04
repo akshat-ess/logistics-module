@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Return Cargo Clearance - Round Trip ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.filter-panel .filter-row { display: flex; flex-direction: column; gap: 4px; }
+.filter-panel input {
+  width: 200px;
+  height: 28px;
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius);
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: var(--font);
+}
+.filter-panel input::placeholder { color: var(--text-secondary); }
+.filter-panel .btn { align-self: flex-end; }
+</style>
+</head>
+<body>
+
+<div class="spinner-overlay"><div class="spinner"></div></div>
+
+<!-- <nav class="erp-topnav">
+  <a href="index.html" class="brand"><i class="fas fa-sync-alt"></i> ROUND TRIP ERP</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="transit-clearance.html">Going</a>
+    <a href="return-clearance.html" class="active">Return</a>
+  </div>
+  <div class="user-info ms-auto"><i class="fas fa-user-circle"></i> Admin User &nbsp;|&nbsp; <i class="fas fa-building"></i> Mombasa</div>
+</nav> -->
+
+<!-- <div class="breadcrumb-bar">
+  <a href="index.html"><i class="fas fa-home"></i></a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="index.html">Round Trip</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <span class="current">Transit Return Cargo Clearance</span>
+</div> -->
+
+<div class="page-container">
+  <div class="page-header" style="align-items:flex-start">
+    <div>
+      <h1><i class="fas fa-undo-alt" style="color:var(--red-btn);font-size:18px;margin-right:8px"></i>Transit Return cargo Clearance Consignment</h1>
+      <div style="margin-top:8px">
+        <button class="btn btn-print btn-sm btn-info"><i class="fas fa-print"></i> Print</button>
+      </div>
+    </div>
+    <div class="filter-panel">
+      <div class="filter-row">
+        <input type="text" id="filterFileNo" placeholder="Search File No▼">
+      </div>
+      <div class="filter-row">
+        <input type="text" id="filterContainer" placeholder="Enter Container No">
+      </div>
+      <a href="return-consignment.html" class="btn btn-primary"><i class="fas fa-plus"></i> Create Return cargo</a>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-list"></i> All Consignments
+      <button onclick="location.reload()" style="border:none;background:none;cursor:pointer;color:var(--blue-primary);margin-left:4px" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+    </div>
+
+    <div class="table-toolbar">
+      <div class="records-control">
+        <select class="form-control per-page-sel" style="width:60px;height:26px">
+          <option>10</option><option>25</option><option>50</option><option>100</option>
+        </select>
+        <span>records per page</span>
+      </div>
+      <div class="search-control">
+        <label>Search:</label>
+        <input type="text" class="form-control table-search" placeholder="Search..." style="width:180px;height:26px">
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="erp-table" id="returnTable">
+        <thead>
+          <tr>
+            <th data-col="uin">UIN <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="fileNo">File No <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="client">Client <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="destination">Destination <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="truckDetails">Truck Details <i class="fas fa-sort sort-icon"></i></th>
+            <th data-col="remarks">Remarks <i class="fas fa-sort sort-icon"></i></th>
+            <th>DETAILS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-bar">
+      <span class="page-info"></span>
+      <div class="pagination-btns">
+        <button class="btn-prev" disabled>Previous</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <footer class="erp-footer">&copy; 2024 Round Trip ERP &bull; Freight Management System &bull; All Rights Reserved</footer> -->
+
+<script src="app.js"></script>
+<script>
+function initPage() {
+  function renderRow(row) {
+    const statusMap = { active: 'badge-active', pending: 'badge-pending', draft: 'badge-draft' };
+    const statusLabel = { active: 'Active', pending: 'Pending', draft: 'Draft' };
+    return `<tr>
+      <td><strong style="color:var(--red-btn);font-family:var(--mono);font-size:11px">${row.uin}</strong></td>
+      <td><span style="font-family:var(--mono);font-size:11px;color:var(--blue-primary)">${row.fileNo}</span></td>
+      <td>${row.client}</td>
+      <td><i class="fas fa-map-marker-alt" style="color:var(--orange-primary);font-size:10px"></i> ${row.destination}</td>
+      <td><i class="fas fa-truck" style="color:var(--text-secondary);font-size:10px;margin-right:4px"></i>${row.truckDetails}</td>
+      <td>${row.remarks ? `<span style="font-size:11px;color:var(--text-secondary)">${row.remarks}</span>` : '<span style="color:var(--grey-border)">—</span>'}</td>
+      <td>
+        <button class="action-btn action-view" onclick="showToast('Viewing details for ${row.fileNo}', 'info')">
+          <i class="fas fa-eye"></i> View
+        </button>
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn action-edit" onclick="window.location='return-consignment.html'"><i class="fas fa-edit"></i></button>
+          <button class="action-btn action-delete" onclick="showToast('Delete ${row.fileNo}?', 'error')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  const columns = ['uin','fileNo','client','destination','truckDetails','remarks','',''];
+  const tableCtrl = initTable('returnTable', MOCK_RETURN_CONSIGNMENTS, renderRow, columns);
+
+  // Filter by File No
+  const filterFileNo = document.getElementById('filterFileNo');
+  const filterContainer = document.getElementById('filterContainer');
+
+  function applyFilters() {
+    const fn = filterFileNo.value.toLowerCase();
+    const cn = filterContainer.value.toLowerCase();
+    if (tableCtrl) {
+      tableCtrl.state.data = MOCK_RETURN_CONSIGNMENTS.filter(r => {
+        const matchFn = !fn || r.fileNo.toLowerCase().includes(fn);
+        const matchCn = !cn || r.truckDetails.toLowerCase().includes(cn);
+        return matchFn && matchCn;
+      });
+      tableCtrl.state.page = 1;
+      tableCtrl.render();
+    }
+  }
+
+  filterFileNo.addEventListener('input', applyFilters);
+  filterContainer.addEventListener('input', applyFilters);
+}
+</script>
+</body>
+</html>

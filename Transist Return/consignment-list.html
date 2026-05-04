@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Return Cargo Clearance Consignment</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f4f6f9;
+    --erp-primary: #3498db;
+    --erp-success: #27ae60;
+    --erp-danger: #e74c3c;
+    --erp-warning: #f39c12;
+    --erp-text: #2c3e50;
+    --erp-border: #dee2e6;
+  }
+  body { background: var(--erp-bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--erp-text); margin: 0; }
+  .top-nav { background: #2c3e50; color: #fff; padding: 0 20px; height: 50px; display: flex; align-items: center; justify-content: space-between; }
+  .top-nav .brand { font-size: 16px; font-weight: 600; }
+  .top-nav .nav-right { display: flex; align-items: center; gap: 15px; font-size: 13px; }
+  .sidebar { width: 220px; background: #fff; height: calc(100vh - 50px); border-right: 1px solid var(--erp-border); position: fixed; top: 50px; left: 0; overflow-y: auto; z-index: 100; }
+  .sidebar .menu-label { font-size: 10px; font-weight: 700; color: #999; padding: 8px 16px 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .sidebar .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #555; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .sidebar .menu-item:hover, .sidebar .menu-item.active { background: #e8f4fd; color: var(--erp-primary); }
+  .sidebar .menu-item i { width: 18px; font-size: 14px; }
+  .main-content { margin-left: 220px; padding: 24px; min-height: calc(100vh - 50px); }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--erp-text); margin-bottom: 16px; }
+  .breadcrumb { font-size: 13px; background: none; padding: 0; margin-bottom: 12px; }
+  .breadcrumb-item a { color: var(--erp-primary); text-decoration: none; }
+
+  /* ACTION BUTTONS ROW */
+  .action-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .action-btns .btn { font-size: 12px; padding: 4px 10px; border-radius: 3px; }
+
+  /* FILTER BADGES ROW */
+  .filter-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+  .filter-badge { font-size: 12px; padding: 4px 12px; border-radius: 3px; cursor: pointer; border: none; font-weight: 500; }
+  .fb-blue { background: #3498db; color: #fff; }
+  .fb-green { background: #27ae60; color: #fff; }
+  .fb-red { background: #e74c3c; color: #fff; }
+  .fb-orange { background: #e67e22; color: #fff; }
+  .fb-teal { background: #1abc9c; color: #fff; }
+  .fb-purple { background: #9b59b6; color: #fff; }
+  .fb-grey { background: #95a5a6; color: #fff; }
+  .filter-badge:hover { opacity: 0.85; }
+  .filter-badge.active-filter { box-shadow: 0 0 0 2px #333; }
+
+  /* SEARCH + CREATE ROW */
+  .search-create-row { display: flex; justify-content: flex-end; align-items: flex-start; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .search-create-row input { font-size: 12px; padding: 5px 10px; border: 1px solid #ccc; border-radius: 3px; width: 180px; }
+  .search-create-row input::placeholder { color: #bbb; }
+  .btn-create { background: #2980b9; color: #fff; border: none; padding: 6px 16px; border-radius: 3px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-create:hover { background: #2471a3; }
+
+  /* TABLE CARD */
+  .table-card { background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .table-card-header { padding: 10px 16px; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .table-card-header .refresh-btn { cursor: pointer; color: var(--erp-primary); font-size: 15px; }
+
+  .table-controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; flex-wrap: wrap; gap: 8px; }
+  .records-sel { display: flex; align-items: center; gap: 6px; }
+  .records-sel select { padding: 3px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; }
+  .table-search { display: flex; align-items: center; gap: 6px; }
+  .table-search input { padding: 4px 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; width: 200px; }
+
+  /* MAIN TABLE */
+  .erp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .erp-table thead th { background: #f8f9fa; padding: 10px 12px; font-weight: 600; border-bottom: 2px solid var(--erp-border); white-space: nowrap; cursor: pointer; user-select: none; }
+  .erp-table thead th .sort-icon { color: #aaa; margin-left: 4px; font-size: 11px; }
+  .erp-table thead th:hover { background: #e9ecef; }
+  .erp-table tbody td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .erp-table tbody tr:hover { background: #f0f7ff; }
+
+  .badge-border-days { display: inline-block; background: #856404; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-top: 3px; }
+  .btn-cover { background: #5bc0de; color: #fff; border: none; font-size: 11px; padding: 3px 8px; border-radius: 3px; cursor: pointer; display: block; margin-bottom: 3px; width: 100px; }
+  .btn-trans { background: #5cb85c; color: #fff; border: none; font-size: 11px; padding: 3px 8px; border-radius: 3px; cursor: pointer; display: block; width: 100px; }
+  .btn-cover:hover { background: #46b8da; }
+  .btn-trans:hover { background: #4cae4c; }
+
+  .action-icons { display: flex; flex-direction: column; gap: 3px; }
+  .action-icons a { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 3px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .act-edit { background: #3498db; color: #fff; }
+  .act-approve { background: #27ae60; color: #fff; }
+  .act-delete { background: #e74c3c; color: #fff; }
+  .act-edit:hover { background: #2980b9; }
+  .act-approve:hover { background: #219a52; }
+  .act-delete:hover { background: #c0392b; }
+
+  .pagination-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 13px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; gap: 8px; }
+  .pagination-btns { display: flex; gap: 4px; }
+  .page-btn { padding: 4px 10px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer; font-size: 12px; }
+  .page-btn.active { background: var(--erp-primary); color: #fff; border-color: var(--erp-primary); }
+  .page-btn:hover:not(.active) { background: #f0f0f0; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="brand"><i class="fas fa-shipping-fast me-2"></i>TransitERP &mdash; Cargo Management System</div>
+  <div class="nav-right">
+    <span><i class="fas fa-bell"></i></span>
+    <span><i class="fas fa-user-circle me-1"></i>Admin User</span>
+    <span><i class="fas fa-sign-out-alt"></i></span>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="menu-section">
+    <div class="menu-label">Main</div>
+    <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="consignment-list.html" class="menu-item active"><i class="fas fa-list-alt"></i>Consignments</a>
+    <a href="add-consignment-file.html" class="menu-item"><i class="fas fa-plus-circle"></i>New Return Cargo</a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">Reports</div>
+    <a href="#" class="menu-item"><i class="fas fa-print"></i>Print Reports</a>
+    <a href="#" class="menu-item"><i class="fas fa-chart-bar"></i>Analytics</a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="dashboard.html">Home</a></li><li class="breadcrumb-item active">Transit Return Cargo Clearance Consignment</li></ol></nav>
+
+  <div class="page-title">Transit Return cargo Clearance Consignment</div>
+
+  <!-- ACTION BUTTONS ROW 1 -->
+  <div class="action-btns mb-1">
+    <button class="btn btn-primary btn-sm"><i class="fas fa-print me-1"></i>Print</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-print me-1"></i>Print Management Report</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-sync me-1"></i>Reload Report</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-file-alt me-1"></i>VS Cargo Report</button>
+    <button class="btn btn-warning btn-sm text-white"><i class="fas fa-bolt me-1"></i>Quickmax</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-file-alt me-1"></i>VS CARGO Report</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-file-alt me-1"></i>BRIDGE SHIPPING Report</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-file-alt me-1"></i>SIMBA SUPPLY CHAIN SOLUTIONS Report</button>
+    <button class="btn btn-primary btn-sm"><i class="fas fa-file-alt me-1"></i>IMPERIAL ROAD HAULAGE LTD Report</button>
+  </div>
+
+  <!-- ACTION BUTTONS ROW 2 + STATUS FILTERS -->
+  <div class="filter-row">
+    <button class="filter-badge fb-blue"><i class="fas fa-sync me-1"></i>RELOAD LOGISTICS Report</button>
+    <button class="filter-badge fb-blue"><i class="fas fa-book me-1"></i>Booking Report</button>
+    <button class="filter-badge fb-green"><i class="fas fa-check-circle me-1"></i>Confirmed Bookings</button>
+    <button class="filter-badge fb-red" onclick="filterTable('No Return Given')"><i class="fas fa-times-circle me-1"></i>No Return Given Report</button>
+    <button class="filter-badge fb-red" onclick="filterTable('No Return Given')"><i class="fas fa-search me-1"></i>No Return Given Search</button>
+    <button class="filter-badge fb-teal" onclick="filterTable('Delivered')"><i class="fas fa-check me-1"></i>Delivered</button>
+    <button class="filter-badge fb-teal" onclick="filterTable('Offloading')"><i class="fas fa-download me-1"></i>Offloading Report</button>
+    <button class="filter-badge fb-grey" onclick="filterTable('Cancelled')"><i class="fas fa-ban me-1"></i>Cancelled</button>
+    <button class="filter-badge fb-orange" onclick="filterTable('')"><i class="fas fa-list me-1"></i>All</button>
+  </div>
+
+  <!-- SEARCH + CREATE ROW -->
+  <div class="search-create-row">
+    <input type="text" id="fileSearch" placeholder="Search File No▼" oninput="filterTable('')">
+    <input type="text" id="containerSearch" placeholder="Enter Container No" oninput="filterTable('')">
+    <button class="btn-create" onclick="window.location.href='add-consignment-file.html'">Create Return Cargo</button>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="table-card">
+    <div class="table-card-header">
+      All Consignments <i class="fas fa-sync-alt refresh-btn ms-1" onclick="loadTableData()" title="Refresh"></i>
+    </div>
+    <div class="table-controls">
+      <div class="records-sel">
+        <select id="perPage" onchange="renderTable()">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
+        <span>records per page</span>
+      </div>
+      <div class="table-search">
+        <label>Search:</label>
+        <input type="text" id="tableSearch" oninput="filterTable('')" placeholder="">
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="erp-table" id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">UIN <i class="fas fa-sort sort-icon"></i></th>
+            <th onclick="sortTable(1)">File No <i class="fas fa-sort sort-icon"></i></th>
+            <th onclick="sortTable(2)">Client <i class="fas fa-sort sort-icon"></i></th>
+            <th onclick="sortTable(3)">Destination <i class="fas fa-sort sort-icon"></i></th>
+            <th onclick="sortTable(4)">Truck Details <i class="fas fa-sort sort-icon"></i></th>
+            <th onclick="sortTable(5)">Remarks <i class="fas fa-sort sort-icon"></i></th>
+            <th>DETAILS <i class="fas fa-sort sort-icon"></i></th>
+            <th>ACTION <i class="fas fa-sort sort-icon"></i></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination-row">
+      <div id="pageInfo">Showing 1 to 3 of 3 entries</div>
+      <div class="pagination-btns">
+        <button class="page-btn" onclick="changePage(-1)">Previous</button>
+        <button class="page-btn active" id="pageNum">1</button>
+        <button class="page-btn" onclick="changePage(1)">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const allData = [
+  { uin:'BRIDGE', file:'TRU/HLL/BRIDGESHIPPI/2026/299', client:'BRIDGE SHIPPING', dest:'IRINGA, TANZANIA', truck:'CAC1880ZM/CAC1884ZM', borderDays:'5 Border Days', remarks:'Offloaded' },
+  { uin:'BRIDGE', file:'TRU/HLL/BRIDGESHIPPI/2026/329', client:'BRIDGE SHIPPING', dest:'DAR ES SALAAM, TANZANIA', truck:'T254DWU /T257DWU', borderDays:'7 Border Days', remarks:'Offloaded' },
+  { uin:'BRIDGE', file:'TRU/HLL/BRIDGESHIPPI/2026/384', client:'BRIDGE SHIPPING', dest:'DAR ES SALAAM, TANZANIA', truck:'CAC1881ZM/CAC1883ZM', borderDays:'', remarks:'Offloaded' },
+  { uin:'SIMBA',  file:'TRU/HLL/SIMBASUPPLY/2026/112',  client:'SIMBA SUPPLY CHAIN', dest:'LUSAKA, ZAMBIA', truck:'ZMB4421A/ZMB4425A', borderDays:'3 Border Days', remarks:'In Transit' },
+  { uin:'IMP',    file:'TRU/HLL/IMPERIALROAD/2026/078', client:'IMPERIAL ROAD HAULAGE', dest:'NAIROBI, KENYA', truck:'KCA234B/KCA238B', borderDays:'', remarks:'Delivered' },
+  { uin:'VSCG',   file:'TRU/HLL/VSCARGO/2026/045',      client:'VS CARGO', dest:'KAMPALA, UGANDA', truck:'UGA5512B/UGA5515B', borderDays:'2 Border Days', remarks:'In Transit' },
+  { uin:'QMAX',   file:'TRU/HLL/QUICKMAX/2026/031',     client:'QUICKMAX LOGISTICS', dest:'BEIRA, MOZAMBIQUE', truck:'MOZ3310C/MOZ3312C', borderDays:'', remarks:'Offloading' },
+];
+
+let filteredData = [...allData];
+let currentPage = 1;
+let sortCol = -1, sortAsc = true;
+
+function loadTableData() { filteredData = [...allData]; currentPage = 1; renderTable(); }
+
+function renderTable() {
+  const perPage = parseInt(document.getElementById('perPage').value);
+  const tbody = document.getElementById('tableBody');
+  const start = (currentPage - 1) * perPage;
+  const end = start + perPage;
+  const pageData = filteredData.slice(start, end);
+
+  tbody.innerHTML = '';
+  if (pageData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#888;padding:20px;">No data available in table</td></tr>';
+  } else {
+    pageData.forEach((row, i) => {
+      const borderBadge = row.borderDays ? `<br><span class="badge-border-days">${row.borderDays}</span>` : '';
+      tbody.innerHTML += `
+        <tr>
+          <td>${row.uin}</td>
+          <td>${row.file}</td>
+          <td>${row.client}</td>
+          <td>${row.dest}</td>
+          <td>${row.truck}${borderBadge}</td>
+          <td>${row.remarks}</td>
+          <td>
+            <button class="btn-cover"><i class="fas fa-file me-1"></i>Cover Page</button>
+            <button class="btn-trans"><i class="fas fa-dollar-sign me-1"></i>Trans Payment</button>
+          </td>
+          <td>
+            <div class="action-icons">
+              <a class="act-edit" href="add-consignment-file.html" title="Edit"><i class="fas fa-edit"></i></a>
+              <a class="act-approve" href="#" title="Approve"><i class="fas fa-check"></i></a>
+              <a class="act-delete" href="#" title="Delete" onclick="return confirm('Delete this record?')"><i class="fas fa-times"></i></a>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+  const total = filteredData.length;
+  const showing_end = Math.min(end, total);
+  document.getElementById('pageInfo').textContent = total === 0
+    ? 'Showing 0 to 0 of 0 entries'
+    : `Showing ${start + 1} to ${showing_end} of ${total} entries`;
+  document.getElementById('pageNum').textContent = currentPage;
+}
+
+function filterTable(statusFilter) {
+  const file = document.getElementById('fileSearch').value.toLowerCase();
+  const container = document.getElementById('containerSearch').value.toLowerCase();
+  const search = document.getElementById('tableSearch').value.toLowerCase();
+  filteredData = allData.filter(r => {
+    const matchFile = !file || r.file.toLowerCase().includes(file);
+    const matchCont = !container || r.truck.toLowerCase().includes(container);
+    const matchSearch = !search || Object.values(r).some(v => String(v).toLowerCase().includes(search));
+    const matchStatus = !statusFilter || r.remarks.toLowerCase().includes(statusFilter.toLowerCase());
+    return matchFile && matchCont && matchSearch && matchStatus;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function changePage(dir) {
+  const perPage = parseInt(document.getElementById('perPage').value);
+  const maxPage = Math.max(1, Math.ceil(filteredData.length / perPage));
+  currentPage = Math.min(Math.max(1, currentPage + dir), maxPage);
+  renderTable();
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; }
+  const keys = ['uin','file','client','dest','truck','remarks'];
+  filteredData.sort((a, b) => {
+    const av = Object.values(a)[col] || '';
+    const bv = Object.values(b)[col] || '';
+    return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  renderTable();
+}
+
+loadTableData();
+</script>
+</body>
+</html>

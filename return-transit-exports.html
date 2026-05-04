@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Return Transit Exports | ERP Logistics</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    /* ========================================================
+       ERP GLOBAL VARIABLES & RESET
+    ======================================================== */
+    :root {
+      --erp-bg:           #f0f2f5;
+      --erp-panel-bg:     #ffffff;
+      --erp-border:       #d1d5db;
+      --erp-header-bg:    #e8eaed;
+      --erp-thead-bg:     #dee2e6;
+      --erp-thead-text:   #343a40;
+      --erp-row-hover:    #f5f7fa;
+      --erp-text:         #212529;
+      --erp-muted:        #6c757d;
+      --erp-blue:         #1a6fc4;
+      --erp-blue-hover:   #155a9e;
+      --erp-teal:         #0d9488;
+      --erp-teal-hover:   #0a7a70;
+      --erp-light-btn:    #5bc0de;
+      --erp-light-btn-h:  #46b8da;
+      --font-main:        'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--erp-bg);
+      color: var(--erp-text);
+      font-size: 13.5px;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ========================================================
+       TOP NAV BAR (branding strip)
+    ======================================================== */
+    .erp-topbar {
+      background: #1e3a5f;
+      color: #fff;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      border-bottom: 2px solid #0d2a4a;
+    }
+    .erp-topbar .module-name {
+      font-size: 11px;
+      font-weight: 400;
+      color: #a0b4cc;
+      margin-left: 12px;
+      padding-left: 12px;
+      border-left: 1px solid #3a5a7a;
+    }
+    .erp-topbar .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: #a0b4cc;
+    }
+    .erp-topbar .topbar-right i { font-size: 14px; }
+
+    /* ========================================================
+       BREADCRUMB
+    ======================================================== */
+    .erp-breadcrumb {
+      background: #e4e8ef;
+      border-bottom: 1px solid #c8cdd6;
+      padding: 5px 20px;
+      font-size: 11.5px;
+      color: var(--erp-muted);
+    }
+    .erp-breadcrumb a {
+      color: var(--erp-blue);
+      text-decoration: none;
+    }
+    .erp-breadcrumb a:hover { text-decoration: underline; }
+    .erp-breadcrumb .sep { margin: 0 5px; color: #aaa; }
+
+    /* ========================================================
+       MAIN CONTENT WRAPPER
+    ======================================================== */
+    .erp-main {
+      padding: 18px 20px 40px;
+    }
+
+    /* ========================================================
+       PAGE HEADER CARD
+    ======================================================== */
+    .erp-page-header {
+      background: var(--erp-panel-bg);
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .erp-page-header .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .erp-page-header .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ========================================================
+       BUTTON STYLES
+    ======================================================== */
+    .btn-erp-print {
+      background-color: var(--erp-light-btn);
+      border: 1px solid #46b8da;
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-erp-print:hover { background-color: var(--erp-light-btn-h); color: #fff; }
+
+    .btn-erp-delivered {
+      background-color: var(--erp-teal);
+      border: 1px solid var(--erp-teal-hover);
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-erp-delivered:hover { background-color: var(--erp-teal-hover); color: #fff; }
+
+    .btn-erp-primary {
+      background-color: var(--erp-blue);
+      border: 1px solid var(--erp-blue-hover);
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-erp-primary:hover { background-color: var(--erp-blue-hover); color: #fff; }
+
+    /* ========================================================
+       TABLE PANEL CARD
+    ======================================================== */
+    .erp-table-panel {
+      background: var(--erp-panel-bg);
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    /* ========================================================
+       TABLE TOOLBAR (records per page + search)
+    ======================================================== */
+    .erp-table-toolbar {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--erp-border);
+      background: #fbfcfd;
+    }
+    .erp-table-toolbar .records-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--erp-muted);
+    }
+    .erp-table-toolbar select {
+      padding: 3px 6px;
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      font-size: 12.5px;
+      background: #fff;
+      color: var(--erp-text);
+      cursor: pointer;
+    }
+    .erp-table-toolbar .search-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--erp-muted);
+    }
+    .erp-table-toolbar .search-wrapper input {
+      padding: 4px 8px;
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      font-size: 12.5px;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .erp-table-toolbar .search-wrapper input:focus {
+      border-color: var(--erp-blue);
+      box-shadow: 0 0 0 2px rgba(26,111,196,0.12);
+    }
+
+    /* ========================================================
+       DATA TABLE
+    ======================================================== */
+    .erp-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .erp-data-table thead tr {
+      background: var(--erp-thead-bg);
+    }
+    .erp-data-table thead th {
+      padding: 8px 12px;
+      font-weight: 600;
+      color: var(--erp-thead-text);
+      border: 1px solid var(--erp-border);
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .erp-data-table thead th:hover { background: #d0d5dc; }
+    .erp-data-table thead th .sort-icons {
+      display: inline-flex;
+      flex-direction: column;
+      margin-left: 4px;
+      vertical-align: middle;
+      opacity: 0.45;
+      font-size: 9px;
+      line-height: 1;
+      gap: 0;
+    }
+    .erp-data-table thead th.sort-asc .sort-icons,
+    .erp-data-table thead th.sort-desc .sort-icons { opacity: 1; }
+
+    .erp-data-table tbody tr {
+      border-bottom: 1px solid #ebebeb;
+      transition: background 0.1s;
+    }
+    .erp-data-table tbody tr:hover { background: var(--erp-row-hover); }
+    .erp-data-table tbody td {
+      padding: 7px 12px;
+      border-right: 1px solid #ebebeb;
+      vertical-align: middle;
+    }
+    .erp-data-table tbody td:last-child { border-right: none; }
+
+    .no-data-row td {
+      text-align: center;
+      color: var(--erp-muted);
+      padding: 24px 12px !important;
+      font-style: italic;
+      font-size: 12.5px;
+    }
+
+    /* ========================================================
+       ACTION COLUMN BUTTONS
+    ======================================================== */
+    .btn-action {
+      padding: 3px 9px;
+      font-size: 11.5px;
+      border-radius: 2px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-right: 3px;
+      transition: opacity 0.15s;
+    }
+    .btn-action:hover { opacity: 0.85; }
+    .btn-edit {
+      background: #1a6fc4;
+      color: #fff;
+      border-color: #155a9e;
+    }
+    .btn-delete {
+      background: #dc3545;
+      color: #fff;
+      border-color: #bd2130;
+    }
+    .btn-view {
+      background: #0d9488;
+      color: #fff;
+      border-color: #0a7a70;
+    }
+
+    /* ========================================================
+       TABLE FOOTER (pagination)
+    ======================================================== */
+    .erp-table-footer {
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--erp-border);
+      background: #fbfcfd;
+      font-size: 12.5px;
+      color: var(--erp-muted);
+    }
+    .erp-pagination {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .erp-pagination button {
+      padding: 4px 12px;
+      font-size: 12px;
+      border: 1px solid var(--erp-border);
+      background: #fff;
+      color: var(--erp-text);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .erp-pagination button:hover:not(:disabled) { background: #e8eaed; }
+    .erp-pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .erp-pagination button.active {
+      background: var(--erp-blue);
+      color: #fff;
+      border-color: var(--erp-blue);
+    }
+
+    /* ========================================================
+       STATUS BADGE
+    ======================================================== */
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-transit { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+    .badge-delivered { background: #d1e7dd; color: #0a5c36; border: 1px solid #75c897; }
+    .badge-pending { background: #f8d7da; color: #842029; border: 1px solid #f1aeb5; }
+
+    /* ========================================================
+       TOAST NOTIFICATION
+    ======================================================== */
+    .erp-toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .erp-toast {
+      background: #1e3a5f;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.25s ease;
+      min-width: 280px;
+    }
+    .erp-toast.success { border-left: 4px solid #0d9488; }
+    .erp-toast.info    { border-left: 4px solid #1a6fc4; }
+    .erp-toast.warning { border-left: 4px solid #f59e0b; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ========================================================
+       HORIZONTAL SCROLLBAR AREA
+    ======================================================== */
+    .erp-table-scroll {
+      overflow-x: auto;
+    }
+    .erp-table-scroll::-webkit-scrollbar { height: 6px; }
+    .erp-table-scroll::-webkit-scrollbar-track { background: #f1f3f5; }
+    .erp-table-scroll::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================
+       TOP NAV BAR
+  ======================================================= -->
+  <!-- <div class="erp-topbar">
+    <i class="bi bi-box-seam"></i>
+    <span style="margin-left:8px;">LogiERP</span>
+    <span class="module-name">Logistics &amp; Transit Management</span>
+    <div class="topbar-right">
+      <span><i class="bi bi-bell"></i></span>
+      <span><i class="bi bi-person-circle"></i> Admin User</span>
+      <span><i class="bi bi-box-arrow-right"></i></span>
+    </div>
+  </div> -->
+
+  <!-- ======================================================
+       BREADCRUMB
+  ======================================================= -->
+  <!-- <div class="erp-breadcrumb">
+    <a href="#">Home</a>
+    <span class="sep">›</span>
+    <a href="#">Logistics</a>
+    <span class="sep">›</span>
+    <span>Return Transit Exports</span>
+  </div> -->
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ======================================================= -->
+  <div class="erp-main">
+
+    <!-- PAGE HEADER -->
+    <div class="erp-page-header">
+      <h1 class="page-title">
+        <i class="bi bi-arrow-return-left" style="color:#1a6fc4;margin-right:8px;font-size:16px;"></i>
+        Return Transit Exports
+      </h1>
+      <div class="header-actions">
+        <button class="btn-erp-print" onclick="handlePrint()">
+          <i class="bi bi-printer-fill" style="margin-right:4px;"></i>Print
+        </button>
+        <button class="btn-erp-delivered" onclick="showToast('Filtered by Delivered status','info')">
+          <i class="bi bi-check-circle-fill" style="margin-right:4px;"></i>Delivered
+        </button>
+        <button class="btn-erp-primary" onclick="window.location.href='add-return-transit-consignment.html'">
+          <i class="bi bi-plus-lg" style="margin-right:4px;"></i>Create Consignment
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE PANEL -->
+    <div class="erp-table-panel">
+
+      <!-- Toolbar -->
+      <div class="erp-table-toolbar">
+        <div class="records-label">
+          <label for="recordsPerPage">Show</label>
+          <select id="recordsPerPage" onchange="changePageSize(this.value)">
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span>records per page</span>
+        </div>
+        <div class="search-wrapper">
+          <label for="tableSearch">Search:</label>
+          <input type="text" id="tableSearch" placeholder="Search records..." oninput="filterTable(this.value)" />
+        </div>
+      </div>
+
+      <!-- Scrollable Table -->
+      <div class="erp-table-scroll">
+        <table class="erp-data-table" id="mainTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)" data-col="0">
+                UIN <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th onclick="sortTable(1)" data-col="1">
+                File No <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th onclick="sortTable(2)" data-col="2">
+                Consignee <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th onclick="sortTable(3)" data-col="3">
+                Truck_Trailer <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th onclick="sortTable(4)" data-col="4">
+                Container No. <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th onclick="sortTable(5)" data-col="5">
+                Commodity <span class="sort-icons"><i class="bi bi-caret-up-fill"></i><i class="bi bi-caret-down-fill"></i></span>
+              </th>
+              <th style="cursor:default; min-width:140px;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer / Pagination -->
+      <div class="erp-table-footer">
+        <div id="entriesInfo">Showing 0 to 0 of 0 entries</div>
+        <div class="erp-pagination" id="paginationControls">
+          <button id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+          <button id="nextBtn" onclick="changePage(1)" disabled>Next</button>
+        </div>
+      </div>
+
+    </div><!-- /erp-table-panel -->
+
+  </div><!-- /erp-main -->
+
+  <!-- ======================================================
+       TOAST CONTAINER
+  ======================================================= -->
+  <div class="erp-toast-container" id="toastContainer"></div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ============================================================
+       DUMMY DATA  — replace with real API call
+    ============================================================ */
+    const dummyData = [
+      { uin: "UIN-2024-001", fileNo: "FN-10231", consignee: "Alpha Traders Ltd",    truck: "KCA 123A",  container: "TCKU3456789", commodity: "Electronics",    status: "transit" },
+      { uin: "UIN-2024-002", fileNo: "FN-10232", consignee: "Beta Logistics Co.",   truck: "KCB 456B",  container: "MSCU9876543", commodity: "Textiles",       status: "delivered" },
+      { uin: "UIN-2024-003", fileNo: "FN-10233", consignee: "Gamma Imports Ltd",    truck: "KCC 789C",  container: "HLXU1122334", commodity: "Machinery",      status: "pending" },
+      { uin: "UIN-2024-004", fileNo: "FN-10234", consignee: "Delta Supplies Inc.",  truck: "KCD 012D",  container: "CMAU5566778", commodity: "Foodstuffs",     status: "transit" },
+      { uin: "UIN-2024-005", fileNo: "FN-10235", consignee: "Epsilon Global Ltd",   truck: "KCE 345E",  container: "TEMU8899001", commodity: "Chemicals",      status: "delivered" },
+      { uin: "UIN-2024-006", fileNo: "FN-10236", consignee: "Zeta Freight Co.",     truck: "KCF 678F",  container: "OOLU2233445", commodity: "Auto Parts",     status: "transit" },
+      { uin: "UIN-2024-007", fileNo: "FN-10237", consignee: "Eta Cargo Services",   truck: "KCG 901G",  container: "APZU6677889", commodity: "Steel Products", status: "pending" },
+      { uin: "UIN-2024-008", fileNo: "FN-10238", consignee: "Theta Distributors",   truck: "KCH 234H",  container: "GESU0011223", commodity: "Plastics",       status: "delivered" },
+      { uin: "UIN-2024-009", fileNo: "FN-10239", consignee: "Iota Trading Ltd",     truck: "KCI 567I",  container: "MAEU3344556", commodity: "Furniture",      status: "transit" },
+      { uin: "UIN-2024-010", fileNo: "FN-10240", consignee: "Kappa Imports Co.",    truck: "KCJ 890J",  container: "TCKU7788990", commodity: "Paper Products", status: "transit" },
+      { uin: "UIN-2024-011", fileNo: "FN-10241", consignee: "Lambda Exports Ltd",   truck: "KCK 123K",  container: "MSCU1122334", commodity: "Garments",       status: "delivered" },
+      { uin: "UIN-2024-012", fileNo: "FN-10242", consignee: "Mu Cargo International",truck: "KCL 456L", container: "HLXU5566779", commodity: "Electronics",    status: "pending" },
+    ];
+
+    /* ============================================================
+       STATE
+    ============================================================ */
+    let filteredData  = [...dummyData];
+    let currentPage   = 1;
+    let pageSize      = 10;
+    let sortCol       = -1;
+    let sortAsc       = true;
+
+    /* ============================================================
+       RENDER TABLE
+    ============================================================ */
+    function renderTable() {
+      const tbody    = document.getElementById("tableBody");
+      const start    = (currentPage - 1) * pageSize;
+      const end      = Math.min(start + pageSize, filteredData.length);
+      const pageRows = filteredData.slice(start, end);
+
+      if (pageRows.length === 0) {
+        tbody.innerHTML = `<tr class="no-data-row"><td colspan="7">No data available in table</td></tr>`;
+        updateFooter(0, 0, 0);
+        renderPagination(0);
+        return;
+      }
+
+      tbody.innerHTML = pageRows.map((row, idx) => `
+        <tr>
+          <td>${row.uin}</td>
+          <td>${row.fileNo}</td>
+          <td>${row.consignee}</td>
+          <td>${row.truck}</td>
+          <td><code style="font-size:11.5px;">${row.container}</code></td>
+          <td>${row.commodity}</td>
+          <td>
+            <button class="btn-action btn-view"   onclick="viewRow('${row.uin}')"><i class="bi bi-eye"></i> View</button>
+            <button class="btn-action btn-edit"   onclick="editRow('${row.uin}')"><i class="bi bi-pencil"></i></button>
+            <button class="btn-action btn-delete" onclick="deleteRow('${row.uin}')"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join("");
+
+      updateFooter(start + 1, end, filteredData.length);
+      renderPagination(filteredData.length);
+    }
+
+    /* ============================================================
+       FOOTER INFO + PAGINATION
+    ============================================================ */
+    function updateFooter(from, to, total) {
+      document.getElementById("entriesInfo").textContent =
+        `Showing ${from} to ${to} of ${total} ${total === 1 ? "entry" : "entries"}`;
+    }
+
+    function renderPagination(total) {
+      const totalPages = Math.ceil(total / pageSize);
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages || total === 0;
+
+      // Build numbered page buttons
+      const ctrl = document.getElementById("paginationControls");
+      // Remove existing page number buttons
+      ctrl.querySelectorAll(".page-num-btn").forEach(b => b.remove());
+
+      if (totalPages > 1) {
+        const fragment = document.createDocumentFragment();
+        for (let p = 1; p <= Math.min(totalPages, 7); p++) {
+          const btn = document.createElement("button");
+          btn.textContent = p;
+          btn.className = "page-num-btn" + (p === currentPage ? " active" : "");
+          btn.onclick = () => { currentPage = p; renderTable(); };
+          fragment.appendChild(btn);
+        }
+        // Insert after Previous button
+        prevBtn.after(fragment);
+      }
+    }
+
+    function changePage(dir) {
+      const total = filteredData.length;
+      const totalPages = Math.ceil(total / pageSize);
+      currentPage = Math.max(1, Math.min(currentPage + dir, totalPages));
+      renderTable();
+    }
+
+    function changePageSize(val) {
+      pageSize = parseInt(val);
+      currentPage = 1;
+      renderTable();
+    }
+
+    /* ============================================================
+       SEARCH / FILTER
+    ============================================================ */
+    function filterTable(query) {
+      const q = query.toLowerCase().trim();
+      filteredData = q
+        ? dummyData.filter(r =>
+            Object.values(r).some(v => String(v).toLowerCase().includes(q))
+          )
+        : [...dummyData];
+      currentPage = 1;
+      renderTable();
+    }
+
+    /* ============================================================
+       SORT
+    ============================================================ */
+    const colKeys = ["uin","fileNo","consignee","truck","container","commodity"];
+
+    function sortTable(colIdx) {
+      if (sortCol === colIdx) {
+        sortAsc = !sortAsc;
+      } else {
+        sortCol = colIdx;
+        sortAsc = true;
+      }
+      const key = colKeys[colIdx];
+      filteredData.sort((a, b) => {
+        const av = a[key].toLowerCase(), bv = b[key].toLowerCase();
+        return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      });
+
+      // Update header classes
+      document.querySelectorAll(".erp-data-table thead th").forEach((th, i) => {
+        th.classList.remove("sort-asc","sort-desc");
+        if (i === colIdx) th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    /* ============================================================
+       ROW ACTIONS
+    ============================================================ */
+    function viewRow(uin) {
+      showToast(`Viewing record: ${uin}`, "info");
+    }
+    function editRow(uin) {
+      showToast(`Editing record: ${uin}`, "info");
+      // In production: redirect to edit form with uin param
+    }
+    function deleteRow(uin) {
+      if (confirm(`Are you sure you want to delete record ${uin}?`)) {
+        const idx = dummyData.findIndex(r => r.uin === uin);
+        if (idx > -1) dummyData.splice(idx, 1);
+        filteredData = filteredData.filter(r => r.uin !== uin);
+        renderTable();
+        showToast(`Record ${uin} deleted successfully.`, "success");
+      }
+    }
+
+    /* ============================================================
+       PRINT
+    ============================================================ */
+    function handlePrint() {
+      showToast("Sending to printer…", "info");
+      setTimeout(() => window.print(), 300);
+    }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const iconMap = { success: "bi-check-circle-fill", info: "bi-info-circle-fill", warning: "bi-exclamation-triangle-fill" };
+      const toast = document.createElement("div");
+      toast.className = `erp-toast ${type}`;
+      toast.innerHTML = `<i class="bi ${iconMap[type] || iconMap.info}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = "0"; toast.style.transition = "opacity 0.3s"; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTable();
+    });
+  </script>
+</body>
+</html>

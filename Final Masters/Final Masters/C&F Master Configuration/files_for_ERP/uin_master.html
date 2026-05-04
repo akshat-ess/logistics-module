@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UIN Master</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { background: #f4f4f4; font-size: 13px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  .page-title { font-size: 24px; font-weight: 400; color: #333; padding: 18px 20px 10px 20px; }
+  .main-layout { display: flex; gap: 16px; padding: 0 20px 20px 20px; align-items: flex-start; }
+  .form-card { width: 300px; min-width: 280px; background: #fff; border: 1px solid #ddd; border-radius: 3px; flex-shrink: 0; }
+  .form-card-header { background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 8px 14px; font-weight: 600; font-size: 13px; color: #333; }
+  .form-card-body { padding: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 4px; display: block; }
+  .form-control { font-size: 12px; border-radius: 2px; border: 1px solid #ccc; height: 28px; padding: 3px 8px; width: 100%; }
+  .form-control:focus { border-color: #4a90d9; box-shadow: none; }
+  select.form-control { background-color: #fff; }
+  .btn-add-main { background: #4a90d9; border: none; color: #fff; font-size: 12px; padding: 5px 16px; border-radius: 3px; cursor: pointer; }
+  .btn-add-main:hover { background: #357abd; }
+
+  /* Table Card */
+  .table-card { flex: 1; background: #fff; border: 1px solid #ddd; border-radius: 3px; min-width: 0; }
+  .table-card-header { background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 8px; }
+  .refresh-icon { color: #4a90d9; cursor: pointer; font-size: 14px; }
+  .table-toolbar { padding: 8px 14px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-bottom: 1px solid #eee; }
+  .search-label { font-size: 12px; color: #555; }
+  .search-input { font-size: 12px; border: 1px solid #ccc; border-radius: 2px; height: 26px; padding: 2px 8px; width: 160px; }
+  .search-input:focus { outline: none; border-color: #4a90d9; }
+  .table-scroll { max-height: 600px; overflow-y: auto; overflow-x: auto; }
+
+  /* Main Data Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 900px; }
+  .data-table thead th { background: #f9f9f9; border-top: 1px solid #ddd; border-bottom: 2px solid #ccc; padding: 7px 10px; font-weight: 600; color: #555; cursor: pointer; white-space: nowrap; vertical-align: middle; }
+  .data-table thead th:hover { background: #f0f0f0; }
+  .data-table tbody tr { border-bottom: 1px solid #eee; }
+  .data-table tbody tr:hover { background: #f5f9ff; }
+  .data-table td { padding: 6px 8px; color: #333; vertical-align: middle; }
+
+  /* Inline Row Controls */
+  .email-link { color: #4a90d9; font-size: 11px; text-decoration: none; display: block; }
+  .email-link:hover { text-decoration: underline; }
+  .btn-plus { background: #5bc0de; border: none; color: #fff; width: 22px; height: 22px; border-radius: 3px; cursor: pointer; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+  .btn-plus:hover { background: #31b0d5; }
+  .inline-select { font-size: 11px; border: 1px solid #ccc; border-radius: 2px; height: 24px; padding: 0 4px; background: #fff; min-width: 90px; }
+  .inline-input { font-size: 11px; border: 1px solid #ccc; border-radius: 2px; height: 24px; padding: 0 6px; width: 110px; }
+  .inline-input-full { font-size: 11px; border: 1px solid #ccc; border-radius: 2px; height: 24px; padding: 0 6px; width: 110px; margin-top: 4px; display: block; }
+  .btn-row-add { background: #4a90d9; border: none; color: #fff; font-size: 11px; padding: 2px 10px; border-radius: 2px; cursor: pointer; margin-top: 4px; }
+  .btn-row-add:hover { background: #357abd; }
+  .free-days-cell { min-width: 280px; }
+  .free-days-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-bottom: 3px; }
+  .free-days-added { font-size: 11px; color: #555; margin-top: 4px; }
+  .free-days-added span { background: #e9f4ff; border: 1px solid #c5ddf7; border-radius: 2px; padding: 1px 5px; margin: 1px 2px; display: inline-block; }
+
+  /* Action Buttons */
+  .btn-edit { background: #4a90d9; border: none; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 2px; cursor: pointer; display: block; width: 60px; margin-bottom: 3px; }
+  .btn-edit:hover { background: #357abd; }
+  .btn-delete { background: #d9534f; border: none; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 2px; cursor: pointer; display: block; width: 60px; }
+  .btn-delete:hover { background: #c9302c; }
+
+  .table-footer { padding: 8px 14px; font-size: 12px; color: #555; border-top: 1px solid #eee; }
+  .no-data { text-align: center; color: #aaa; padding: 30px; font-size: 12px; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 9999; justify-content: center; align-items: center; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: #fff; border-radius: 4px; padding: 24px; width: 380px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .modal-box h6 { margin-bottom: 14px; font-size: 14px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  .btn-cancel { background: #aaa; border: none; color: #fff; font-size: 12px; padding: 5px 14px; border-radius: 3px; cursor: pointer; }
+  .btn-confirm-del { background: #d9534f; border: none; color: #fff; font-size: 12px; padding: 5px 14px; border-radius: 3px; cursor: pointer; }
+
+  /* Email Modal */
+  .email-modal-box { background: #fff; border-radius: 4px; padding: 24px; width: 420px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .email-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .email-item input { font-size: 12px; border: 1px solid #ccc; border-radius: 2px; height: 26px; padding: 2px 8px; flex: 1; }
+  .btn-email-remove { background: none; border: none; color: #d9534f; cursor: pointer; font-size: 14px; }
+  .btn-email-add-row { background: none; border: none; color: #4a90d9; font-size: 12px; cursor: pointer; padding: 0; }
+  .btn-email-save { background: #4a90d9; border: none; color: #fff; font-size: 12px; padding: 5px 14px; border-radius: 3px; cursor: pointer; }
+
+  .sort-asc::after { content: ' ▲'; font-size: 10px; }
+  .sort-desc::after { content: ' ▼'; font-size: 10px; }
+
+  .active-badge-yes { color: #333; font-size: 12px; }
+  .active-badge-no { color: #aaa; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="page-title">UIN</div>
+
+<div class="main-layout">
+  <!-- LEFT: Form Card -->
+  <div class="form-card">
+    <div class="form-card-header">Add UIN</div>
+    <div class="form-card-body">
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" id="uinName" class="form-control" placeholder="">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select id="uinActive" class="form-control">
+          <option value="">Select..</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <button class="btn-add-main" id="submitBtn" onclick="addRecord()">Add UIN</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Table Card -->
+  <div class="table-card">
+    <div class="table-card-header">
+      All UINs <i class="fas fa-sync-alt refresh-icon" onclick="renderTable()"></i>
+    </div>
+    <div class="table-toolbar">
+      <span class="search-label">Search:</span>
+      <input type="text" class="search-input" id="searchInput" oninput="searchTable()" placeholder="">
+      <i class="fas fa-sort" style="color:#aaa; font-size:11px;"></i>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table" id="dataTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)" style="min-width:80px;">Name</th>
+            <th style="min-width:120px;">UIN Email</th>
+            <th class="free-days-cell">Free Days</th>
+            <th style="min-width:70px;">Pre Alert Email</th>
+            <th style="min-width:60px;">Is Active</th>
+            <th style="min-width:90px;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="table-footer" id="tableFooter">Showing 0 entries</div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <h6>Confirm Delete</h6>
+    <p style="font-size:13px;">Are you sure you want to delete this UIN record?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="email-modal-box">
+    <h6 id="emailModalTitle" style="font-size:14px; margin-bottom:14px;">Manage Emails</h6>
+    <div id="emailList"></div>
+    <button class="btn-email-add-row" onclick="addEmailRow()">
+      <i class="fas fa-plus-circle"></i> Add Email
+    </button>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn-email-save" onclick="saveEmails()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'uin_master_data';
+  let records = [];
+  let editId = null;
+  let deleteId = null;
+  let sortColIndex = -1;
+  let sortDir = 'asc';
+
+  // Email modal state
+  let emailModalRecordId = null;
+  let emailModalType = null; // 'uin' or 'prealert'
+
+  const COUNTRIES = ['Tanzania','Zambia','Zimbabwe','DRC','Malawi','Kenya','Uganda','Mozambique','Rwanda','Burundi'];
+
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      records = JSON.parse(saved);
+    } else {
+      records = [
+        { id: genId(), name: '', uinEmails: ['sales1@honestlogistics.co.tz'], freeDays: [], preAlertEmails: [], isActive: '' },
+        { id: genId(), name: '20CUBE', uinEmails: [], freeDays: [], preAlertEmails: [], isActive: 'Yes' },
+        { id: genId(), name: '3EPL', uinEmails: [], freeDays: [], preAlertEmails: [], isActive: 'Yes' },
+        { id: genId(), name: '5S', uinEmails: [], freeDays: [], preAlertEmails: [], isActive: 'Yes' },
+        { id: genId(), name: 'AAL', uinEmails: ['ayaz@afriport.co.tz'], freeDays: [], preAlertEmails: [], isActive: 'Yes' },
+        { id: genId(), name: 'AAT', uinEmails: [], freeDays: [], preAlertEmails: [], isActive: 'Yes' },
+      ];
+      saveData();
+    }
+  }
+
+  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 9); }
+
+  function addRecord() {
+    const nameVal = document.getElementById('uinName').value.trim();
+    const activeVal = document.getElementById('uinActive').value;
+    if (!nameVal) { alert('Name is required.'); return; }
+    if (editId) {
+      const rec = records.find(r => r.id === editId);
+      if (rec) { rec.name = nameVal; rec.isActive = activeVal; }
+      editId = null;
+      document.getElementById('submitBtn').textContent = 'Add UIN';
+    } else {
+      records.push({ id: genId(), name: nameVal, uinEmails: [], freeDays: [], preAlertEmails: [], isActive: activeVal });
+    }
+    saveData();
+    document.getElementById('uinName').value = '';
+    document.getElementById('uinActive').value = '';
+    renderTable();
+  }
+
+  function editRecord(id) {
+    const rec = records.find(r => r.id === id);
+    if (!rec) return;
+    editId = id;
+    document.getElementById('uinName').value = rec.name;
+    document.getElementById('uinActive').value = rec.isActive || '';
+    document.getElementById('submitBtn').textContent = 'Update UIN';
+    window.scrollTo(0, 0);
+  }
+
+  function deleteRecord(id) {
+    deleteId = id;
+    document.getElementById('deleteModal').classList.add('active');
+  }
+
+  function closeDeleteModal() {
+    deleteId = null;
+    document.getElementById('deleteModal').classList.remove('active');
+  }
+
+  function confirmDelete() {
+    records = records.filter(r => r.id !== deleteId);
+    saveData();
+    closeDeleteModal();
+    renderTable();
+  }
+
+  // Add Free Day entry for a record
+  function addFreeDayRow(recordId) {
+    const country = document.getElementById('fd_country_' + recordId).value;
+    const bfd = document.getElementById('fd_bfd_' + recordId).value.trim();
+    const fod = document.getElementById('fd_fod_' + recordId).value.trim();
+    if (!country || !bfd || !fod) { alert('Please fill Country, Border Free Days and Free Offload Days.'); return; }
+
+    const rec = records.find(r => r.id === recordId);
+    if (rec) {
+      rec.freeDays.push({ country, bfd, fod });
+      saveData();
+    }
+    // Reset inputs
+    document.getElementById('fd_country_' + recordId).value = '';
+    document.getElementById('fd_bfd_' + recordId).value = '';
+    document.getElementById('fd_fod_' + recordId).value = '';
+    renderTable();
+  }
+
+  // Email Modal
+  let tempEmails = [];
+
+  function openEmailModal(recordId, type) {
+    emailModalRecordId = recordId;
+    emailModalType = type;
+    const rec = records.find(r => r.id === recordId);
+    tempEmails = type === 'uin' ? [...(rec.uinEmails || [])] : [...(rec.preAlertEmails || [])];
+    document.getElementById('emailModalTitle').textContent = type === 'uin' ? 'UIN Emails' : 'Pre Alert Emails';
+    renderEmailList();
+    document.getElementById('emailModal').classList.add('active');
+  }
+
+  function renderEmailList() {
+    const container = document.getElementById('emailList');
+    container.innerHTML = '';
+    if (tempEmails.length === 0) {
+      tempEmails.push('');
+    }
+    tempEmails.forEach((em, idx) => {
+      const div = document.createElement('div');
+      div.className = 'email-item';
+      div.innerHTML = `
+        <input type="email" value="${escHtml(em)}" placeholder="email@example.com" oninput="tempEmails[${idx}]=this.value">
+        <button class="btn-email-remove" onclick="removeEmailRow(${idx})"><i class="fas fa-times"></i></button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function addEmailRow() {
+    tempEmails.push('');
+    renderEmailList();
+  }
+
+  function removeEmailRow(idx) {
+    tempEmails.splice(idx, 1);
+    renderEmailList();
+  }
+
+  function saveEmails() {
+    const rec = records.find(r => r.id === emailModalRecordId);
+    if (rec) {
+      const cleaned = tempEmails.map(e => e.trim()).filter(e => e.length > 0);
+      if (emailModalType === 'uin') rec.uinEmails = cleaned;
+      else rec.preAlertEmails = cleaned;
+      saveData();
+    }
+    closeEmailModal();
+    renderTable();
+  }
+
+  function closeEmailModal() {
+    emailModalRecordId = null;
+    emailModalType = null;
+    tempEmails = [];
+    document.getElementById('emailModal').classList.remove('active');
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = records.filter(r => r.name.toLowerCase().includes(search));
+
+    if (sortColIndex === 0) {
+      filtered.sort((a, b) => sortDir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+    }
+
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="no-data">No data available</td></tr>`;
+      document.getElementById('tableFooter').textContent = 'Showing 0 entries';
+      return;
+    }
+
+    filtered.forEach(rec => {
+      const tr = document.createElement('tr');
+
+      // UIN Emails cell
+      const emailsHtml = rec.uinEmails && rec.uinEmails.length > 0
+        ? rec.uinEmails.map(e => `<a class="email-link" href="mailto:${escHtml(e)}">${escHtml(e)}</a>`).join('')
+        : '';
+      const uinEmailCell = `
+        <div>${emailsHtml}</div>
+        <button class="btn-plus" onclick="openEmailModal('${rec.id}', 'uin')" title="Add UIN Email"><i class="fas fa-plus" style="font-size:10px;"></i></button>
+      `;
+
+      // Free Days cell
+      const addedFreeDays = (rec.freeDays || []).map(fd =>
+        `<span>${escHtml(fd.country)}: BFD=${escHtml(fd.bfd)}, FOD=${escHtml(fd.fod)}</span>`
+      ).join('');
+
+      const freeDaysCell = `
+        <div class="free-days-row">
+          <select class="inline-select" id="fd_country_${rec.id}">
+            <option value="">Country...</option>
+            ${COUNTRIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+          </select>
+          <input type="number" class="inline-input" id="fd_bfd_${rec.id}" placeholder="Border Free Days" min="0">
+        </div>
+        <div>
+          <input type="number" class="inline-input-full" id="fd_fod_${rec.id}" placeholder="Free Offload Days" min="0">
+          <button class="btn-row-add" onclick="addFreeDayRow('${rec.id}')">Add</button>
+        </div>
+        ${addedFreeDays ? `<div class="free-days-added">${addedFreeDays}</div>` : ''}
+      `;
+
+      // Pre Alert Email cell
+      const preAlertHtml = rec.preAlertEmails && rec.preAlertEmails.length > 0
+        ? rec.preAlertEmails.map(e => `<a class="email-link" href="mailto:${escHtml(e)}">${escHtml(e)}</a>`).join('')
+        : '';
+      const preAlertCell = `
+        <div>${preAlertHtml}</div>
+        <button class="btn-plus" onclick="openEmailModal('${rec.id}', 'prealert')" title="Add Pre Alert Email"><i class="fas fa-plus" style="font-size:10px;"></i></button>
+      `;
+
+      const isActiveText = rec.isActive === 'Yes'
+        ? `<span class="active-badge-yes">Yes</span>`
+        : rec.isActive === 'No'
+          ? `<span class="active-badge-no">No</span>`
+          : '';
+
+      tr.innerHTML = `
+        <td>${escHtml(rec.name)}</td>
+        <td>${uinEmailCell}</td>
+        <td class="free-days-cell">${freeDaysCell}</td>
+        <td>${preAlertCell}</td>
+        <td>${isActiveText}</td>
+        <td>
+          <button class="btn-edit" onclick="editRecord('${rec.id}')">Edit</button>
+          <button class="btn-delete" onclick="deleteRecord('${rec.id}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('tableFooter').textContent = `Showing 1 to ${filtered.length} of ${records.length} entries`;
+  }
+
+  function searchTable() { renderTable(); }
+
+  function sortTable(colIdx) {
+    if (sortColIndex === colIdx) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+    else { sortColIndex = colIdx; sortDir = 'asc'; }
+    document.querySelectorAll('.data-table thead th').forEach((th, i) => {
+      th.className = i === colIdx ? (sortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
+    });
+    renderTable();
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadData();
+  renderTable();
+</script>
+</body>
+</html>

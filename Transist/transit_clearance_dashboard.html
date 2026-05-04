@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Clearance - Dashboard</title>
+<style>
+  /* ===== CSS VARIABLES ===== */
+  :root {
+    --primary: #3c8dbc;
+    --primary-dark: #2e6d96;
+    --primary-light: #d9edf7;
+    --success: #00a65a;
+    --warning: #f39c12;
+    --danger: #dd4b39;
+    --info: #00c0ef;
+    --bg: #ecf0f5;
+    --white: #ffffff;
+    --border: #d2d6de;
+    --text: #333333;
+    --text-muted: #777777;
+    --header-bg: #3c8dbc;
+    --sidebar-bg: #222d32;
+    --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+    --radius: 3px;
+    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ===== TOP NAVBAR ===== */
+  .navbar {
+    background: var(--primary);
+    color: #fff;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .navbar-brand {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .navbar-brand span.icon {
+    font-size: 22px;
+  }
+  .navbar-nav {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .navbar-nav a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+  .navbar-nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb-bar {
+    background: var(--white);
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+  .breadcrumb-bar a:hover { text-decoration: underline; }
+  .breadcrumb-bar .sep { color: #ccc; }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .page-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    padding: 7px 14px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--font);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    transition: filter 0.15s, transform 0.1s;
+    font-weight: 500;
+  }
+  .btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-warning { background: var(--warning); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-info { background: var(--info); color: #fff; }
+  .btn-default { background: #f4f4f4; color: var(--text); border: 1px solid var(--border); }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-header .card-title-icon { margin-right: 8px; }
+  .card-body { padding: 16px; }
+
+  /* ===== TRANSIT CLEARANCE HERO CARD ===== */
+  .transit-hero {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .transit-hero .road-icon {
+    font-size: 60px;
+    color: var(--danger);
+    background: #fce8e6;
+    width: 90px;
+    height: 90px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .transit-hero-info h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .transit-hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .transit-hero-stats span {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .transit-hero-stats span strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ===== FILTER BUTTONS ===== */
+  .filter-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .filter-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+    font-family: var(--font);
+  }
+  .filter-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
+  .filter-btn.active { box-shadow: 0 0 0 3px rgba(0,0,0,0.15); }
+  .filter-btn.btn-all    { background: #f39c12; color: #fff; }
+  .filter-btn.btn-zm     { background: #3c8dbc; color: #fff; }
+  .filter-btn.btn-drc    { background: #00a65a; color: #fff; }
+  .filter-btn.btn-mal    { background: #dd4b39; color: #fff; }
+  .filter-btn.btn-bur    { background: #605ca8; color: #fff; }
+  .filter-btn.btn-rw     { background: #e08e0b; color: #fff; }
+  .filter-btn.btn-network{ background: #39cccc; color: #fff; }
+
+  /* ===== STATS GRID ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s;
+  }
+  .stat-card:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  .stat-card.green  { border-left-color: var(--success); }
+  .stat-card.orange { border-left-color: var(--warning); }
+  .stat-card.red    { border-left-color: var(--danger); }
+  .stat-card.teal   { border-left-color: #39cccc; }
+  .stat-card.purple { border-left-color: #605ca8; }
+  .stat-info { display: flex; flex-direction: column; gap: 3px; }
+  .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
+  .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-icon { font-size: 36px; opacity: 0.25; }
+
+  /* ===== RECENT TABLE ===== */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table thead tr {
+    background: var(--primary);
+    color: #fff;
+  }
+  .data-table thead th {
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    font-size: 12px;
+  }
+  .data-table tbody tr { border-bottom: 1px solid #f0f0f0; }
+  .data-table tbody tr:hover { background: var(--primary-light); }
+  .data-table tbody td { padding: 8px 10px; vertical-align: middle; }
+  .data-table tbody tr:nth-child(even) { background: #fafafa; }
+  .data-table tbody tr:nth-child(even):hover { background: var(--primary-light); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-success  { background: #dff0d8; color: #3c763d; }
+  .badge-warning  { background: #fcf8e3; color: #8a6d3b; }
+  .badge-danger   { background: #f2dede; color: #a94442; }
+  .badge-info     { background: #d9edf7; color: #31708f; }
+  .badge-primary  { background: #d9edf7; color: #2e6d96; }
+
+  /* ===== SPINNER ===== */
+  .spinner-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== TOOLTIP ===== */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: #333; color: #fff;
+    padding: 4px 8px; border-radius: 3px;
+    font-size: 11px; white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 200;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* ===== CHART BARS ===== */
+  .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+  .mini-bar {
+    flex: 1; background: var(--primary-light);
+    border-radius: 2px 2px 0 0;
+    border: 1px solid var(--primary);
+    min-height: 4px;
+    transition: background 0.2s;
+  }
+  .mini-bar:hover { background: var(--primary); }
+
+  /* ===== QUICK NAV TILES ===== */
+  .quick-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .quick-tile {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .quick-tile:hover {
+    border-color: var(--primary);
+    box-shadow: 0 3px 8px rgba(60,141,188,0.2);
+    transform: translateY(-2px);
+    color: var(--primary);
+  }
+  .quick-tile .tile-icon { font-size: 24px; }
+  .quick-tile .tile-label { font-size: 12px; font-weight: 600; text-align: center; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    background: #fff;
+    margin-top: 20px;
+  }
+
+  /* ===== TWO-COL LAYOUT ===== */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- SPINNER -->
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+</div>
+
+<!-- TOP NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="icon">🛣️</span>
+    TransitERP — Logistics Management System
+  </div>
+  <div class="navbar-nav">
+    <a href="#">Dashboard</a>
+    <a href="transit_clearance_consignment.html">Consignments</a>
+    <a href="add_transit_cargo_doc.html">New Entry</a>
+    <a href="#" style="background:rgba(255,255,255,0.2);">👤 Admin</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="#">🏠 Home</a>
+  <span class="sep">›</span>
+  <span>Transit Clearance</span>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">📊 Transit Clearance Dashboard</h1>
+    <div class="page-actions">
+      <a href="transit_clearance_consignment.html" class="btn btn-primary" data-tooltip="View all consignment records">
+        📋 View Consignments
+      </a>
+      <a href="add_transit_cargo_doc.html" class="btn btn-success" data-tooltip="Create a new transit consignment">
+        ➕ Create Consignment
+      </a>
+      <button class="btn btn-default" data-tooltip="Refresh dashboard data" onclick="refreshDashboard()">
+        🔄 Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO CARD -->
+  <div class="transit-hero">
+    <div class="road-icon">🛣️</div>
+    <div class="transit-hero-info">
+      <h2>Transit Clearance</h2>
+      <div class="transit-hero-stats">
+        <span>Active Items: <strong id="activeItems">24</strong></span>
+        <span>Active Containers: <strong id="activeContainers">87</strong></span>
+      </div>
+      <!-- FILTER BUTTONS -->
+      <div class="filter-btn-group">
+        <button class="filter-btn btn-all active" onclick="filterBy('ALL', this)" data-tooltip="Show all records">All</button>
+        <button class="filter-btn btn-zm"  onclick="filterBy('ZM', this)"  data-tooltip="Zambia corridor">ZM</button>
+        <button class="filter-btn btn-drc" onclick="filterBy('DRC', this)" data-tooltip="DR Congo corridor">DRC</button>
+        <button class="filter-btn btn-mal" onclick="filterBy('MAL', this)" data-tooltip="Malawi corridor">MAL</button>
+        <button class="filter-btn btn-bur" onclick="filterBy('BUR', this)" data-tooltip="Burundi corridor">BUR</button>
+        <button class="filter-btn btn-rw"  onclick="filterBy('RW', this)"  data-tooltip="Rwanda corridor">RW</button>
+        <button class="filter-btn btn-network" onclick="filterBy('NETWORK', this)" data-tooltip="Network consignments">NETWORK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-total">24</div>
+        <div class="stat-label">Active Items</div>
+      </div>
+      <div class="stat-icon">📦</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-containers">87</div>
+        <div class="stat-label">Active Containers</div>
+      </div>
+      <div class="stat-icon">🚢</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-delivered">156</div>
+        <div class="stat-label">Delivered</div>
+      </div>
+      <div class="stat-icon">✅</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-pending">8</div>
+        <div class="stat-label">DO Pending</div>
+      </div>
+      <div class="stat-icon">⏳</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-transport">19</div>
+        <div class="stat-label">With Transport</div>
+      </div>
+      <div class="stat-icon">🚛</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-info">
+        <div class="stat-value" id="stat-await">5</div>
+        <div class="stat-label">Await Carry In</div>
+      </div>
+      <div class="stat-icon">🕐</div>
+    </div>
+  </div>
+
+  <!-- QUICK NAV -->
+  <div class="card">
+    <div class="card-header">🔗 Quick Navigation</div>
+    <div class="card-body">
+      <div class="quick-nav">
+        <a href="transit_clearance_consignment.html" class="quick-tile">
+          <span class="tile-icon">📋</span>
+          <span class="tile-label">Consignment Listing</span>
+        </a>
+        <a href="add_transit_cargo_doc.html" class="quick-tile">
+          <span class="tile-icon">📄</span>
+          <span class="tile-label">Add Consignment (DOC)</span>
+        </a>
+        <a href="add_transit_cargo_ops.html" class="quick-tile">
+          <span class="tile-icon">⚙️</span>
+          <span class="tile-label">Add Consignment (OPS)</span>
+        </a>
+        <a href="add_transit_cargo_sl.html" class="quick-tile">
+          <span class="tile-icon">🚢</span>
+          <span class="tile-label">Add Consignment (SL)</span>
+        </a>
+        <a href="#" class="quick-tile">
+          <span class="tile-icon">📊</span>
+          <span class="tile-label">Container Report</span>
+        </a>
+        <a href="#" class="quick-tile">
+          <span class="tile-icon">🗺️</span>
+          <span class="tile-label">Border Report</span>
+        </a>
+        <a href="#" class="quick-tile">
+          <span class="tile-icon">⏱️</span>
+          <span class="tile-label">Ageing Search</span>
+        </a>
+        <a href="#" class="quick-tile">
+          <span class="tile-icon">🔍</span>
+          <span class="tile-label">UIN Container Report</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TWO COLUMN -->
+  <div class="two-col">
+
+    <!-- RECENT CONSIGNMENTS -->
+    <div class="card">
+      <div class="card-header">
+        📦 Recent Consignments
+        <a href="transit_clearance_consignment.html" class="btn btn-default" style="font-size:11px; padding:3px 8px;">View All</a>
+      </div>
+      <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>File No</th>
+              <th>Consignee</th>
+              <th>Destination</th>
+              <th>Containers</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentTable">
+            <tr>
+              <td>TC-2024-001</td>
+              <td>ACME Logistics</td>
+              <td>Lusaka, ZM</td>
+              <td>3 × 20ft</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>TC-2024-002</td>
+              <td>GlobalTrade Ltd</td>
+              <td>Kinshasa, DRC</td>
+              <td>1 × 40ft</td>
+              <td><span class="badge badge-warning">In Transit</span></td>
+            </tr>
+            <tr>
+              <td>TC-2024-003</td>
+              <td>East Africa Cargo</td>
+              <td>Kigali, RW</td>
+              <td>2 × 20ft</td>
+              <td><span class="badge badge-info">Awaiting DO</span></td>
+            </tr>
+            <tr>
+              <td>TC-2024-004</td>
+              <td>Northern Freight</td>
+              <td>Lilongwe, MAL</td>
+              <td>4 × 40ft</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>TC-2024-005</td>
+              <td>Congo Trade Co</td>
+              <td>Bujumbura, BUR</td>
+              <td>2 × 20ft</td>
+              <td><span class="badge badge-danger">DO Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CORRIDOR CHART -->
+    <div class="card">
+      <div class="card-header">📈 Active Consignments by Corridor</div>
+      <div class="card-body">
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:12px;">
+          <thead>
+            <tr style="background:#f4f4f4;">
+              <th style="padding:6px 8px; text-align:left; border-bottom:1px solid #ddd;">Corridor</th>
+              <th style="padding:6px 8px; text-align:right; border-bottom:1px solid #ddd;">Items</th>
+              <th style="padding:6px 8px; text-align:right; border-bottom:1px solid #ddd;">Containers</th>
+              <th style="padding:6px 8px; text-align:left; border-bottom:1px solid #ddd;">Chart</th>
+            </tr>
+          </thead>
+          <tbody id="corridorData">
+            <tr>
+              <td style="padding:6px 8px;"><span class="badge badge-primary">ZM</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>8</strong></td>
+              <td style="padding:6px 8px; text-align:right;">32</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#3c8dbc; height:10px; border-radius:2px; width:80%;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;"><span class="badge badge-success">DRC</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>6</strong></td>
+              <td style="padding:6px 8px; text-align:right;">25</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#00a65a; height:10px; border-radius:2px; width:60%;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;"><span class="badge badge-danger">MAL</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>4</strong></td>
+              <td style="padding:6px 8px; text-align:right;">14</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#dd4b39; height:10px; border-radius:2px; width:40%;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;"><span style="background:#e8d5ff;color:#605ca8;" class="badge">BUR</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>3</strong></td>
+              <td style="padding:6px 8px; text-align:right;">9</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#605ca8; height:10px; border-radius:2px; width:30%;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;"><span style="background:#fff3cd;color:#e08e0b;" class="badge">RW</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>2</strong></td>
+              <td style="padding:6px 8px; text-align:right;">6</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#e08e0b; height:10px; border-radius:2px; width:20%;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;"><span style="background:#d1f5f5;color:#39cccc;" class="badge">NETWORK</span></td>
+              <td style="padding:6px 8px; text-align:right;"><strong>1</strong></td>
+              <td style="padding:6px 8px; text-align:right;">1</td>
+              <td style="padding:6px 8px;">
+                <div style="background:#39cccc; height:10px; border-radius:2px; width:10%;"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /.two-col -->
+
+</div><!-- /.main-content -->
+
+<div class="footer">
+  &copy; 2024 TransitERP Logistics Management System — All rights reserved
+</div>
+
+<script>
+  // === SPINNER ===
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('spinner').style.display = 'none';
+    }, 600);
+  });
+
+  // === FILTER BUTTONS ===
+  const filterData = {
+    ALL:     { items: 24, containers: 87 },
+    ZM:      { items: 8,  containers: 32 },
+    DRC:     { items: 6,  containers: 25 },
+    MAL:     { items: 4,  containers: 14 },
+    BUR:     { items: 3,  containers: 9  },
+    RW:      { items: 2,  containers: 6  },
+    NETWORK: { items: 1,  containers: 1  },
+  };
+
+  function filterBy(key, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const d = filterData[key] || filterData.ALL;
+    document.getElementById('activeItems').textContent = d.items;
+    document.getElementById('activeContainers').textContent = d.containers;
+    document.getElementById('stat-total').textContent = d.items;
+    document.getElementById('stat-containers').textContent = d.containers;
+  }
+
+  function refreshDashboard() {
+    document.getElementById('spinner').style.display = 'flex';
+    setTimeout(() => {
+      document.getElementById('spinner').style.display = 'none';
+    }, 800);
+  }
+</script>
+</body>
+</html>

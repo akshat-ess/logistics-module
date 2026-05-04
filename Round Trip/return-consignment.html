@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Return Cargo Consignment - Round Trip ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+.tab-group-wrapper { border-bottom: 2px solid var(--blue-primary); margin-bottom: 0; }
+.field-label-row {
+  display: grid;
+  gap: 0;
+  background: var(--grey-header);
+  border-bottom: 1px solid var(--grey-border);
+  border-top: 1px solid var(--grey-border);
+}
+.field-label-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.field-label-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.field-label-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.field-label-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.field-label-row.cols-1 { grid-template-columns: repeat(1, 1fr); }
+.field-label-cell {
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-right: 1px solid var(--grey-border);
+}
+.field-label-cell:last-child { border-right: none; }
+
+.field-input-row { display: grid; gap: 0; }
+.field-input-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.field-input-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.field-input-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.field-input-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.field-input-row.cols-1 { grid-template-columns: 1fr; }
+
+.field-input-cell {
+  padding: 6px 10px;
+  border-right: 1px solid var(--grey-border);
+  border-bottom: 1px solid var(--grey-border);
+}
+.field-input-cell:last-child { border-right: none; }
+.field-input-cell .form-control { height: 26px; font-size: 12px; }
+.field-input-cell select.form-control { height: 26px; }
+.field-input-cell textarea.form-control { height: 80px; resize: vertical; }
+
+/* FILE tab header - blue bar */
+.file-tab-bar {
+  background: var(--blue-primary);
+  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.save-bar {
+  background: var(--white);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .field-label-row.cols-5, .field-input-row.cols-5 { grid-template-columns: repeat(2, 1fr); }
+  .field-label-row.cols-4, .field-input-row.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .field-label-row.cols-3, .field-input-row.cols-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .field-label-row, .field-input-row { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="spinner-overlay"><div class="spinner"></div></div>
+
+<nav class="erp-topnav">
+  <a href="index.html" class="brand"><i class="fas fa-sync-alt"></i> ROUND TRIP ERP</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="transit-clearance.html">Going</a>
+    <a href="return-clearance.html" class="active">Return</a>
+  </div>
+  <div class="user-info ms-auto"><i class="fas fa-user-circle"></i> Admin User &nbsp;|&nbsp; <i class="fas fa-building"></i> Mombasa</div>
+</nav>
+
+<div class="breadcrumb-bar">
+  <a href="index.html"><i class="fas fa-home"></i></a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="index.html">Round Trip</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="return-clearance.html">Return Clearance</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <span class="current">Add Return Consignment</span>
+</div>
+
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-undo-alt" style="color:var(--red-btn);font-size:18px;margin-right:8px"></i>Add Return Cargo Consignment</h1>
+    <div class="header-actions">
+      <a href="return-clearance.html" class="btn btn-primary"><i class="fas fa-list"></i> View Consignments</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-boxes"></i> Cargo details
+      <button onclick="location.reload()" style="border:none;background:none;cursor:pointer;color:var(--blue-primary);margin-left:4px" title="Reset"><i class="fas fa-sync-alt"></i></button>
+    </div>
+
+    <!-- FILE Tab Header (blue bar as in screenshot) -->
+    <div class="file-tab-bar">
+      <span>FILE</span>
+    </div>
+
+    <form id="returnForm">
+
+      <!-- Row 1: 5 cols -->
+      <div class="field-label-row cols-5">
+        <div class="field-label-cell">File No</div>
+        <div class="field-label-cell">UIN</div>
+        <div class="field-label-cell">Client</div>
+        <div class="field-label-cell">Material Descr.</div>
+        <div class="field-label-cell">S/Line</div>
+      </div>
+      <div class="field-input-row cols-5">
+        <div class="field-input-cell"><input type="text" class="form-control" name="fileNo" placeholder="RC-2024-" required></div>
+        <div class="field-input-cell"><select class="form-control" name="uin" data-options="uin"></select></div>
+        <div class="field-input-cell"><select class="form-control" name="client" data-options="client"></select></div>
+        <div class="field-input-cell"><select class="form-control" name="materialDescr" data-options="materialDescr"></select></div>
+        <div class="field-input-cell"><select class="form-control" name="sline" data-options="sline"></select></div>
+      </div>
+
+      <!-- Row 2: 5 cols -->
+      <div class="field-label-row cols-5">
+        <div class="field-label-cell">SO Valid Date</div>
+        <div class="field-label-cell">Empty Offload Location</div>
+        <div class="field-label-cell">Country</div>
+        <div class="field-label-cell">Border</div>
+        <div class="field-label-cell">Destination</div>
+      </div>
+      <div class="field-input-row cols-5">
+        <div class="field-input-cell"><input type="date" class="form-control" name="soValidDate"></div>
+        <div class="field-input-cell"><input type="text" class="form-control" name="emptyOffloadLocation" placeholder="Location..."></div>
+        <div class="field-input-cell"><select class="form-control" name="country" data-options="country"></select></div>
+        <div class="field-input-cell"><select class="form-control" name="border" data-options="border"></select></div>
+        <div class="field-input-cell"><select class="form-control" name="destination" data-options="destination"></select></div>
+      </div>
+
+      <!-- Row 3: 5 cols (Booking Date, Delivery Date, File Closed, Booking Status, Notes) -->
+      <div class="field-label-row cols-5">
+        <div class="field-label-cell">Booking Date</div>
+        <div class="field-label-cell">Delivery Date</div>
+        <div class="field-label-cell">File Closed</div>
+        <div class="field-label-cell">Booking Status</div>
+        <div class="field-label-cell">Notes</div>
+      </div>
+      <div class="field-input-row cols-5">
+        <div class="field-input-cell"><input type="date" class="form-control" name="bookingDate"></div>
+        <div class="field-input-cell"><input type="date" class="form-control" name="deliveryDate"></div>
+        <div class="field-input-cell"><input type="text" class="form-control" name="fileClosed" placeholder="File closed date/ref"></div>
+        <div class="field-input-cell"><select class="form-control" name="bookingStatus" data-options="bookingStatus"></select></div>
+        <div class="field-input-cell" style="border-right:none">
+          <textarea class="form-control" name="notes" placeholder="Additional notes..." style="height:80px;resize:vertical"></textarea>
+        </div>
+      </div>
+
+      <!-- Row 4: LoadCon Number (single col) -->
+      <div class="field-label-row cols-1" style="width:calc(20% + 2px)">
+        <div class="field-label-cell">LoadCon Number</div>
+      </div>
+      <div class="field-input-row cols-1" style="width:calc(20% + 2px)">
+        <div class="field-input-cell"><input type="text" class="form-control" name="loadconNumber" placeholder="LC-"></div>
+      </div>
+
+    </form>
+
+    <!-- Scroll Indicators -->
+    <div style="display:flex;justify-content:space-between;padding:2px 6px;color:var(--grey-border);font-size:18px;border-top:1px solid var(--grey-border)">
+      <span>&#9668;</span><span>&#9658;</span>
+    </div>
+  </div>
+
+  <!-- Save Bar -->
+  <div class="save-bar">
+    <button class="btn btn-primary btn-save" id="saveBtn"><i class="fas fa-save"></i> Save</button>
+    <button class="btn btn-outline" onclick="if(confirm('Clear all fields?')) location.reload()"><i class="fas fa-times"></i> Cancel</button>
+  </div>
+</div>
+
+<footer class="erp-footer">&copy; 2024 Round Trip ERP &bull; Freight Management System &bull; All Rights Reserved</footer>
+
+<script src="app.js"></script>
+<script>
+function initPage() {
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    const form = document.getElementById('returnForm');
+    const data = {};
+    new FormData(form).forEach((v, k) => data[k] = v);
+
+    if (!data.fileNo.trim()) {
+      showToast('File No is required', 'error');
+      form.querySelector('[name="fileNo"]').classList.add('is-invalid');
+      return;
+    }
+
+    showSpinner();
+    setTimeout(() => {
+      hideSpinner();
+      console.log('[Return Cargo Consignment] Saved:', data);
+      showToast('Return Cargo Consignment saved successfully!', 'success');
+      setTimeout(() => window.location.href = 'return-clearance.html', 1500);
+    }, 900);
+  });
+}
+</script>
+</body>
+</html>

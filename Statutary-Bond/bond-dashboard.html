@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bond Utilization Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --primary: #2e86de;
+      --border: #dee2e6;
+      --green: #27ae60;
+      --red: #e74c3c;
+    }
+    body { background: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; color: #333; }
+
+    /* Top Stats Bar */
+    .stats-bar {
+      background: #fff; border-bottom: 2px solid var(--border);
+      padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .stat-item { display: flex; align-items: center; gap: 8px; }
+    .stat-label { font-size: 15px; font-weight: 700; color: #444; }
+    .stat-val-red { font-size: 22px; font-weight: 800; color: var(--red); }
+    .stat-val-green { font-size: 22px; font-weight: 800; color: var(--green); }
+    .stat-divider { width: 1px; background: var(--border); height: 36px; }
+    .btn-add-debit {
+      background: var(--primary); color: #fff; border: none; border-radius: 4px;
+      padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-add-debit:hover { background: #1a6bbf; }
+
+    /* Layout */
+    .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px; }
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+
+    /* Panel */
+    .panel { background: #fff; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .panel-header {
+      background: #fff; padding: 14px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    .panel-title { font-size: 16px; font-weight: 700; color: #222; }
+    .btn-add-credit {
+      background: var(--green); color: #fff; border: none; border-radius: 4px;
+      padding: 5px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-add-credit:hover { background: #229954; }
+    .totals-bar {
+      background: #f8f9fa; border-bottom: 1px solid var(--border);
+      padding: 8px 16px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .total-item { font-size: 12.5px; color: #555; }
+    .total-item strong { color: #222; }
+    .btn-refresh { background: none; border: none; cursor: pointer; color: #888; font-size: 14px; margin-left: 4px; transition: color 0.15s; }
+    .btn-refresh:hover { color: var(--primary); }
+
+    /* Table Controls */
+    .tbl-controls {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; border-bottom: 1px solid var(--border); background: #fff; flex-wrap: wrap; gap: 8px;
+    }
+    .records-sel { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+    .records-sel select { width: 60px; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; font-size: 12.5px; }
+    .search-box { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+    .search-box input { border: 1px solid #ccc; border-radius: 3px; padding: 3px 8px; font-size: 12.5px; width: 160px; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #f8f9fa; border-bottom: 2px solid var(--border); border-top: 1px solid var(--border);
+      padding: 8px 10px; font-weight: 600; font-size: 12px; color: #444; white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    tbody tr { border-bottom: 1px solid #eee; }
+    tbody tr:hover { background: #f5f9ff; }
+    tbody td { padding: 7px 10px; font-size: 12.5px; vertical-align: middle; }
+    .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+    .debit-val { color: var(--red); }
+    .credit-val { color: var(--green); }
+
+    /* Pagination */
+    .pag-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 8px;
+    }
+    .showing { font-size: 12px; color: #666; }
+    .pag-btns { display: flex; gap: 3px; flex-wrap: wrap; }
+    .pb { border: 1px solid #ccc; background: #fff; border-radius: 3px; padding: 3px 9px; font-size: 12px; cursor: pointer; color: #333; transition: background 0.15s; }
+    .pb.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .pb:hover:not(.active):not(:disabled) { background: #e9f0fb; }
+    .pb:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Empty panel */
+    .empty-panel {
+      display: flex; align-items: center; justify-content: center;
+      height: 300px; color: #bbb; font-size: 14px; flex-direction: column; gap: 10px;
+    }
+    .empty-panel i { font-size: 40px; }
+  </style>
+</head>
+<body>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+      <div class="stat-item">
+        <span class="stat-label">Bond Utilization:</span>
+        <span class="stat-val-red">86.37%</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Balance:</span>
+        <span class="stat-val-green">7,539,274,823</span>
+      </div>
+    </div>
+    <button class="btn-add-debit" onclick="showAddDebitModal()">
+      <i class="fa fa-plus me-1"></i> Add Debit
+    </button>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+
+    <!-- LEFT: Today's Bond Credited -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Today's Bond Credited:</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted" style="font-size:12px">Receiving</span>
+          <button class="btn-refresh" onclick="refreshCredit()" title="Refresh"><i class="fa fa-rotate-right"></i></button>
+          <button class="btn-add-credit" onclick="showAddCreditModal()">
+            <i class="fa fa-plus me-1"></i> Add Credit
+          </button>
+        </div>
+      </div>
+      <!-- Totals -->
+      <div class="totals-bar">
+        <div class="total-item">Total Credit: <strong id="totalCredit">55,302,509,143</strong></div>
+        <div class="total-item">Total Debit: <strong id="totalDebit">47,763,234,320</strong></div>
+      </div>
+      <!-- Table Controls -->
+      <div class="tbl-controls">
+        <div class="records-sel">
+          <select id="perPageCredit" onchange="renderCredit()">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+          </select>
+          <span>records per page</span>
+        </div>
+        <div class="search-box">
+          <label>Search:</label>
+          <input type="text" id="searchCredit" oninput="filterCredit()" placeholder=""/>
+        </div>
+      </div>
+      <!-- Credit Table -->
+      <div style="overflow-x:auto;">
+        <table id="creditTable">
+          <thead>
+            <tr>
+              <th onclick="sortCredit(0)">Payment Date ▲</th>
+              <th onclick="sortCredit(1)" class="num-cell">Debit</th>
+              <th onclick="sortCredit(2)" class="num-cell">Credit</th>
+              <th onclick="sortCredit(3)" class="num-cell">Balance</th>
+              <th onclick="sortCredit(4)">Updated At</th>
+            </tr>
+          </thead>
+          <tbody id="creditBody"></tbody>
+        </table>
+      </div>
+      <div class="pag-wrap">
+        <div class="showing" id="showingCredit"></div>
+        <div class="pag-btns" id="pagCredit"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Today's Bond Debited -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Today's Bond Debited:</span>
+      </div>
+      <div class="empty-panel">
+        <i class="fa fa-file-invoice-dollar text-muted"></i>
+        <span>No debit entries for today</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Add Credit Modal -->
+  <div id="creditModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:6px; padding:24px; width:420px; max-width:95vw; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <h6 style="font-weight:700; margin-bottom:16px; color:#222; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <i class="fa fa-plus-circle me-2" style="color:var(--green)"></i>Add Credit Entry
+      </h6>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:600; color:#555; display:block; margin-bottom:4px;">Payment Date *</label>
+        <input type="date" id="m-paymentDate" style="width:100%; border:1px solid #ccc; border-radius:3px; padding:6px 10px; font-size:13px;"/>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:600; color:#555; display:block; margin-bottom:4px;">Credit Amount *</label>
+        <input type="number" id="m-credit" placeholder="0" style="width:100%; border:1px solid #ccc; border-radius:3px; padding:6px 10px; font-size:13px;"/>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px; font-weight:600; color:#555; display:block; margin-bottom:4px;">Note</label>
+        <input type="text" id="m-note" placeholder="Optional note" style="width:100%; border:1px solid #ccc; border-radius:3px; padding:6px 10px; font-size:13px;"/>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button onclick="closeCreditModal()" style="background:#6c757d; color:#fff; border:none; border-radius:3px; padding:6px 18px; font-size:13px; cursor:pointer;">Cancel</button>
+        <button onclick="saveCreditEntry()" style="background:var(--green); color:#fff; border:none; border-radius:3px; padding:6px 18px; font-size:13px; font-weight:600; cursor:pointer;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Debit Modal -->
+  <div id="debitModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:6px; padding:24px; width:420px; max-width:95vw; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <h6 style="font-weight:700; margin-bottom:16px; color:#222; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <i class="fa fa-minus-circle me-2" style="color:var(--red)"></i>Add Debit Entry
+      </h6>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:600; color:#555; display:block; margin-bottom:4px;">Payment Date *</label>
+        <input type="date" id="d-paymentDate" style="width:100%; border:1px solid #ccc; border-radius:3px; padding:6px 10px; font-size:13px;"/>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:600; color:#555; display:block; margin-bottom:4px;">Debit Amount *</label>
+        <input type="number" id="d-debit" placeholder="0" style="width:100%; border:1px solid #ccc; border-radius:3px; padding:6px 10px; font-size:13px;"/>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button onclick="closeDebitModal()" style="background:#6c757d; color:#fff; border:none; border-radius:3px; padding:6px 18px; font-size:13px; cursor:pointer;">Cancel</button>
+        <button onclick="saveDebitEntry()" style="background:var(--red); color:#fff; border:none; border-radius:3px; padding:6px 18px; font-size:13px; font-weight:600; cursor:pointer;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Credit Data ─────────────────────────────────────────────
+    const rawCredit = [
+      { date:'01/11/2024', debit:'',              credit:'295,724,108',   balance:'6,728,345,099',  updatedAt:'2024-11-01 08:02:27' },
+      { date:'01/11/2024', debit:'',              credit:'5,000',         balance:'6,728,350,099',  updatedAt:'2024-11-01 08:03:03' },
+      { date:'01/11/2024', debit:'1,278,802,197', credit:'',              balance:'5,449,547,902',  updatedAt:'2024-11-01 13:43:42' },
+      { date:'01/11/2024', debit:'',              credit:'424,193,321',   balance:'5,873,741,223',  updatedAt:'2024-11-01 13:47:05' },
+      { date:'02/01/2025', debit:'',              credit:'202,052,213',   balance:'1,986,064,243',  updatedAt:'2025-01-02 08:09:21' },
+      { date:'02/01/2025', debit:'',              credit:'5,168,281,345', balance:'7,144,345,588',  updatedAt:'2025-01-02 13:53:11' },
+      { date:'02/11/2024', debit:'75,352,172',    credit:'',              balance:'6,798,389,051',  updatedAt:'2024-11-02 06:11:52' },
+      { date:'02/11/2024', debit:'354,979,676',   credit:'',              balance:'6,443,409,375',  updatedAt:'2024-11-02 10:18:44' },
+      { date:'02/11/2024', debit:'30,785,226',    credit:'',              balance:'6,412,624,149',  updatedAt:'2024-11-02 10:18:48' },
+      { date:'02/12/2024', debit:'',              credit:'82,803,537',    balance:'3,830,899,671',  updatedAt:'2024-12-02 05:50:23' },
+      { date:'03/01/2025', debit:'120,000,000',   credit:'',              balance:'3,710,899,671',  updatedAt:'2025-01-03 09:15:00' },
+      { date:'03/11/2024', debit:'',              credit:'600,000,000',   balance:'4,030,899,671',  updatedAt:'2024-11-03 11:00:00' },
+      { date:'04/11/2024', debit:'200,000,000',   credit:'',              balance:'3,830,899,671',  updatedAt:'2024-11-04 14:30:00' },
+      { date:'05/11/2024', debit:'',              credit:'150,000,000',   balance:'3,980,899,671',  updatedAt:'2024-11-05 08:45:00' },
+      { date:'06/01/2025', debit:'80,000,000',    credit:'',              balance:'3,900,899,671',  updatedAt:'2025-01-06 10:00:00' },
+      { date:'07/01/2025', debit:'',              credit:'250,000,000',   balance:'4,150,899,671',  updatedAt:'2025-01-07 12:00:00' },
+      { date:'08/11/2024', debit:'90,000,000',    credit:'',              balance:'4,060,899,671',  updatedAt:'2024-11-08 09:30:00' },
+    ];
+
+    let filteredCredit = [...rawCredit];
+    let creditPage = 1;
+
+    function fmt(n) { return n ? n : ''; }
+
+    function filterCredit() {
+      const q = document.getElementById('searchCredit').value.toLowerCase();
+      filteredCredit = rawCredit.filter(r =>
+        Object.values(r).some(v => v.toString().toLowerCase().includes(q))
+      );
+      creditPage = 1;
+      renderCredit();
+    }
+
+    function sortCredit(col) {
+      const keys = ['date','debit','credit','balance','updatedAt'];
+      filteredCredit.sort((a,b) => a[keys[col]].localeCompare(b[keys[col]]));
+      creditPage = 1;
+      renderCredit();
+    }
+
+    function renderCredit() {
+      const pp = parseInt(document.getElementById('perPageCredit').value);
+      const start = (creditPage-1)*pp;
+      const end = Math.min(start+pp, filteredCredit.length);
+      const page = filteredCredit.slice(start,end);
+      const tbody = document.getElementById('creditBody');
+      tbody.innerHTML = '';
+      if (!page.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No records found</td></tr>';
+      } else {
+        page.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.date}</td>
+            <td class="num-cell debit-val">${r.debit}</td>
+            <td class="num-cell credit-val">${r.credit}</td>
+            <td class="num-cell">${r.balance}</td>
+            <td>${r.updatedAt}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById('showingCredit').textContent =
+        filteredCredit.length === 0 ? 'No entries' :
+        `Showing ${start+1} to ${end} of ${filteredCredit.length} entries`;
+      renderCreditPag(pp);
+    }
+
+    function renderCreditPag(pp) {
+      const total = Math.ceil(filteredCredit.length/pp);
+      const wrap = document.getElementById('pagCredit');
+      wrap.innerHTML = '';
+      const prev = document.createElement('button');
+      prev.className='pb'; prev.textContent='Previous'; prev.disabled=creditPage===1;
+      prev.onclick=()=>{ creditPage--; renderCredit(); };
+      wrap.appendChild(prev);
+      for(let i=1;i<=total;i++){
+        if(total>7 && i>3 && i<total-2 && Math.abs(i-creditPage)>1){
+          if(i===4){const d=document.createElement('span');d.textContent='...';d.style.padding='3px 4px';wrap.appendChild(d);}
+          continue;
+        }
+        const b=document.createElement('button');
+        b.className='pb'+(i===creditPage?' active':'');
+        b.textContent=i;
+        b.onclick=(p=>()=>{creditPage=p;renderCredit();})(i);
+        wrap.appendChild(b);
+      }
+      const next=document.createElement('button');
+      next.className='pb'; next.textContent='Next'; next.disabled=creditPage===total||total===0;
+      next.onclick=()=>{creditPage++;renderCredit();};
+      wrap.appendChild(next);
+    }
+
+    function refreshCredit() {
+      document.getElementById('searchCredit').value='';
+      filteredCredit=[...rawCredit];
+      creditPage=1;
+      renderCredit();
+    }
+
+    // ── Modals ──────────────────────────────────────────────────
+    function showAddCreditModal() { document.getElementById('creditModal').style.display='flex'; }
+    function closeCreditModal()   { document.getElementById('creditModal').style.display='none'; }
+    function showAddDebitModal()  { document.getElementById('debitModal').style.display='flex'; }
+    function closeDebitModal()    { document.getElementById('debitModal').style.display='none'; }
+
+    function saveCreditEntry() {
+      const d = document.getElementById('m-paymentDate').value;
+      const c = document.getElementById('m-credit').value;
+      if (!d || !c) { alert('Please fill Payment Date and Credit Amount.'); return; }
+      rawCredit.unshift({ date: d.split('-').reverse().join('/'), debit:'', credit: parseInt(c).toLocaleString(), balance:'—', updatedAt: new Date().toISOString().slice(0,19).replace('T',' ')});
+      filteredCredit=[...rawCredit];
+      renderCredit();
+      closeCreditModal();
+    }
+
+    function saveDebitEntry() {
+      const d = document.getElementById('d-paymentDate').value;
+      const db = document.getElementById('d-debit').value;
+      if (!d || !db) { alert('Please fill Payment Date and Debit Amount.'); return; }
+      rawCredit.unshift({ date: d.split('-').reverse().join('/'), debit: parseInt(db).toLocaleString(), credit:'', balance:'—', updatedAt: new Date().toISOString().slice(0,19).replace('T',' ')});
+      filteredCredit=[...rawCredit];
+      renderCredit();
+      closeDebitModal();
+    }
+
+    // Init
+    renderCredit();
+  </script>
+</body>
+</html>

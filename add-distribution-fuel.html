@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Distribution Fuel Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, 'Roboto', sans-serif;
+      font-size: 13px;
+      background: #f4f5f7;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* ===================== BANNER ===================== */
+    .banner {
+      background: #4ab3e8;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 24px;
+    }
+    .banner-icon {
+      background: rgba(255,255,255,0.22);
+      border-radius: 8px;
+      width: 64px; height: 64px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .banner-icon i { font-size: 30px; color: #fff; }
+    .banner-content { flex: 1; }
+    .banner-title { font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 8px; }
+    .banner-badges { display: flex; gap: 8px; }
+    .badge-dist { background: #f0a030; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .5px; padding: 4px 12px; border-radius: 3px; cursor: pointer; border: none; }
+    .badge-dist:hover { background: #d88b20; }
+    .badge-staff { background: #5cb85c; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .5px; padding: 4px 12px; border-radius: 3px; cursor: pointer; border: none; }
+    .badge-staff:hover { background: #449d44; }
+
+    /* ===================== MAIN ===================== */
+    .main-content { padding: 20px 24px; }
+
+    /* ===================== PAGE HEADER ===================== */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .page-title { font-size: 1.3rem; font-weight: 600; color: #222; }
+    .btn-view {
+      background: #3a8fd1; color: #fff; border: none;
+      padding: 7px 20px; border-radius: 4px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-view:hover { background: #2a6fa8; }
+
+    /* ===================== FORM CARD ===================== */
+    .form-card {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    /* ===================== FORM ROW HEADER ===================== */
+    .form-row-header {
+      display: grid;
+      gap: 0;
+      background: #e8e9eb;
+      border-bottom: 1px solid #d0d3d8;
+    }
+    .form-row-header.row1 { grid-template-columns: 1.5fr 1.5fr 1.4fr 1.2fr 1.2fr; }
+    .form-row-header.row2 { grid-template-columns: 1.5fr 1.5fr 1.2fr 1.8fr; }
+
+    .col-header {
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #555;
+      text-align: left;
+      border-right: 1px solid #d0d3d8;
+    }
+    .col-header:last-child { border-right: none; }
+
+    /* ===================== FORM ROW INPUTS ===================== */
+    .form-row-inputs {
+      display: grid;
+      gap: 0;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dde2e8;
+    }
+    .form-row-inputs.row1 { grid-template-columns: 1.5fr 1.5fr 1.4fr 1.2fr 1.2fr; }
+    .form-row-inputs.row2 { grid-template-columns: 1.5fr 1.5fr 1.2fr 1.8fr; }
+
+    .form-cell {
+      padding: 10px 14px;
+      border-right: 1px solid #dde2e8;
+    }
+    .form-cell:last-child { border-right: none; }
+
+    .form-input {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      padding: 6px 10px;
+      font-size: 12.5px;
+      height: 33px;
+      outline: none;
+      color: #333;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-input:focus {
+      border-color: #3a8fd1;
+      box-shadow: 0 0 0 2px rgba(58,143,209,.15);
+    }
+    .form-input.error {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 2px rgba(220,53,69,.12);
+    }
+    .error-msg {
+      font-size: 10.5px;
+      color: #dc3545;
+      margin-top: 3px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ===================== SCROLL ARROWS ===================== */
+    .scroll-arrows {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: #fff;
+      border-top: 1px solid #eee;
+    }
+    .scroll-btn {
+      background: none; border: none; cursor: pointer; color: #888; font-size: 14px; padding: 2px 6px;
+    }
+    .scroll-btn:hover { color: #3a8fd1; }
+
+    /* ===================== FORM FOOTER ===================== */
+    .form-footer {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border-top: 1px solid #e8e9eb;
+    }
+    .btn-save {
+      background: #3a8fd1; color: #fff; border: none;
+      padding: 8px 24px; border-radius: 4px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: #2a6fa8; }
+    .btn-reset {
+      background: #fff; color: #666; border: 1px solid #ccc;
+      padding: 8px 18px; border-radius: 4px; font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-reset:hover { background: #f5f5f5; }
+
+    /* ===================== RECENT TABLE ===================== */
+    .recent-section { margin-top: 24px; }
+    .section-label {
+      font-size: 12.5px; font-weight: 700; color: #555;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .recent-card {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .recent-card table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .recent-card thead th {
+      background: #f0f2f5; font-weight: 700; color: #444;
+      padding: 8px 10px; text-align: left;
+      border-bottom: 2px solid #dde2e8; border-right: 1px solid #e2e6ea;
+      white-space: nowrap;
+    }
+    .recent-card thead th:last-child { border-right: none; }
+    .recent-card tbody td { padding: 7px 10px; border-bottom: 1px solid #eee; border-right: 1px solid #eee; color: #444; }
+    .recent-card tbody td:last-child { border-right: none; }
+    .recent-card tbody tr:hover { background: #e8f3fb; }
+    .tag-dist { background: #fff3e0; color: #e07b20; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .tag-staff { background: #e8f5e9; color: #388e3c; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+
+    /* ===================== TOAST ===================== */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #28a745; color: #fff;
+      padding: 12px 22px; border-radius: 5px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+      z-index: 9999; display: none;
+      animation: fadeUp .22s ease;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 900px) {
+      .form-row-header.row1,
+      .form-row-inputs.row1 { grid-template-columns: 1fr 1fr 1fr; }
+      .form-row-header.row2,
+      .form-row-inputs.row2 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .form-row-header.row1, .form-row-inputs.row1,
+      .form-row-header.row2, .form-row-inputs.row2 { grid-template-columns: 1fr; }
+      .main-content { padding: 12px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BANNER ===== -->
+<div class="banner">
+  <div class="banner-icon"><i class="fa fa-truck"></i></div>
+  <div class="banner-content">
+    <div class="banner-title">Distribution Fuel<br/>Report</div>
+    <div class="banner-badges">
+      <button class="badge-dist">DISTRIBUTION</button>
+      <button class="badge-staff">STAFF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">Add Distribution Fuel Management</div>
+    <button class="btn-view" onclick="window.location.href='distribution-fuel-report.html'">
+      <i class="fa fa-eye"></i> View
+    </button>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card">
+
+    <!-- ROW 1: Headers -->
+    <div class="form-row-header row1">
+      <div class="col-header">Date</div>
+      <div class="col-header">Name</div>
+      <div class="col-header">Vehicle No</div>
+      <div class="col-header">KM</div>
+      <div class="col-header">Mileage</div>
+    </div>
+
+    <!-- ROW 1: Inputs -->
+    <div class="form-row-inputs row1">
+      <div class="form-cell">
+        <input type="date" id="fDate" class="form-input" placeholder="Date"/>
+        <div class="error-msg" id="err-date">Date is required.</div>
+      </div>
+      <div class="form-cell">
+        <input type="text" id="fName" class="form-input" placeholder="Enter name" maxlength="100"/>
+        <div class="error-msg" id="err-name">Name is required.</div>
+      </div>
+      <div class="form-cell">
+        <input type="text" id="fVehicle" class="form-input" placeholder="e.g. T 902 DJQ" maxlength="30"/>
+        <div class="error-msg" id="err-vehicle">Vehicle No is required.</div>
+      </div>
+      <div class="form-cell">
+        <input type="number" id="fKM" class="form-input" placeholder="KM" min="0"/>
+        <div class="error-msg" id="err-km">Enter a valid KM value.</div>
+      </div>
+      <div class="form-cell">
+        <input type="number" id="fMileage" class="form-input" placeholder="Mileage" min="0"/>
+        <div class="error-msg" id="err-mileage">Enter valid mileage.</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Headers -->
+    <div class="form-row-header row2">
+      <div class="col-header">Amount</div>
+      <div class="col-header">Order No</div>
+      <div class="col-header">Litres</div>
+      <div class="col-header">Remarks</div>
+    </div>
+
+    <!-- ROW 2: Inputs -->
+    <div class="form-row-inputs row2">
+      <div class="form-cell">
+        <input type="number" id="fAmount" class="form-input" placeholder="Amount" step="0.01" min="0"/>
+        <div class="error-msg" id="err-amount">Amount is required (numeric).</div>
+      </div>
+      <div class="form-cell">
+        <input type="text" id="fOrderNo" class="form-input" placeholder="Order No" maxlength="30"/>
+      </div>
+      <div class="form-cell">
+        <input type="number" id="fLitres" class="form-input" placeholder="Litres" step="0.01" min="0"/>
+        <div class="error-msg" id="err-litres">Enter valid litres value.</div>
+      </div>
+      <div class="form-cell">
+        <input type="text" id="fRemarks" class="form-input" placeholder="Remarks" maxlength="200"/>
+      </div>
+    </div>
+
+    <!-- Scroll arrows (decorative, matches screenshot) -->
+    <div class="scroll-arrows">
+      <button class="scroll-btn" title="Scroll left"><i class="fa fa-chevron-left"></i></button>
+      <button class="scroll-btn" title="Scroll right"><i class="fa fa-chevron-right"></i></button>
+    </div>
+
+    <!-- Footer -->
+    <div class="form-footer">
+      <button class="btn-save" onclick="saveRecord()">
+        <i class="fa fa-floppy-disk"></i> Save
+      </button>
+      <button class="btn-reset" onclick="resetForm()">
+        <i class="fa fa-rotate-left"></i> Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== RECENTLY ADDED ===== -->
+  <div class="recent-section">
+    <div class="section-label">
+      <i class="fa fa-clock-rotate-left" style="color:#3a8fd1;"></i>
+      Recently Added Records
+      <span id="recentCount" style="font-weight:400;color:#999;font-size:11.5px;"></span>
+    </div>
+    <div class="recent-card">
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Vehicle No</th>
+              <th>KM</th>
+              <th>Mileage</th>
+              <th>Amount</th>
+              <th>Order No</th>
+              <th>Litres</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody">
+            <tr><td colspan="10" style="text-align:center;padding:18px;color:#aaa;">No records added yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   LOCAL STORAGE KEY
+================================================================ */
+const STORAGE_KEY = 'dist_fuel_records';
+
+/* ================================================================
+   LOAD EXISTING RECORDS
+================================================================ */
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+function saveRecords(records) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+}
+
+/* ================================================================
+   VALIDATION HELPERS
+================================================================ */
+function setError(fieldId, errId, show) {
+  const field = document.getElementById(fieldId);
+  const errEl = document.getElementById(errId);
+  if (show) {
+    field.classList.add('error');
+    errEl.classList.add('show');
+  } else {
+    field.classList.remove('error');
+    errEl.classList.remove('show');
+  }
+}
+
+function clearAllErrors() {
+  const pairs = [
+    ['fDate','err-date'],['fName','err-name'],['fVehicle','err-vehicle'],
+    ['fKM','err-km'],['fMileage','err-mileage'],['fAmount','err-amount'],['fLitres','err-litres']
+  ];
+  pairs.forEach(([f,e]) => setError(f, e, false));
+}
+
+/* ================================================================
+   ADD LIVE VALIDATION
+================================================================ */
+['fDate','fName','fVehicle','fAmount'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    if (this.value.trim()) {
+      this.classList.remove('error');
+      const errId = 'err-' + id.replace('f','').toLowerCase();
+      const errEl = document.getElementById(errId);
+      if(errEl) errEl.classList.remove('show');
+    }
+  });
+});
+
+/* ================================================================
+   SAVE RECORD
+================================================================ */
+function saveRecord() {
+  clearAllErrors();
+  let valid = true;
+
+  const date    = document.getElementById('fDate').value;
+  const name    = document.getElementById('fName').value.trim();
+  const vehicle = document.getElementById('fVehicle').value.trim();
+  const km      = document.getElementById('fKM').value;
+  const mileage = document.getElementById('fMileage').value;
+  const amount  = document.getElementById('fAmount').value;
+  const orderNo = document.getElementById('fOrderNo').value.trim();
+  const litres  = document.getElementById('fLitres').value;
+  const remarks = document.getElementById('fRemarks').value.trim();
+
+  if (!date) { setError('fDate','err-date',true); valid = false; }
+  if (!name) { setError('fName','err-name',true); valid = false; }
+  if (!vehicle) { setError('fVehicle','err-vehicle',true); valid = false; }
+  if (km && (isNaN(km) || Number(km)<0)) { setError('fKM','err-km',true); valid = false; }
+  if (mileage && (isNaN(mileage) || Number(mileage)<0)) { setError('fMileage','err-mileage',true); valid = false; }
+  if (!amount || isNaN(amount) || Number(amount)<0) { setError('fAmount','err-amount',true); valid = false; }
+  if (litres && (isNaN(litres) || Number(litres)<0)) { setError('fLitres','err-litres',true); valid = false; }
+
+  if (!valid) {
+    showToast('Please fix the validation errors.', '#dc3545');
+    return;
+  }
+
+  const record = {
+    id: Date.now(),
+    date: formatDisplayDate(date),
+    name, vehicle,
+    km: km ? Number(km) : '',
+    mileage: mileage ? Number(mileage) : '',
+    amount: parseFloat(amount),
+    orderNo: orderNo || '',
+    litres: litres ? parseFloat(litres) : '',
+    remarks,
+    type: 'DISTRIBUTION',
+    savedAt: new Date().toISOString()
+  };
+
+  const records = loadRecords();
+  records.unshift(record);
+  saveRecords(records);
+
+  renderRecent();
+  resetForm();
+  showToast('Data Saved Successfully!');
+}
+
+/* ================================================================
+   FORMAT DATE
+================================================================ */
+function formatDisplayDate(iso) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = new Date(iso);
+  return `${String(d.getDate()).padStart(2,'0')}-${months[d.getMonth()]}-${String(d.getFullYear()).slice(2)}`;
+}
+
+/* ================================================================
+   RESET FORM
+================================================================ */
+function resetForm() {
+  const ids = ['fDate','fName','fVehicle','fKM','fMileage','fAmount','fOrderNo','fLitres','fRemarks'];
+  ids.forEach(id => document.getElementById(id).value = '');
+  clearAllErrors();
+}
+
+/* ================================================================
+   RENDER RECENT
+================================================================ */
+function renderRecent() {
+  const records = loadRecords();
+  const tbody = document.getElementById('recentBody');
+  const countEl = document.getElementById('recentCount');
+  countEl.textContent = records.length ? `(${records.length} record${records.length>1?'s':''})` : '';
+
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:18px;color:#aaa;">No records added yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = '';
+  records.slice(0, 10).forEach((row, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${esc(row.date)}</td>
+      <td>${esc(row.name)}</td>
+      <td>${esc(row.vehicle)}</td>
+      <td>${row.km !== '' ? row.km : '—'}</td>
+      <td>${row.mileage !== '' ? row.mileage : '—'}</td>
+      <td>${row.amount !== '' ? Number(row.amount).toFixed(2) : '—'}</td>
+      <td>${esc(String(row.orderNo||''))}</td>
+      <td>${row.litres !== '' ? Number(row.litres).toFixed(2) : '—'}</td>
+      <td>${esc(row.remarks)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function showToast(msg, color='#28a745') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = color;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = 'none'; }, 3200);
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+renderRecent();
+</script>
+</body>
+</html>

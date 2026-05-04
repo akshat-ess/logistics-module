@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Voyage Master - ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  body{background:#f0f2f5;font-family:'Segoe UI',sans-serif;font-size:13px;}
+  .erp-header{background:#1a3c6e;color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .erp-header .brand{font-size:18px;font-weight:700;}
+  .page-title{font-size:24px;font-weight:600;padding:15px 20px 5px;color:#222;}
+  .left-card{background:#fff;border:1px solid #dde;border-radius:4px;padding:15px;}
+  .left-card-title{font-weight:600;font-size:13px;margin-bottom:12px;color:#333;border-bottom:1px solid #eee;padding-bottom:6px;}
+  .right-card{background:#fff;border:1px solid #dde;border-radius:4px;}
+  .right-card-header{background:#f5f6f8;border-bottom:1px solid #dde;padding:8px 14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .form-label{font-size:12px;font-weight:500;margin-bottom:3px;color:#444;}
+  .form-control,.form-select{font-size:12px;height:30px;border-radius:3px;border:1px solid #ccc;}
+  .btn-add{background:#337ab7;color:#fff;font-size:12px;border-radius:3px;padding:5px 14px;border:none;margin-top:6px;}
+  .btn-edit{background:#337ab7;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  .btn-delete{background:#d9534f;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  table.dataTable thead th{background:#f5f6f8;font-size:12px;font-weight:600;border-bottom:2px solid #dde;white-space:nowrap;}
+  table.dataTable tbody td{font-size:12px;vertical-align:middle;}
+  .btn-refresh{background:none;border:none;color:#337ab7;font-size:14px;cursor:pointer;}
+</style>
+</head>
+<body>
+<!-- <div class="erp-header">
+  <div class="brand"><i class="fa fa-cube me-2"></i>HONEST LOGISTICS LTD</div>
+  <div><a href="#" style="color:#cde;text-decoration:none;font-size:12px;">Master ▾</a></div>
+  <div style="font-size:12px;color:#acd;"><i class="fa fa-user-circle me-1"></i>temp user</div>
+</div> -->
+
+<div class="page-title">Voyage</div>
+
+<div class="px-3 pb-3 d-flex gap-3 align-items-start">
+  <div style="width:300px;flex-shrink:0;">
+    <div class="left-card">
+      <div class="left-card-title">Add Voyage</div>
+      <div class="mb-2">
+        <label class="form-label">Vessel</label>
+        <select id="f_vessel" class="form-select"><option value="">select...</option></select>
+      </div>
+      <div class="mb-2"><label class="form-label">Name</label><input type="text" id="f_name" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETA</label><input type="date" id="f_eta" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETB</label><input type="date" id="f_etb" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETD</label><input type="date" id="f_etd" class="form-control"/></div>
+      <button class="btn-add" onclick="saveRecord()">Add Voyage</button>
+    </div>
+  </div>
+  <div class="flex-grow-1">
+    <div class="right-card">
+      <div class="right-card-header">All Voyages <button class="btn-refresh" onclick="buildTable()"><i class="fa fa-sync-alt"></i></button></div>
+      <div class="p-2">
+        <table id="mainTable" class="table table-bordered table-hover table-sm w-100">
+          <thead><tr><th>Vessel</th><th>Voyage</th><th>ETD</th><th>ETA</th><th>ETB</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header py-2"><h6 class="modal-title">Edit Voyage</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editIndex"/>
+      <div class="mb-2">
+        <label class="form-label">Vessel</label>
+        <select id="e_vessel" class="form-select"><option value="">select...</option></select>
+      </div>
+      <div class="mb-2"><label class="form-label">Name</label><input id="e_name" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETA</label><input type="date" id="e_eta" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETB</label><input type="date" id="e_etb" class="form-control"/></div>
+      <div class="mb-2"><label class="form-label">ETD</label><input type="date" id="e_etd" class="form-control"/></div>
+    </div>
+    <div class="modal-footer py-1">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="updateRecord()">Save</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm"><div class="modal-content">
+    <div class="modal-header py-2"><h6 class="modal-title">Confirm Delete</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><p class="mb-0">Delete this voyage?</p></div>
+    <div class="modal-footer py-1">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+<script>
+const SK='erp_voyages';
+const SK_VESSELS='erp_vessels';
+let delIdx=-1;
+
+const defVessels=[{name:'EA NVOCC'},{name:'KOTA NEBULA'},{name:'KOTA NEKAD'},{name:'KOTA NEKADO'}];
+const defVoyages=[];
+
+function getVessels(){const s=localStorage.getItem(SK_VESSELS);return s?JSON.parse(s):[...defVessels];}
+function getData(){const s=localStorage.getItem(SK);return s?JSON.parse(s):[...defVoyages];}
+function saveData(d){localStorage.setItem(SK,JSON.stringify(d));}
+
+function populateVesselDropdowns(){
+  const vessels=getVessels();
+  const opts=vessels.map(v=>`<option>${v.name}</option>`).join('');
+  $('#f_vessel,#e_vessel').find('option:not(:first)').remove();
+  $('#f_vessel,#e_vessel').append(opts);
+}
+
+let dt;
+function buildTable(){
+  populateVesselDropdowns();
+  const data=getData();if(dt){dt.destroy();}
+  const tbody=$('#mainTable tbody');tbody.empty();
+  if(data.length===0){
+    tbody.append('<tr><td colspan="6" class="text-center text-muted">No data available in table</td></tr>');
+  } else {
+    data.forEach((r,i)=>{
+      tbody.append(`<tr>
+        <td>${r.vessel}</td><td>${r.name}</td><td>${r.etd}</td><td>${r.eta}</td><td>${r.etb}</td>
+        <td><button class="btn-edit me-1" onclick="editRec(${i})">Edit</button><button class="btn-delete" onclick="openDel(${i})">Delete</button></td>
+      </tr>`);
+    });
+  }
+  dt=$('#mainTable').DataTable({pageLength:10,order:[[0,'asc']],columnDefs:[{orderable:false,targets:5}],
+    language:{emptyTable:'No data available in table',zeroRecords:'No matching records found'}
+  });
+}
+
+function saveRecord(){
+  const vessel=$('#f_vessel').val();const name=$('#f_name').val().trim();
+  if(!vessel){alert('Select a vessel');return;}
+  if(!name){alert('Voyage name required');return;}
+  const data=getData();
+  data.push({vessel,name,eta:$('#f_eta').val(),etb:$('#f_etb').val(),etd:$('#f_etd').val()});
+  saveData(data);$('#f_name,#f_eta,#f_etb,#f_etd').val('');$('#f_vessel').val('');buildTable();
+}
+function editRec(i){
+  const data=getData();const r=data[i];
+  $('#editIndex').val(i);$('#e_vessel').val(r.vessel);$('#e_name').val(r.name);
+  $('#e_eta').val(r.eta);$('#e_etb').val(r.etb);$('#e_etd').val(r.etd);
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+function updateRecord(){
+  const data=getData();const i=parseInt($('#editIndex').val());
+  data[i]={vessel:$('#e_vessel').val(),name:$('#e_name').val().trim(),eta:$('#e_eta').val(),etb:$('#e_etb').val(),etd:$('#e_etd').val()};
+  saveData(data);bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();buildTable();
+}
+function openDel(i){delIdx=i;new bootstrap.Modal(document.getElementById('deleteModal')).show();}
+function confirmDelete(){
+  const data=getData();data.splice(delIdx,1);saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();buildTable();
+}
+$(()=>buildTable());
+</script>
+</body>
+</html>

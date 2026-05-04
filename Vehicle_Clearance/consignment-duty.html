@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Vehicle Port Consignment – Duty Payment</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #333; font-size: 13px; }
+
+  .topnav { background: #1a2940; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 50px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .topnav .brand { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .topnav .brand span { color: #4db8ff; }
+  .topnav .nav-right { display: flex; align-items: center; gap: 16px; }
+  .topnav .nav-right a { color: #cdd8e8; text-decoration: none; font-size: 13px; }
+  .topnav .nav-right a:hover { color: #fff; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #4db8ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+  .layout { display: flex; min-height: calc(100vh - 50px); }
+  .sidebar { width: 210px; background: #1e3050; color: #cdd8e8; flex-shrink: 0; padding-top: 10px; }
+  .sidebar-menu { list-style: none; }
+  .sidebar-menu li a { display: flex; align-items: center; gap: 9px; padding: 10px 18px; font-size: 13px; color: #cdd8e8; text-decoration: none; transition: background .2s; border-left: 3px solid transparent; }
+  .sidebar-menu li a:hover, .sidebar-menu li a.active { background: #253d5e; color: #fff; border-left-color: #4db8ff; }
+  .sidebar-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #7a94b0; padding: 14px 18px 5px; }
+
+  .main { flex: 1; padding: 20px 24px; overflow: auto; }
+  .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .page-title-row h1 { font-size: 20px; font-weight: 700; color: #1a2940; }
+
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 16px; border-radius: 5px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background .15s; text-decoration: none; white-space: nowrap; }
+  .btn-primary { background: #007bff; color: #fff; }
+  .btn-primary:hover { background: #0069d9; }
+  .btn-success { background: #28a745; color: #fff; }
+  .btn-success:hover { background: #218838; }
+  .btn-secondary { background: #6c757d; color: #fff; }
+  .btn-secondary:hover { background: #545b62; }
+
+  .cargo-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.08); overflow: hidden; }
+  .cargo-card-header { background: #f8fafd; border-bottom: 1px solid #e2e8f0; padding: 10px 18px; display: flex; align-items: center; gap: 8px; }
+  .cargo-card-header .title { font-size: 13px; font-weight: 600; color: #1a2940; }
+  .refresh-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #007bff; }
+
+  .declarant-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+  .decl-group { display: flex; align-items: center; gap: 12px; }
+  .decl-label { font-size: 12px; font-weight: 700; color: #1a2940; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  select, input[type="text"], input[type="date"] {
+    border: 1px solid #ced4da; border-radius: 4px; padding: 5px 10px; font-size: 12px; font-family: inherit; background: #fff; color: #333; outline: none; transition: border-color .2s; height: 30px;
+  }
+  select:focus, input:focus { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,0.15); }
+  select { min-width: 160px; }
+
+  .tabs-nav { display: flex; gap: 0; padding: 0 18px; border-bottom: 2px solid #e2e8f0; background: #fff; }
+  .tab-btn { padding: 10px 20px; font-size: 13px; font-weight: 500; color: #555; background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .15s, border-color .15s; text-decoration: none; white-space: nowrap; display: inline-block; }
+  .tab-btn:hover { color: #007bff; }
+  .tab-btn.active { color: #007bff; border-bottom-color: #007bff; font-weight: 600; }
+
+  .scroll-indicator { display: flex; align-items: center; justify-content: space-between; padding: 4px 18px; background: #f8fafd; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+  .scroll-indicator .arrows { display: flex; gap: 6px; }
+  .scroll-indicator button { background: none; border: none; font-size: 14px; cursor: pointer; color: #555; padding: 2px 6px; }
+  .collapse-btn { background: none; border: none; font-size: 14px; cursor: pointer; color: #555; }
+
+  .form-grid { display: grid; gap: 0; }
+  .form-row { display: grid; border-bottom: 1px solid #f0f4fa; }
+  .form-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .form-cell { padding: 6px 12px 8px; border-right: 1px solid #f0f4fa; }
+  .form-cell:last-child { border-right: none; }
+  .form-cell label { display: block; font-size: 11px; font-weight: 600; color: #6b7a8d; margin-bottom: 4px; text-align: center; }
+  .form-cell input, .form-cell select { width: 100%; }
+
+  .bottom-scroll { display: flex; align-items: center; justify-content: space-between; padding: 5px 18px; background: #f8fafd; border-top: 1px solid #e2e8f0; }
+  .bottom-scroll button { background: none; border: none; font-size: 14px; cursor: pointer; color: #555; }
+  .scroll-bar-track { flex: 1; height: 8px; background: #e0e6ef; border-radius: 4px; margin: 0 12px; }
+  .scroll-bar-thumb { height: 8px; background: #888; border-radius: 4px; width: 60%; }
+
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 18px; background: #f8fafd; border-top: 1px solid #e2e8f0; }
+
+  /* Summary panel */
+  .summary-panel { background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 14px 18px; margin-top: 20px; }
+  .summary-panel h3 { font-size: 14px; font-weight: 700; color: #1b5e20; margin-bottom: 12px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .summary-item label { font-size: 11px; color: #4a7a52; font-weight: 600; display: block; margin-bottom: 3px; }
+  .summary-item span { font-size: 12px; color: #1b5e20; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">&#9783; <span>ClearPort</span> ERP</div>
+  <div class="nav-right">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="cargo-position.html">Cargo Position</a>
+    <div class="avatar">JD</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Main Menu</div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html"><span>🏠</span> Dashboard</a></li>
+      <li><a href="cargo-position.html"><span>🚢</span> Cargo Position</a></li>
+      <li><a href="consignment-file.html" class="active"><span>📄</span> Consignments</a></li>
+      <li><a href="#"><span>📦</span> Inventory</a></li>
+    </ul>
+    <div class="sidebar-section">Reports</div>
+    <ul class="sidebar-menu">
+      <li><a href="#"><span>📊</span> Analytics</a></li>
+      <li><a href="#"><span>🖨️</span> Print Reports</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <div class="page-title-row">
+      <h1>Add Vehicle Port Consignment</h1>
+      <a href="cargo-position.html" class="btn btn-primary">View Consignments</a>
+    </div>
+
+    <div class="cargo-card">
+      <div class="cargo-card-header">
+        <span class="title">Cargo details</span>
+        <button class="refresh-btn" title="Refresh">🔄</button>
+      </div>
+
+      <div class="declarant-row">
+        <div class="decl-group">
+          <span class="decl-label">DECLARANT</span>
+          <select id="declarant">
+            <option value="">select...</option>
+            <option>John Doe – JD001</option>
+            <option>Mary Smith – MS002</option>
+            <option>Peter Kamau – PK003</option>
+          </select>
+        </div>
+        <div class="decl-group">
+          <span class="decl-label">PORT AGENT</span>
+          <select id="portAgent">
+            <option value="">select...</option>
+            <option>Maersk Line Agency</option>
+            <option>MSC Shipping Agency</option>
+            <option>CMA CGM Agency</option>
+            <option>Hapag-Lloyd Agency</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tabs-nav">
+        <a href="consignment-file.html" class="tab-btn">File No</a>
+        <a href="consignment-vessel.html" class="tab-btn">Vessel</a>
+        <span class="tab-btn active">Duty Payment</span>
+      </div>
+
+      <!-- DUTY PAYMENT TAB -->
+      <div>
+        <div class="scroll-indicator">
+          <div class="arrows">
+            <button>◀</button>
+            <button>▶</button>
+          </div>
+          <button class="collapse-btn">▲</button>
+        </div>
+
+        <div class="form-grid">
+          <!-- Row 1: Doc Lodged Date | Assmt Valu. Date | Duty Pay Date | Transf. Manifest Date -->
+          <div class="form-row cols-4">
+            <div class="form-cell">
+              <label>Doc. Lodged Date</label>
+              <input type="date" id="docLodgedDate">
+            </div>
+            <div class="form-cell">
+              <label>Assmt Valu. Date</label>
+              <input type="date" id="assmtValuDate">
+            </div>
+            <div class="form-cell">
+              <label>Duty Pay Date</label>
+              <input type="date" id="dutyPayDate">
+            </div>
+            <div class="form-cell">
+              <label>Transf. Manifest Date</label>
+              <input type="date" id="transfManifestDate">
+            </div>
+          </div>
+
+          <!-- Row 2: Verification Date | Wharfage Pay Date | RO Recd Date | Port Charge Pay Date -->
+          <div class="form-row cols-4">
+            <div class="form-cell">
+              <label>Verification Date</label>
+              <input type="date" id="verificationDate">
+            </div>
+            <div class="form-cell">
+              <label>Wharfage Pay Date</label>
+              <input type="date" id="wharfagePayDate">
+            </div>
+            <div class="form-cell">
+              <label>RO Recd Date</label>
+              <input type="date" id="roRecdDate">
+            </div>
+            <div class="form-cell">
+              <label>Port Charge Pay Date</label>
+              <input type="date" id="portChargePayDate">
+            </div>
+          </div>
+
+          <!-- Row 3: ICD Charge Pay Date | Delivery Date | TBS | Remarks -->
+          <div class="form-row cols-4">
+            <div class="form-cell">
+              <label>ICD Charge Pay Date</label>
+              <input type="date" id="icdChargePayDate">
+            </div>
+            <div class="form-cell">
+              <label>Delivery Date</label>
+              <input type="date" id="deliveryDate">
+            </div>
+            <div class="form-cell">
+              <label>TBS</label>
+              <input type="text" id="tbs" placeholder="">
+            </div>
+            <div class="form-cell">
+              <label>Remarks</label>
+              <input type="text" id="remarks" placeholder="">
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-scroll">
+          <button>◀</button>
+          <div class="scroll-bar-track"><div class="scroll-bar-thumb"></div></div>
+          <button>▶</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+        <button class="btn btn-success" onclick="saveDuty()">💾 Save &amp; Finalise</button>
+      </div>
+    </div>
+
+    <!-- STATUS SUMMARY PANEL -->
+    <div class="summary-panel">
+      <h3>📋 Consignment Workflow Status</h3>
+      <div class="summary-grid">
+        <div class="summary-item"><label>Step 1 – File Details</label><span id="s1">✅ Complete</span></div>
+        <div class="summary-item"><label>Step 2 – Vessel Details</label><span id="s2">✅ Complete</span></div>
+        <div class="summary-item"><label>Step 3 – Duty Payment</label><span id="s3">⏳ In Progress</span></div>
+        <div class="summary-item"><label>Doc. Lodged</label><span id="disp-doc">—</span></div>
+        <div class="summary-item"><label>Duty Paid</label><span id="disp-duty">—</span></div>
+        <div class="summary-item"><label>Delivery Date</label><span id="disp-del">—</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+document.getElementById('docLodgedDate').addEventListener('change', e => {
+  document.getElementById('disp-doc').textContent = e.target.value || '—';
+});
+document.getElementById('dutyPayDate').addEventListener('change', e => {
+  document.getElementById('disp-duty').textContent = e.target.value || '—';
+});
+document.getElementById('deliveryDate').addEventListener('change', e => {
+  document.getElementById('disp-del').textContent = e.target.value || '—';
+});
+
+function saveDuty() {
+  const remarks = document.getElementById('remarks').value;
+  const delivery = document.getElementById('deliveryDate').value;
+  document.getElementById('s3').textContent = '✅ Complete';
+  alert('✅ Duty Payment details saved!\n\nDelivery Date: ' + (delivery || 'Not set') + '\nRemarks: ' + (remarks || 'None') + '\n\nConsignment record finalised successfully.');
+  window.location.href = 'cargo-position.html';
+}
+
+function resetForm() {
+  if (confirm('Reset all duty payment fields?')) {
+    document.querySelectorAll('input[type="date"], input[type="text"]').forEach(el => el.value = '');
+    document.querySelectorAll('select').forEach(el => el.value = '');
+    ['disp-doc','disp-duty','disp-del'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('s3').textContent = '⏳ In Progress';
+  }
+}
+</script>
+</body>
+</html>

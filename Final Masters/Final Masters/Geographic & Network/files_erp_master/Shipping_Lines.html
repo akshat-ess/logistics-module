@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shipping Line Master</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; color: #333; }
+  .page-header { background: #fff; border-bottom: 1px solid #dde1e7; padding: 10px 20px; margin-bottom: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .page-header h4 { margin: 0; font-size: 18px; font-weight: 600; color: #1a2b4a; }
+  .card { border: 1px solid #dde1e7; border-radius: 6px; box-shadow: 0 1px 6px rgba(0,0,0,.07); background: #fff; }
+  .card-header { background: #f7f8fa; border-bottom: 1px solid #dde1e7; padding: 8px 14px; font-weight: 600; font-size: 13px; color: #1a2b4a; border-radius: 6px 6px 0 0 !important; }
+  .form-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 3px; }
+  .form-control, .form-select { font-size: 12px; padding: 5px 9px; border-radius: 4px; border: 1px solid #cdd0d5; }
+  .form-control:focus, .form-select:focus { border-color: #3b7ddd; box-shadow: 0 0 0 2px rgba(59,125,221,.15); }
+  .btn-sm { font-size: 11px; padding: 3px 9px; border-radius: 3px; }
+  .btn-primary { background: #3b7ddd; border-color: #3b7ddd; font-size: 12px; }
+  .btn-info { background: #17a2b8; border-color: #17a2b8; color: #fff; }
+  .btn-info:hover { background: #138496; border-color: #138496; color: #fff; }
+  .btn-danger { background: #dc3545; border-color: #dc3545; }
+  .btn-success { background: #28a745; border-color: #28a745; }
+  .table { font-size: 11px; margin-bottom: 0; }
+  .table thead th { background: #f0f2f5; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .3px; color: #555; border-bottom: 2px solid #dde1e7; padding: 6px 7px; cursor: pointer; white-space: nowrap; user-select: none; text-align: center; }
+  .table thead th:first-child { text-align: left; }
+  .table thead th:hover { background: #e4e7ec; }
+  .sort-icon { margin-left: 3px; color: #aaa; font-size: 9px; }
+  .table tbody td { padding: 5px 7px; vertical-align: middle; border-color: #eef0f3; text-align: center; }
+  .table tbody td:first-child, .table tbody td:nth-child(2), .table tbody td:nth-child(3), .table tbody td:nth-child(4), .table tbody td:nth-child(5), .table tbody td:nth-child(6) { text-align: left; }
+  .table-hover tbody tr:hover { background: #f4f8ff; }
+  .table-striped tbody tr:nth-child(odd) { background-color: #fafbfc; }
+  .search-box { max-width: 180px; }
+  .pagination .page-link { font-size: 11px; padding: 4px 9px; color: #3b7ddd; border-color: #dde1e7; }
+  .pagination .page-item.active .page-link { background: #3b7ddd; border-color: #3b7ddd; }
+  .table-container { overflow-x: auto; max-height: 380px; overflow-y: auto; }
+  .table-container thead th { position: sticky; top: 0; z-index: 1; }
+  .records-info { font-size: 11px; color: #777; }
+  .container-fluid { padding: 0 18px; }
+  .modal-header { background: #1a2b4a; color: #fff; padding: 10px 16px; }
+  .modal-header .btn-close { filter: invert(1); }
+  .modal-title { font-size: 14px; font-weight: 600; }
+  .status-active { display:inline-block; background:#d4edda; color:#155724; font-size:10px; padding:1px 7px; border-radius:10px; font-weight:600; }
+  .status-inactive { display:inline-block; background:#f8d7da; color:#721c24; font-size:10px; padding:1px 7px; border-radius:10px; font-weight:600; }
+  .det-val { display:inline-block; background:#e9ecef; color:#555; font-size:10px; padding:1px 5px; border-radius:3px; min-width:20px; text-align:center; }
+  .cfd-section { background:#f8f9fa; border:1px solid #dee2e6; border-radius:4px; padding:10px; margin-top:8px; }
+  .cfd-section .section-title { font-size:11px; font-weight:700; color:#1a2b4a; text-transform:uppercase; letter-spacing:.4px; margin-bottom:8px; }
+  .cfd-item { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .cfd-item .form-select, .cfd-item .form-control { flex:1; font-size:11px; padding:3px 7px; }
+  .cfd-item .btn { flex-shrink:0; }
+  .cfd-tag { display:inline-flex; align-items:center; gap:4px; background:#dbeafe; color:#1e40af; font-size:10px; padding:2px 7px; border-radius:10px; margin:2px; }
+  .cfd-tag .remove-cfd { cursor:pointer; font-size:11px; color:#dc3545; }
+  .section-divider { border-top:1px solid #e9ecef; margin: 10px 0 8px; }
+  .det-group-header { background:#e8edf4; padding:4px 8px; font-size:10px; font-weight:700; color:#1a2b4a; letter-spacing:.3px; }
+  .file-label { font-size:11px; color:#666; margin-top:3px; display:block; }
+  .upload-area { border:1px dashed #cdd0d5; border-radius:4px; padding:8px; text-align:center; background:#fafbfc; cursor:pointer; }
+  .upload-area:hover { border-color:#3b7ddd; background:#f0f5ff; }
+  .upload-area i { font-size:20px; color:#aaa; }
+  .upload-area .upload-text { font-size:11px; color:#888; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h4><i class="bi bi-water me-2 text-primary"></i>ShippingLine</h4>
+</div>
+<div class="container-fluid">
+  <div class="row g-3">
+    <!-- FORM PANEL -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">Add ShippingLine</div>
+        <div class="card-body p-3">
+          <form id="slForm" novalidate>
+            <div class="mb-2">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="slName" placeholder="Enter shipping line name" required/>
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="slStatus">
+                <option value="">Select...</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Address</label>
+              <input type="text" class="form-control" id="slAddress" placeholder="Enter address"/>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label">Code</label>
+                <input type="text" class="form-control" id="slCode" placeholder="Code"/>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Telephone</label>
+                <input type="text" class="form-control" id="slTel" placeholder="Telephone"/>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="slEmail" placeholder="Enter email"/>
+            </div>
+            <!-- Authorisation Letter Upload -->
+            <div class="mb-2">
+              <label class="form-label">Authorisation Letter Template</label>
+              <div class="upload-area" onclick="document.getElementById('slFile').click()">
+                <i class="bi bi-cloud-upload"></i>
+                <div class="upload-text" id="fileLabel">Choose file... No file chosen</div>
+              </div>
+              <input type="file" id="slFile" class="d-none" accept=".pdf,.doc,.docx" onchange="updateFileLabel(this)"/>
+            </div>
+            <!-- Container Free Days -->
+            <div class="cfd-section">
+              <div class="section-title"><i class="bi bi-calendar3 me-1"></i>Container Free Days</div>
+              <div class="cfd-item">
+                <select class="form-select" id="cfdCountry">
+                  <option value="">Country...</option>
+                  <option value="Tanzania">Tanzania</option>
+                  <option value="Kenya">Kenya</option>
+                  <option value="Uganda">Uganda</option>
+                  <option value="Rwanda">Rwanda</option>
+                  <option value="Zambia">Zambia</option>
+                  <option value="Malawi">Malawi</option>
+                  <option value="Burundi">Burundi</option>
+                  <option value="Congo">Congo</option>
+                </select>
+                <input type="number" class="form-control" id="cfdDays" placeholder="days" min="0" style="max-width:70px"/>
+                <button type="button" class="btn btn-success btn-sm" onclick="addCFD()">
+                  <i class="bi bi-plus"></i> Add
+                </button>
+              </div>
+              <div id="cfdTags"></div>
+            </div>
+            <!-- Detention Fields -->
+            <div class="section-divider"></div>
+            <div class="cfd-section">
+              <div class="section-title"><i class="bi bi-hourglass-split me-1"></i>Detention (Days)</div>
+              <div class="row g-1 mb-1">
+                <div class="col-12"><small class="text-muted fw-semibold" style="font-size:10px">20' Container</small></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">0-7 Days</label><input type="number" class="form-control" id="det20_0_7" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">8-14 Days</label><input type="number" class="form-control" id="det20_8_14" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">15-30 Days</label><input type="number" class="form-control" id="det20_15_30" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">&gt;30 Days</label><input type="number" class="form-control" id="det20_30p" value="0" min="0"/></div>
+              </div>
+              <div class="row g-1">
+                <div class="col-12"><small class="text-muted fw-semibold" style="font-size:10px">40' Container</small></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">0-7 Days</label><input type="number" class="form-control" id="det40_0_7" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">8-14 Days</label><input type="number" class="form-control" id="det40_8_14" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">15-30 Days</label><input type="number" class="form-control" id="det40_15_30" value="0" min="0"/></div>
+                <div class="col-6"><label class="form-label mb-1" style="font-size:10px">&gt;30 Days</label><input type="number" class="form-control" id="det40_30p" value="0" min="0"/></div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button type="submit" class="btn btn-primary btn-sm px-3">
+                <i class="bi bi-plus-circle me-1"></i>Add ShippingLine
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm px-3 ms-1" onclick="resetForm()">
+                <i class="bi bi-x-circle me-1"></i>Clear
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID PANEL -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span>All ShippingLines <button class="btn btn-link btn-sm p-0 ms-1" onclick="filterTable()" title="Refresh"><i class="bi bi-arrow-clockwise text-primary"></i></button></span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted me-1" style="font-size:11px">Search:</span>
+            <input type="text" class="form-control form-control-sm search-box" id="searchInput" oninput="filterTable()"/>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-container">
+            <table class="table table-striped table-bordered table-hover mb-0">
+              <thead>
+                <tr>
+                  <th rowspan="2" onclick="sortTable(0)" style="vertical-align:middle;min-width:100px">Name <span class="sort-icon" id="sort-0"><i class="bi bi-arrow-down-up"></i></span></th>
+                  <th rowspan="2" onclick="sortTable(1)" style="vertical-align:middle;min-width:60px">Status <span class="sort-icon" id="sort-1"><i class="bi bi-arrow-down-up"></i></span></th>
+                  <th rowspan="2" style="min-width:90px">Address</th>
+                  <th rowspan="2" style="min-width:50px">Code</th>
+                  <th rowspan="2" style="min-width:100px">Email</th>
+                  <th rowspan="2" style="min-width:70px">Telephone</th>
+                  <th colspan="5" style="background:#e8edf4;color:#1a2b4a;font-size:10px">Container Free Days</th>
+                  <th colspan="4" style="background:#e8f4e8;color:#155724;font-size:10px">20' Det.</th>
+                  <th colspan="4" style="background:#fff3cd;color:#856404;font-size:10px">40' Det.</th>
+                  <th rowspan="2" style="min-width:50px;vertical-align:middle">Auth Letter</th>
+                  <th rowspan="2" style="min-width:110px;vertical-align:middle">Action</th>
+                </tr>
+                <tr>
+                  <th style="min-width:70px;background:#eef2f8">TZ</th>
+                  <th style="min-width:70px;background:#eef2f8">KE</th>
+                  <th style="min-width:70px;background:#eef2f8">UG</th>
+                  <th style="min-width:70px;background:#eef2f8">RW</th>
+                  <th style="min-width:70px;background:#eef2f8">ZM</th>
+                  <th style="min-width:35px;background:#f0faf0;font-size:9px">0-7</th>
+                  <th style="min-width:35px;background:#f0faf0;font-size:9px">8-14</th>
+                  <th style="min-width:35px;background:#f0faf0;font-size:9px">15-30</th>
+                  <th style="min-width:35px;background:#f0faf0;font-size:9px">&gt;30</th>
+                  <th style="min-width:35px;background:#fffbf0;font-size:9px">0-7</th>
+                  <th style="min-width:35px;background:#fffbf0;font-size:9px">8-14</th>
+                  <th style="min-width:35px;background:#fffbf0;font-size:9px">15-30</th>
+                  <th style="min-width:35px;background:#fffbf0;font-size:9px">&gt;30</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top">
+            <span class="records-info" id="recordsInfo"></span>
+            <nav><ul class="pagination pagination-sm mb-0" id="pagination"></ul></nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Edit Shipping Line</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body p-3">
+        <input type="hidden" id="editIndex"/>
+        <div class="row g-2">
+          <div class="col-md-4"><label class="form-label">Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="editName"/></div>
+          <div class="col-md-2"><label class="form-label">Status</label>
+            <select class="form-select" id="editStatus">
+              <option value="">Select...</option><option value="Active">Active</option><option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="col-md-4"><label class="form-label">Address</label><input type="text" class="form-control" id="editAddress"/></div>
+          <div class="col-md-2"><label class="form-label">Code</label><input type="text" class="form-control" id="editCode"/></div>
+          <div class="col-md-4"><label class="form-label">Email</label><input type="email" class="form-control" id="editEmail"/></div>
+          <div class="col-md-2"><label class="form-label">Telephone</label><input type="text" class="form-control" id="editTel"/></div>
+        </div>
+        <hr class="my-2"/>
+        <div class="row g-2">
+          <div class="col-12"><small class="fw-bold text-muted">20' Detention ($/day)</small></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">0-7 Days</label><input type="number" class="form-control" id="editDet20_0_7" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">8-14 Days</label><input type="number" class="form-control" id="editDet20_8_14" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">15-30 Days</label><input type="number" class="form-control" id="editDet20_15_30" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">&gt;30 Days</label><input type="number" class="form-control" id="editDet20_30p" min="0"/></div>
+          <div class="col-12"><small class="fw-bold text-muted">40' Detention ($/day)</small></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">0-7 Days</label><input type="number" class="form-control" id="editDet40_0_7" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">8-14 Days</label><input type="number" class="form-control" id="editDet40_8_14" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">15-30 Days</label><input type="number" class="form-control" id="editDet40_15_30" min="0"/></div>
+          <div class="col-3"><label class="form-label" style="font-size:11px">&gt;30 Days</label><input type="number" class="form-control" id="editDet40_30p" min="0"/></div>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Confirm Delete</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body p-3"><p class="mb-0" style="font-size:13px">Delete <strong id="deleteNameDisplay"></strong>?</p></div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let pendingCFD = [];
+
+function addCFD() {
+  const country = document.getElementById('cfdCountry').value;
+  const days = document.getElementById('cfdDays').value;
+  if (!country || !days) return;
+  if (pendingCFD.find(c => c.country === country)) {
+    pendingCFD = pendingCFD.map(c => c.country === country ? {country, days} : c);
+  } else {
+    pendingCFD.push({country, days});
+  }
+  document.getElementById('cfdCountry').value = '';
+  document.getElementById('cfdDays').value = '';
+  renderCFDTags();
+}
+
+function renderCFDTags() {
+  const el = document.getElementById('cfdTags');
+  el.innerHTML = pendingCFD.map((c,i) => `
+    <span class="cfd-tag">${c.country}: ${c.days}d <span class="remove-cfd" onclick="removeCFD(${i})">×</span></span>
+  `).join('');
+}
+
+function removeCFD(i) { pendingCFD.splice(i,1); renderCFDTags(); }
+
+function updateFileLabel(input) {
+  document.getElementById('fileLabel').textContent = input.files[0] ? input.files[0].name : 'Choose file... No file chosen';
+}
+
+function makeSL(name, status, address, code, email, tel, cfd, det20, det40, auth) {
+  return {name, status, address, code, email, tel,
+    cfd: cfd || {Tanzania:0, Kenya:0, Uganda:0, Rwanda:0, Zambia:0},
+    det20: det20 || {a:0, b:0, c:0, d:0},
+    det40: det40 || {a:0, b:0, c:0, d:0},
+    auth: auth || ''
+  };
+}
+
+let data = [
+  makeSL('ACL','Active','','','',0,{Tanzania:14,Kenya:21,Uganda:0,Rwanda:0,Zambia:0},{a:0,b:0,c:0,d:0},{a:0,b:0,c:0,d:0},''),
+  makeSL('AIL','Active','','','',0,{Tanzania:14,Kenya:14,Uganda:0,Rwanda:0,Zambia:0},{a:5,b:10,c:15,d:20},{a:8,b:15,c:20,d:25},''),
+  makeSL('AIR','Active','','','',0,{Tanzania:0,Kenya:0,Uganda:0,Rwanda:0,Zambia:0},{a:0,b:0,c:0,d:0},{a:0,b:0,c:0,d:0},''),
+  makeSL('ALLCARGO','Active','','','',0,{Tanzania:21,Kenya:21,Uganda:14,Rwanda:14,Zambia:14},{a:5,b:8,c:12,d:18},{a:8,b:12,c:18,d:24},''),
+  makeSL('ANHUI JIANGHAI MEDICAL EQUIPMENT CO.,LTD','Active','','','',0,{Tanzania:0,Kenya:0,Uganda:0,Rwanda:0,Zambia:0},{a:0,b:0,c:0,d:0},{a:0,b:0,c:0,d:0},''),
+  makeSL('ARKAS','Active','ISTANBUL, TURKEY','ARK','arkas@arkas.com.tr','+90 232 444 0252',{Tanzania:14,Kenya:14,Uganda:14,Rwanda:0,Zambia:0},{a:6,b:10,c:14,d:18},{a:10,b:15,c:20,d:28},''),
+  makeSL('CMA CGM','Active','MARSEILLE, FRANCE','CMA','cma@cmacgm.com','+33 4 88 91 90 00',{Tanzania:21,Kenya:21,Uganda:21,Rwanda:21,Zambia:21},{a:7,b:12,c:18,d:25},{a:10,b:18,c:25,d:35},'cma_auth_letter.pdf'),
+  makeSL('COSCO','Active','SHANGHAI, CHINA','CSC','cosco@cosco.com','+86 21 6596 6666',{Tanzania:21,Kenya:21,Uganda:14,Rwanda:14,Zambia:14},{a:6,b:10,c:16,d:22},{a:9,b:15,c:22,d:30},''),
+  makeSL('EVERGREEN','Active','TAIPEI, TAIWAN','EMC','ever@evergreen.com','+886 2 2505 7766',{Tanzania:21,Kenya:21,Uganda:21,Rwanda:21,Zambia:21},{a:7,b:12,c:18,d:24},{a:10,b:18,c:25,d:32},'')
+];
+
+let filtered=[...data],sortCol=0,sortDir=1,currentPage=1,pageSize=5,deleteIdx=-1;
+const editModal=new bootstrap.Modal(document.getElementById('editModal'));
+const deleteModal=new bootstrap.Modal(document.getElementById('deleteModal'));
+
+function filterTable(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filtered=data.filter(r=>r.name.toLowerCase().includes(q)||r.status.toLowerCase().includes(q)||r.address.toLowerCase().includes(q));
+  currentPage=1;renderTable();
+}
+function sortTable(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+  document.querySelectorAll('.sort-icon').forEach((el,i)=>{
+    el.innerHTML=i===col?(sortDir===1?'<i class="bi bi-arrow-up"></i>':'<i class="bi bi-arrow-down"></i>'):'<i class="bi bi-arrow-down-up"></i>';
+  });
+  const keys=['name','status'];
+  if(keys[col]) filtered.sort((a,b)=>a[keys[col]].localeCompare(b[keys[col]])*sortDir);
+  renderTable();
+}
+function dv(v){return`<span class="det-val">${v}</span>`;}
+function statusBadge(s){
+  if(s==='Active')return`<span class="status-active">Active</span>`;
+  if(s==='Inactive')return`<span class="status-inactive">Inactive</span>`;
+  return'';
+}
+function renderTable(){
+  const tbody=document.getElementById('tableBody');
+  const start=(currentPage-1)*pageSize;
+  const pageData=filtered.slice(start,start+pageSize);
+  tbody.innerHTML=pageData.map((r,i)=>`
+    <tr>
+      <td style="text-align:left;font-weight:500">${r.name}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td style="text-align:left;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.address}">${r.address}</td>
+      <td>${r.code}</td>
+      <td style="text-align:left;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.email}">${r.email}</td>
+      <td>${r.tel}</td>
+      <td>${dv(r.cfd.Tanzania||0)}</td>
+      <td>${dv(r.cfd.Kenya||0)}</td>
+      <td>${dv(r.cfd.Uganda||0)}</td>
+      <td>${dv(r.cfd.Rwanda||0)}</td>
+      <td>${dv(r.cfd.Zambia||0)}</td>
+      <td>${dv(r.det20.a)}</td><td>${dv(r.det20.b)}</td><td>${dv(r.det20.c)}</td><td>${dv(r.det20.d)}</td>
+      <td>${dv(r.det40.a)}</td><td>${dv(r.det40.b)}</td><td>${dv(r.det40.c)}</td><td>${dv(r.det40.d)}</td>
+      <td>${r.auth?`<i class="bi bi-file-earmark-pdf text-danger" title="${r.auth}"></i>`:''}</td>
+      <td>
+        <button class="btn btn-info btn-sm me-1" onclick="openEdit(${start+i})"><i class="bi bi-pencil-fill me-1"></i>Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="openDelete(${start+i})"><i class="bi bi-trash-fill me-1"></i>Delete</button>
+      </td>
+    </tr>`).join('');
+  renderPagination();
+  const s=start+1,e=Math.min(start+pageSize,filtered.length);
+  document.getElementById('recordsInfo').textContent=filtered.length>0?`Showing ${s} to ${e} of ${filtered.length} entries`:'No entries found';
+}
+function renderPagination(){
+  const total=Math.ceil(filtered.length/pageSize);
+  const ul=document.getElementById('pagination');
+  let html=`<li class="page-item ${currentPage===1?'disabled':''}"><a class="page-link" href="#" onclick="goPage(${currentPage-1});return false;">‹</a></li>`;
+  for(let i=1;i<=total;i++){
+    if(total>7&&Math.abs(i-currentPage)>2&&i!==1&&i!==total){if(i===2||i===total-1)html+=`<li class="page-item disabled"><a class="page-link">…</a></li>`;continue;}
+    html+=`<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" href="#" onclick="goPage(${i});return false;">${i}</a></li>`;
+  }
+  html+=`<li class="page-item ${currentPage===total||total===0?'disabled':''}"><a class="page-link" href="#" onclick="goPage(${currentPage+1});return false;">›</a></li>`;
+  ul.innerHTML=html;
+}
+function goPage(p){const t=Math.ceil(filtered.length/pageSize);if(p<1||p>t)return;currentPage=p;renderTable();}
+
+document.getElementById('slForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const n=document.getElementById('slName');
+  if(!n.value.trim()){n.classList.add('is-invalid');return;}
+  n.classList.remove('is-invalid');
+  const cfd={Tanzania:0,Kenya:0,Uganda:0,Rwanda:0,Zambia:0};
+  pendingCFD.forEach(c=>{if(cfd.hasOwnProperty(c.country))cfd[c.country]=parseInt(c.days)||0;});
+  data.push(makeSL(
+    n.value.trim(),
+    document.getElementById('slStatus').value,
+    document.getElementById('slAddress').value.trim(),
+    document.getElementById('slCode').value.trim(),
+    document.getElementById('slEmail').value.trim(),
+    document.getElementById('slTel').value.trim()||0,
+    cfd,
+    {a:parseInt(document.getElementById('det20_0_7').value)||0, b:parseInt(document.getElementById('det20_8_14').value)||0, c:parseInt(document.getElementById('det20_15_30').value)||0, d:parseInt(document.getElementById('det20_30p').value)||0},
+    {a:parseInt(document.getElementById('det40_0_7').value)||0, b:parseInt(document.getElementById('det40_8_14').value)||0, c:parseInt(document.getElementById('det40_15_30').value)||0, d:parseInt(document.getElementById('det40_30p').value)||0},
+    document.getElementById('slFile').files[0]?.name||''
+  ));
+  filterTable();resetForm();
+});
+document.getElementById('slName').addEventListener('input',function(){this.classList.remove('is-invalid');});
+
+function resetForm(){
+  document.getElementById('slForm').reset();
+  pendingCFD=[];
+  renderCFDTags();
+  document.getElementById('fileLabel').textContent='Choose file... No file chosen';
+}
+
+function openEdit(idx){
+  const r=filtered[idx];
+  document.getElementById('editIndex').value=idx;
+  document.getElementById('editName').value=r.name;
+  document.getElementById('editStatus').value=r.status;
+  document.getElementById('editAddress').value=r.address;
+  document.getElementById('editCode').value=r.code;
+  document.getElementById('editEmail').value=r.email;
+  document.getElementById('editTel').value=r.tel;
+  document.getElementById('editDet20_0_7').value=r.det20.a;
+  document.getElementById('editDet20_8_14').value=r.det20.b;
+  document.getElementById('editDet20_15_30').value=r.det20.c;
+  document.getElementById('editDet20_30p').value=r.det20.d;
+  document.getElementById('editDet40_0_7').value=r.det40.a;
+  document.getElementById('editDet40_8_14').value=r.det40.b;
+  document.getElementById('editDet40_15_30').value=r.det40.c;
+  document.getElementById('editDet40_30p').value=r.det40.d;
+  editModal.show();
+}
+function saveEdit(){
+  const idx=parseInt(document.getElementById('editIndex').value);
+  const n=document.getElementById('editName').value.trim();if(!n)return;
+  const orig=filtered[idx],di=data.indexOf(orig);
+  data[di]={
+    ...data[di],
+    name:n,
+    status:document.getElementById('editStatus').value,
+    address:document.getElementById('editAddress').value.trim(),
+    code:document.getElementById('editCode').value.trim(),
+    email:document.getElementById('editEmail').value.trim(),
+    tel:document.getElementById('editTel').value.trim(),
+    det20:{a:parseInt(document.getElementById('editDet20_0_7').value)||0, b:parseInt(document.getElementById('editDet20_8_14').value)||0, c:parseInt(document.getElementById('editDet20_15_30').value)||0, d:parseInt(document.getElementById('editDet20_30p').value)||0},
+    det40:{a:parseInt(document.getElementById('editDet40_0_7').value)||0, b:parseInt(document.getElementById('editDet40_8_14').value)||0, c:parseInt(document.getElementById('editDet40_15_30').value)||0, d:parseInt(document.getElementById('editDet40_30p').value)||0}
+  };
+  filterTable();editModal.hide();
+}
+function openDelete(idx){deleteIdx=idx;document.getElementById('deleteNameDisplay').textContent=filtered[idx].name;deleteModal.show();}
+function confirmDelete(){const orig=filtered[deleteIdx],di=data.indexOf(orig);data.splice(di,1);filterTable();deleteModal.hide();}
+filterTable();
+</script>
+</body>
+</html>

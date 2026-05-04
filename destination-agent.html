@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Destination Agent</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/jquery.dataTables.min.css"/>
+  <style>
+    :root {
+      --erp-bg: #f0f2f5;
+      --erp-card: #ffffff;
+      --erp-header-bg: #f8f9fa;
+      --erp-border: #dee2e6;
+      --erp-text: #343a40;
+      --erp-primary: #0d6efd;
+      --erp-danger: #dc3545;
+      --erp-shadow: 0 1px 4px rgba(0,0,0,0.10);
+    }
+    body { background: var(--erp-bg); font-family: 'Segoe UI', Arial, sans-serif; font-size: 13.5px; color: var(--erp-text); }
+    h4.page-title { font-size: 1.35rem; font-weight: 600; color: #222; margin-bottom: 18px; border-bottom: 2px solid var(--erp-primary); padding-bottom: 8px; display: inline-block; }
+    .erp-card { background: var(--erp-card); border: 1px solid var(--erp-border); border-radius: 6px; box-shadow: var(--erp-shadow); }
+    .erp-card-header { background: var(--erp-header-bg); border-bottom: 1px solid var(--erp-border); padding: 9px 14px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 7px; border-radius: 6px 6px 0 0; }
+    .erp-card-body { padding: 16px 14px; }
+    .form-label { font-size: 12.5px; font-weight: 600; color: var(--erp-text); margin-bottom: 4px; }
+    .form-control, .form-select { font-size: 13px; border-radius: 4px; border: 1px solid #ced4da; padding: 5px 9px; height: 32px; }
+    .form-control:focus, .form-select:focus { border-color: var(--erp-primary); box-shadow: 0 0 0 2px rgba(13,110,253,.13); }
+    .btn-erp-add { background: var(--erp-primary); color: #fff; font-size: 12.5px; padding: 6px 16px; border: none; border-radius: 4px; font-weight: 600; transition: background .15s; }
+    .btn-erp-add:hover { background: #0b5ed7; color: #fff; }
+    .btn-edit { background: #0d6efd; color: #fff; font-size: 11.5px; padding: 3px 10px; border: none; border-radius: 3px; font-weight: 500; }
+    .btn-edit:hover { background: #0b5ed7; }
+    .btn-reset { background: #6c757d; color: #fff; font-size: 12.5px; padding: 6px 13px; border: none; border-radius: 4px; font-weight: 600; }
+    .badge-active { background: #d1fae5; color: #065f46; font-size: 11.5px; padding: 3px 9px; border-radius: 10px; font-weight: 600; }
+    .badge-inactive { background: #fee2e2; color: #991b1b; font-size: 11.5px; padding: 3px 9px; border-radius: 10px; font-weight: 600; }
+    table.dataTable thead th { font-size: 12.5px; font-weight: 700; background: #f4f5f7; color: #495057; border-bottom: 2px solid #dee2e6; padding: 8px 10px; }
+    table.dataTable tbody td { font-size: 12.5px; padding: 7px 10px; vertical-align: middle; }
+    table.dataTable tbody tr:nth-child(even) { background: #f9fafb; }
+    table.dataTable tbody tr:hover { background: #eef2ff; }
+    .dataTables_wrapper .dataTables_filter input { font-size: 12.5px; height: 30px; padding: 3px 8px; border: 1px solid #ced4da; border-radius: 4px; }
+    .dataTables_wrapper .dataTables_length select { font-size: 12.5px; height: 30px; padding: 2px 4px; border-radius: 4px; border: 1px solid #ced4da; }
+    .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { font-size: 12.5px; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { font-size: 12px !important; padding: 3px 8px !important; }
+    .refresh-icon { cursor: pointer; color: var(--erp-primary); font-size: 13px; }
+    .toast-container { position: fixed; top: 18px; right: 18px; z-index: 9999; }
+    .toast { min-width: 230px; font-size: 13px; }
+    .modal-header { background: var(--erp-header-bg); border-bottom: 1px solid var(--erp-border); }
+    .modal-title { font-size: 14px; font-weight: 700; }
+    .invalid-feedback { font-size: 11.5px; }
+    .was-validated .form-control:invalid, .was-validated .form-select:invalid { border-color: var(--erp-danger); }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid py-3 px-4">
+  <h4 class="page-title"><i class="fa fa-location-dot me-2 text-primary"></i>Destination Agent</h4>
+
+  <div class="row g-3">
+    <!-- LEFT: Form -->
+    <div class="col-md-4 col-lg-3">
+      <div class="erp-card">
+        <div class="erp-card-header"><i class="fa fa-plus-circle text-primary"></i> Add Destination Agent</div>
+        <div class="erp-card-body">
+          <form id="addForm" novalidate>
+            <div class="mb-2">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" id="fName" class="form-control" placeholder="Enter name" required maxlength="120"/>
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Contact <span class="text-danger">*</span></label>
+              <input type="text" id="fContact" class="form-control" placeholder="Enter contact" required maxlength="100"/>
+              <div class="invalid-feedback">Contact is required.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Is Active <span class="text-danger">*</span></label>
+              <select id="fActive" class="form-select" required>
+                <option value="">Select..</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <div class="invalid-feedback">Please select a status.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn-erp-add"><i class="fa fa-plus me-1"></i>Add Agent</button>
+              <button type="button" class="btn-reset" id="resetBtn"><i class="fa fa-rotate-left me-1"></i>Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Table -->
+    <div class="col-md-8 col-lg-9">
+      <div class="erp-card">
+        <div class="erp-card-header">
+          <i class="fa fa-table text-primary"></i> All Destination Agents
+          <i class="fa fa-rotate refresh-icon ms-1" id="refreshBtn" title="Refresh"></i>
+        </div>
+        <div class="erp-card-body" style="overflow-x:auto;">
+          <table id="destTable" class="table table-bordered w-100">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th style="width:110px;">Is Active?</th>
+                <th style="width:90px;">Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-pen-to-square me-2 text-primary"></i>Edit Destination Agent</h5>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" novalidate>
+          <input type="hidden" id="editId"/>
+          <div class="mb-2">
+            <label class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" id="eName" class="form-control" required/>
+            <div class="invalid-feedback">Name is required.</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Contact <span class="text-danger">*</span></label>
+            <input type="text" id="eContact" class="form-control" required/>
+            <div class="invalid-feedback">Contact is required.</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Is Active <span class="text-danger">*</span></label>
+            <select id="eActive" class="form-select" required>
+              <option value="">Select..</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <div class="invalid-feedback">Please select a status.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-sm btn-primary" id="saveEdit"><i class="fa fa-floppy-disk me-1"></i>Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div id="liveToast" class="toast align-items-center border-0 text-white" role="alert" style="background:#198754;">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMsg"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+<script>
+  let data = [
+    { id:1, name:'GAGAN', contact:'+250 791 945 399', isActive:'Yes' },
+    { id:2, name:'JEAN PAUL / IDRISS/ FABRIGAS', contact:'+243840880820 / +243 840 880 290 / +243 840 880 577', isActive:'Yes' },
+    { id:3, name:'KELVIN', contact:'+255 756 671 565', isActive:'Yes' },
+    { id:4, name:'LUKAS', contact:'+255 888 335 222', isActive:'Yes' },
+    { id:5, name:'ZAMEER KAMAL', contact:'+257 75 36 80 09', isActive:'Yes' },
+  ];
+  let nextId = 6;
+  let dt;
+
+  function showToast(msg, color='#198754') {
+    const el = document.getElementById('liveToast');
+    el.style.background = color;
+    document.getElementById('toastMsg').textContent = msg;
+    bootstrap.Toast.getOrCreateInstance(el, {delay:2800}).show();
+  }
+
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function activeBadge(val) {
+    return val === 'Yes'
+      ? `<span class="badge-active"><i class="fa fa-circle-check me-1"></i>Yes</span>`
+      : `<span class="badge-inactive"><i class="fa fa-circle-xmark me-1"></i>No</span>`;
+  }
+
+  function renderTable() {
+    if(dt){ dt.destroy(); }
+    const tbody = $('#destTable tbody');
+    tbody.empty();
+    data.forEach(row => {
+      tbody.append(`<tr>
+        <td>${escHtml(row.name)}</td>
+        <td>${escHtml(row.contact)}</td>
+        <td>${activeBadge(row.isActive)}</td>
+        <td>
+          <button class="btn-edit" onclick="openEdit(${row.id})"><i class="fa fa-pen me-1"></i>Edit</button>
+        </td>
+      </tr>`);
+    });
+    dt = $('#destTable').DataTable({
+      pageLength: 10,
+      lengthMenu: [5,10,25,50],
+      language: { search: "Search:" },
+      columnDefs: [{ orderable: false, targets: 3 }],
+      scrollX: true
+    });
+  }
+
+  $('#addForm').on('submit', function(e){
+    e.preventDefault();
+    if(!this.checkValidity()){ $(this).addClass('was-validated'); return; }
+    data.push({ id:nextId++, name:$('#fName').val().trim(), contact:$('#fContact').val().trim(), isActive:$('#fActive').val() });
+    renderTable(); this.reset(); $(this).removeClass('was-validated');
+    showToast('Destination Agent added successfully!');
+  });
+
+  $('#resetBtn').on('click', function(){ $('#addForm')[0].reset(); $('#addForm').removeClass('was-validated'); });
+
+  function openEdit(id) {
+    const row = data.find(r=>r.id===id);
+    if(!row) return;
+    $('#editId').val(id); $('#eName').val(row.name); $('#eContact').val(row.contact); $('#eActive').val(row.isActive);
+    $('#editForm').removeClass('was-validated');
+    new bootstrap.Modal('#editModal').show();
+  }
+
+  $('#saveEdit').on('click', function(){
+    const form = document.getElementById('editForm');
+    if(!form.checkValidity()){ $('#editForm').addClass('was-validated'); return; }
+    const id = parseInt($('#editId').val());
+    const row = data.find(r=>r.id===id);
+    if(row){ row.name=$('#eName').val().trim(); row.contact=$('#eContact').val().trim(); row.isActive=$('#eActive').val(); }
+    bootstrap.Modal.getInstance('#editModal').hide();
+    renderTable(); showToast('Record updated successfully!');
+  });
+
+  $('#refreshBtn').on('click', function(){ renderTable(); showToast('Table refreshed.'); });
+  $(document).ready(function(){ renderTable(); });
+</script>
+</body>
+</html>

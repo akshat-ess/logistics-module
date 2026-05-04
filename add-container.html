@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Transit Exports Container – FreightPro ERP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f0f2f5;
+    --erp-card-bg: #ffffff;
+    --erp-border: #dee2e6;
+    --erp-table-head: #f1f3f5;
+    --erp-text-primary: #212529;
+    --erp-text-muted: #6c757d;
+    --erp-text-small: 0.78rem;
+    --erp-font: 'IBM Plex Sans', sans-serif;
+    --erp-mono: 'IBM Plex Mono', monospace;
+    
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: var(--erp-font); font-size: var(--erp-text-small); background: var(--erp-bg); color: var(--erp-text-primary); margin: 0; padding: 0; }
+
+  /* Main */
+  #erp-main { margin-left: 0; margin-top: 0; padding: 20px; min-height: 100vh; }
+
+  /* Page Header */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .page-header .page-title { font-size: 1.05rem; font-weight: 700; color: var(--erp-text-primary); display: flex; align-items: center; gap: 8px; }
+  .page-header .page-title .title-icon { width: 30px; height: 30px; background: #e7f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #0d6efd; flex-shrink: 0; }
+  .page-header .bl-badge { font-family: var(--erp-mono); font-size: 0.78rem; color: #0d6efd; background: #e7f0ff; border: 1px solid #b8d0ff; padding: 2px 10px; border-radius: 4px; }
+
+  /* Buttons */
+  .btn-erp { font-size: 0.75rem; font-weight: 500; padding: 5px 11px; border-radius: 5px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .btn-erp-primary { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .btn-erp-primary:hover { background: #0b5ed7; }
+  .btn-erp-success { background: #198754; color: #fff; border-color: #198754; }
+  .btn-erp-success:hover { background: #157347; }
+  .btn-erp-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
+  .btn-erp-danger:hover { background: #bb2d3b; }
+  .btn-erp-outline { background: #fff; color: #495057; border-color: var(--erp-border); }
+  .btn-erp-outline:hover { background: var(--erp-bg); }
+  .btn-erp-secondary { background: #6c757d; color: #fff; border-color: #6c757d; }
+  .btn-erp-secondary:hover { background: #5c636a; }
+
+  /* Alert */
+  .erp-alert { border-radius: 7px; padding: 10px 14px; font-size: 0.76rem; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; border: 1px solid; }
+  .erp-alert-danger { background: #fdf2f2; border-color: #f5c6cb; color: #721c24; }
+  .erp-alert-success { background: #d1e7dd; border-color: #badbcc; color: #0a3622; }
+  .erp-alert-warning { background: #fff8e6; border-color: #ffe69c; color: #664d03; }
+  .erp-alert-info { background: #e8f4fd; border-color: #b6d4fe; color: #084298; }
+  .erp-alert .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .erp-alert .alert-close { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px; opacity: .6; color: inherit; padding: 0; flex-shrink: 0; }
+  .erp-alert .alert-close:hover { opacity: 1; }
+
+  /* Card */
+  .erp-card { background: var(--erp-card-bg); border: 1px solid var(--erp-border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+  .erp-card-header { padding: 9px 14px; background: #f8f9fa; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; font-weight: 600; color: #495057; }
+  .erp-card-header .header-icon { margin-right: 6px; color: #0d6efd; }
+  .erp-card-body { padding: 0; }
+
+  /* Container Input Table */
+  .container-table { width: 100%; border-collapse: collapse; }
+  .container-table thead th { background: var(--erp-table-head); color: #495057; font-weight: 600; font-size: 0.74rem; padding: 8px 12px; border: 1px solid var(--erp-border); text-align: left; }
+  .container-table tbody td { padding: 6px 10px; border: 1px solid var(--erp-border); vertical-align: middle; }
+  .container-table tbody tr:hover td { background: #f8f9fc; }
+  .container-table tbody tr.error-row td { background: #fdf2f2 !important; }
+  .container-table tbody tr.success-row td { background: #d1e7dd !important; }
+
+  /* Container number input */
+  .container-input {
+    font-size: 0.76rem; font-family: var(--erp-mono);
+    padding: 4px 8px; height: 28px; width: 200px;
+    border: 1px solid #ced4da; border-radius: 4px;
+    background: #fff; color: var(--erp-text-primary);
+    text-transform: uppercase; letter-spacing: 1px;
+    transition: border-color .15s;
+  }
+  .container-input:focus { outline: none; border-color: #86b7fe; box-shadow: 0 0 0 2px rgba(13,110,253,.15); }
+  .container-input.is-invalid { border-color: #dc3545; background: #fff8f8; }
+  .container-input.is-valid { border-color: #198754; background: #f8fff8; }
+
+  /* Checkbox style */
+  .size-checkbox { width: 16px; height: 16px; accent-color: #0d6efd; cursor: pointer; }
+  .size-cell { text-align: center; }
+
+  /* Row status badge */
+  .row-status { font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+  .row-status.pending { background: #e2e3e5; color: #41464b; }
+  .row-status.ok { background: #d1e7dd; color: #0a3622; }
+  .row-status.error { background: #f8d7da; color: #58151c; }
+
+  /* Row action */
+  .btn-row-del { width: 24px; height: 24px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; background: #f8d7da; color: #dc3545; border: 1px solid #f1aeb5; cursor: pointer; transition: all .15s; }
+  .btn-row-del:hover { background: #dc3545; color: #fff; }
+
+  /* Summary Panel */
+  .summary-panel { background: #f8f9fa; border: 1px solid var(--erp-border); border-radius: 7px; padding: 12px 14px; }
+  .summary-panel .sum-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .summary-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 70px; }
+  .summary-stat .stat-val { font-size: 1.4rem; font-weight: 700; color: #0d6efd; font-family: var(--erp-mono); line-height: 1; }
+  .summary-stat .stat-label { font-size: 0.65rem; font-weight: 600; color: var(--erp-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+  .summary-divider { width: 1px; height: 40px; background: var(--erp-border); }
+
+  /* Form footer */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #f8f9fa; border-top: 1px solid var(--erp-border); flex-wrap: wrap; gap: 8px; }
+
+  /* Toast */
+  .erp-toast-container { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
+  .erp-toast { background: #fff; border-radius: 7px; padding: 10px 14px; box-shadow: 0 4px 18px rgba(0,0,0,.14); display: flex; align-items: center; gap: 10px; font-size: 0.78rem; border-left: 4px solid; animation: slideIn .25s ease; min-width: 240px; max-width: 360px; }
+  .erp-toast.toast-success { border-color: #198754; }
+  .erp-toast.toast-error { border-color: #dc3545; }
+  .erp-toast.toast-warning { border-color: #fd7e14; }
+  .erp-toast .toast-icon { font-size: 14px; flex-shrink: 0; }
+  .erp-toast.toast-success .toast-icon { color: #198754; }
+  .erp-toast.toast-error .toast-icon { color: #dc3545; }
+  .erp-toast.toast-warning .toast-icon { color: #fd7e14; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  /* Info bar */
+  .bl-info-bar { background: #f0f6ff; border: 1px solid #b8d0ff; border-radius: 7px; padding: 10px 14px; margin-bottom: 14px; }
+  .bl-info-bar .bl-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 0.73rem; }
+  .bl-info-bar .bl-item { display: flex; gap: 5px; align-items: center; }
+  .bl-info-bar .bl-label { color: #6c757d; font-weight: 500; }
+  .bl-info-bar .bl-val { color: #0a58ca; font-weight: 700; font-family: var(--erp-mono); }
+
+  /* Validation guide */
+  .format-guide { font-size: 0.68rem; color: #6c757d; margin-top: 10px; padding: 8px 12px; background: #f8f9fa; border: 1px solid var(--erp-border); border-radius: 6px; }
+  .format-guide strong { color: #0d6efd; }
+
+  @media (max-width: 768px) {
+    
+    
+    .container-input { width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<main id="erp-main">
+
+  <div class="page-header">
+    <div class="page-title">
+      <div class="title-icon"><i class="fa-solid fa-container-storage"></i></div>
+      <span>Add Transit Exports Container for BL NO:</span>
+      <span class="bl-badge" id="bl-display">EXPTRS/ALISTAIR/25/053</span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn-erp btn-erp-outline" onclick="window.location.href='transit-exports-list.html'">
+        <i class="fa-solid fa-list"></i> View Consignments
+      </button>
+    </div>
+  </div>
+
+  <!-- ERROR ALERT (duplicate container) -->
+  <div class="erp-alert erp-alert-danger" id="duplicate-alert">
+    <i class="fa-solid fa-circle-xmark alert-icon"></i>
+    <div>
+      <strong>Oops! Duplicate Container Number Detected.</strong><br>
+      That Container number exists for File number <strong id="dup-file">EXP/ALISTAIR/25/053</strong>.
+      Failed adding JobCard. Please, try again with a different container number.
+    </div>
+    <button class="alert-close" onclick="dismissAlert('duplicate-alert')">✕</button>
+  </div>
+
+  <!-- BL Info -->
+  <div class="bl-info-bar">
+    <div class="bl-row">
+      <div class="bl-item"><span class="bl-label">BL No:</span><span class="bl-val">EXPTRS/ALISTAIR/25/053</span></div>
+      <div class="bl-item"><span class="bl-label">Shipper:</span><span class="bl-val">ALISTAIR LOGISTICS LTD</span></div>
+      <div class="bl-item"><span class="bl-label">S/Line:</span><span class="bl-val">MAERSK LINE</span></div>
+      <div class="bl-item"><span class="bl-label">Vessel:</span><span class="bl-val">MAERSK KENYA</span></div>
+      <div class="bl-item"><span class="bl-label">POD:</span><span class="bl-val">MOMBASA / KENYA</span></div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-panel" style="margin-bottom:14px;">
+    <div class="sum-row">
+      <div class="summary-stat">
+        <span class="stat-val" id="sum-total">0</span>
+        <span class="stat-label">Total Containers</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-stat">
+        <span class="stat-val" id="sum-20" style="color:#198754;">0</span>
+        <span class="stat-label">Size 20</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-stat">
+        <span class="stat-val" id="sum-40" style="color:#fd7e14;">0</span>
+        <span class="stat-label">Size 40</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-stat">
+        <span class="stat-val" id="sum-errors" style="color:#dc3545;">1</span>
+        <span class="stat-label">Errors</span>
+      </div>
+      <div style="margin-left:auto;">
+        <button class="btn-erp btn-erp-outline" onclick="addRow()" style="margin-right:6px;">
+          <i class="fa-solid fa-plus"></i> Add Row
+        </button>
+        <button class="btn-erp btn-erp-secondary" onclick="clearAll()">
+          <i class="fa-solid fa-broom"></i> Clear All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container Input Card -->
+  <div class="erp-card">
+    <div class="erp-card-header">
+      <span><i class="fa-solid fa-container-storage header-icon"></i> Container Entry</span>
+      <span style="font-size:0.68rem;color:#6c757d;font-weight:400;">Enter container numbers — one per row</span>
+    </div>
+    <div class="erp-card-body">
+      <div style="overflow-x:auto;">
+        <table class="container-table" id="container-table">
+          <thead>
+            <tr>
+              <th style="width:40px;text-align:center;">#</th>
+              <th>Container No.</th>
+              <th style="width:120px;text-align:center;">Size 20</th>
+              <th style="width:120px;text-align:center;">Size 40</th>
+              <th style="width:100px;text-align:center;">Status</th>
+              <th style="width:80px;text-align:center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="container-tbody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="format-guide">
+        <i class="fa-solid fa-circle-info" style="color:#0d6efd;margin-right:5px;"></i>
+        <strong>Container Number Format:</strong> Standard ISO format — 4 letters + 6 digits + 1 check digit.
+        Example: <strong style="font-family:'IBM Plex Mono',monospace;">MSKU1234567</strong>, <strong style="font-family:'IBM Plex Mono',monospace;">TCKU9876540</strong>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="form-footer">
+      <div style="display:flex;align-items:center;gap:8px;font-size:0.72rem;color:#6c757d;">
+        <i class="fa-solid fa-arrow-left" style="color:#6c757d;"></i>
+        <a href="add-consignment-ops.html" style="color:#0d6efd;text-decoration:none;">← Back to OPS</a>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-erp btn-erp-outline" onclick="addRow()">
+          <i class="fa-solid fa-plus"></i> Add More Rows
+        </button>
+        <button class="btn-erp btn-erp-success" onclick="saveContainers()">
+          <i class="fa-solid fa-floppy-disk"></i> Save Containers
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Containers List -->
+  <div class="erp-card" id="saved-card" style="display:none;">
+    <div class="erp-card-header">
+      <span><i class="fa-solid fa-circle-check header-icon" style="color:#198754;"></i> Saved Containers</span>
+      <span class="row-status ok" id="saved-count">0 Saved</span>
+    </div>
+    <div class="erp-card-body">
+      <div style="overflow-x:auto;">
+        <table class="container-table" id="saved-table">
+          <thead>
+            <tr>
+              <th style="width:40px;text-align:center;">#</th>
+              <th>Container No.</th>
+              <th style="width:120px;text-align:center;">Size 20</th>
+              <th style="width:120px;text-align:center;">Size 40</th>
+              <th style="width:120px;text-align:center;">Saved At</th>
+              <th style="width:80px;text-align:center;">Remove</th>
+            </tr>
+          </thead>
+          <tbody id="saved-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn-erp btn-erp-primary" onclick="window.location.href='transit-exports-list.html'">
+        <i class="fa-solid fa-circle-check"></i> Done – Back to List
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<div class="erp-toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ══════════════════════════════════════════
+//  State
+// ══════════════════════════════════════════
+let rows = [];
+let savedContainers = [];
+let rowIdCounter = 0;
+
+// Known duplicates (simulated from server)
+const knownDuplicates = ['MSKU1234567', 'TCKU9876540', 'ABCD1234560'];
+
+// ══════════════════════════════════════════
+//  Read BL from URL param
+// ══════════════════════════════════════════
+const urlParams = new URLSearchParams(window.location.search);
+const blParam = urlParams.get('bl');
+if (blParam) {
+  document.getElementById('bl-display').textContent = blParam;
+  document.getElementById('dup-file').textContent = blParam;
+}
+
+// ══════════════════════════════════════════
+//  Add Row
+// ══════════════════════════════════════════
+function addRow() {
+  rowIdCounter++;
+  const id = rowIdCounter;
+  rows.push({ id, containerNo: '', size20: false, size40: false, status: 'pending' });
+  renderRows();
+  setTimeout(() => {
+    const input = document.getElementById('cn-' + id);
+    if (input) input.focus();
+  }, 50);
+}
+
+// ══════════════════════════════════════════
+//  Render Rows
+// ══════════════════════════════════════════
+function renderRows() {
+  const tbody = document.getElementById('container-tbody');
+  tbody.innerHTML = '';
+  rows.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    if (row.status === 'error') tr.classList.add('error-row');
+    if (row.status === 'ok') tr.classList.add('success-row');
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:600;color:#6c757d;font-size:0.72rem;">${idx + 1}</td>
+      <td>
+        <input
+          type="text"
+          class="container-input ${row.status === 'error' ? 'is-invalid' : row.status === 'ok' ? 'is-valid' : ''}"
+          id="cn-${row.id}"
+          value="${row.containerNo}"
+          placeholder="e.g. MSKU1234567"
+          maxlength="12"
+          oninput="onContainerInput(${row.id}, this.value)"
+          onblur="validateContainer(${row.id})"
+        >
+        ${row.status === 'error' ? `<div style="font-size:0.67rem;color:#dc3545;margin-top:2px;"><i class="fa-solid fa-triangle-exclamation"></i> ${row.errorMsg || 'Invalid container number'}</div>` : ''}
+      </td>
+      <td class="size-cell">
+        <input type="checkbox" class="size-checkbox" id="s20-${row.id}" ${row.size20 ? 'checked' : ''} onchange="onSizeChange(${row.id}, '20', this.checked)">
+      </td>
+      <td class="size-cell">
+        <input type="checkbox" class="size-checkbox" id="s40-${row.id}" ${row.size40 ? 'checked' : ''} onchange="onSizeChange(${row.id}, '40', this.checked)">
+      </td>
+      <td class="size-cell">
+        <span class="row-status ${row.status}">${
+          row.status === 'pending' ? '⏳ Pending' :
+          row.status === 'ok' ? '✓ Valid' :
+          '✗ Error'
+        }</span>
+      </td>
+      <td class="size-cell">
+        <button class="btn-row-del" onclick="removeRow(${row.id})" title="Remove row">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  updateSummary();
+}
+
+// ══════════════════════════════════════════
+//  Input Handlers
+// ══════════════════════════════════════════
+function onContainerInput(id, value) {
+  const row = rows.find(r => r.id === id);
+  if (!row) return;
+  row.containerNo = value.toUpperCase();
+  row.status = 'pending';
+  row.errorMsg = '';
+  // Sync the input value to uppercase
+  document.getElementById('cn-' + id).value = row.containerNo;
+  updateSummary();
+}
+
+function onSizeChange(id, size, checked) {
+  const row = rows.find(r => r.id === id);
+  if (!row) return;
+  if (size === '20') { row.size20 = checked; if (checked) row.size40 = false; document.getElementById('s40-' + id).checked = false; }
+  if (size === '40') { row.size40 = checked; if (checked) row.size20 = false; document.getElementById('s20-' + id).checked = false; }
+  updateSummary();
+}
+
+// ══════════════════════════════════════════
+//  Validate Container Number
+// ══════════════════════════════════════════
+function validateContainer(id) {
+  const row = rows.find(r => r.id === id);
+  if (!row || !row.containerNo.trim()) return;
+  const val = row.containerNo.trim();
+  const containerRegex = /^[A-Z]{4}[0-9]{7}$/;
+  if (!containerRegex.test(val)) {
+    row.status = 'error';
+    row.errorMsg = 'Format must be 4 letters + 7 digits (e.g. MSKU1234567)';
+    renderRows();
+    updateSummary();
+    return;
+  }
+  if (knownDuplicates.includes(val)) {
+    row.status = 'error';
+    row.errorMsg = 'Container number already exists for this file. Duplicate detected.';
+    showDuplicateAlert(val);
+    renderRows();
+    updateSummary();
+    return;
+  }
+  const duplicate = rows.filter(r => r.id !== id && r.containerNo === val);
+  if (duplicate.length > 0) {
+    row.status = 'error';
+    row.errorMsg = 'Duplicate entry — this container number is already in the list.';
+    renderRows();
+    updateSummary();
+    return;
+  }
+  row.status = 'ok';
+  row.errorMsg = '';
+  renderRows();
+  updateSummary();
+}
+
+// ══════════════════════════════════════════
+//  Remove Row
+// ══════════════════════════════════════════
+function removeRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  renderRows();
+}
+
+function clearAll() {
+  rows = [];
+  renderRows();
+  showToast('All rows cleared.', 'warning');
+}
+
+// ══════════════════════════════════════════
+//  Summary
+// ══════════════════════════════════════════
+function updateSummary() {
+  const total = rows.filter(r => r.containerNo.trim()).length;
+  const s20 = rows.filter(r => r.size20).length;
+  const s40 = rows.filter(r => r.size40).length;
+  const errors = rows.filter(r => r.status === 'error').length;
+  document.getElementById('sum-total').textContent = total;
+  document.getElementById('sum-20').textContent = s20;
+  document.getElementById('sum-40').textContent = s40;
+  document.getElementById('sum-errors').textContent = errors;
+}
+
+// ══════════════════════════════════════════
+//  Save Containers
+// ══════════════════════════════════════════
+function saveContainers() {
+  // Validate all rows first
+  rows.forEach(row => { if (row.containerNo.trim()) validateContainer(row.id); });
+  const validRows = rows.filter(r => r.containerNo.trim() && r.status === 'ok');
+  const errorRows = rows.filter(r => r.status === 'error');
+  if (errorRows.length > 0) {
+    showToast(`${errorRows.length} row(s) have errors. Fix them before saving.`, 'error');
+    return;
+  }
+  if (validRows.length === 0) {
+    showToast('Please enter at least one valid container number.', 'error');
+    return;
+  }
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  validRows.forEach(row => {
+    savedContainers.push({ ...row, savedAt: timeStr });
+  });
+  rows = [];
+  renderRows();
+  renderSavedTable();
+  document.getElementById('saved-card').style.display = '';
+  showToast(`${validRows.length} container(s) saved successfully!`, 'success');
+  addRow(); // Add a fresh row for next entry
+}
+
+// ══════════════════════════════════════════
+//  Render Saved Table
+// ══════════════════════════════════════════
+function renderSavedTable() {
+  const tbody = document.getElementById('saved-tbody');
+  tbody.innerHTML = '';
+  savedContainers.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    tr.classList.add('success-row');
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:700;color:#198754;font-size:0.72rem;">${idx + 1}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0a3622;letter-spacing:1px;">${row.containerNo}</td>
+      <td class="size-cell">${row.size20 ? '<i class="fa-solid fa-square-check" style="color:#198754;font-size:14px;"></i>' : '<i class="fa-regular fa-square" style="color:#dee2e6;font-size:14px;"></i>'}</td>
+      <td class="size-cell">${row.size40 ? '<i class="fa-solid fa-square-check" style="color:#fd7e14;font-size:14px;"></i>' : '<i class="fa-regular fa-square" style="color:#dee2e6;font-size:14px;"></i>'}</td>
+      <td style="text-align:center;font-size:0.72rem;color:#6c757d;">${row.savedAt}</td>
+      <td class="size-cell">
+        <button class="btn-row-del" onclick="removeSaved(${idx})" title="Remove">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('saved-count').textContent = savedContainers.length + ' Saved';
+  updateSummary();
+}
+
+function removeSaved(idx) {
+  savedContainers.splice(idx, 1);
+  renderSavedTable();
+  if (savedContainers.length === 0) {
+    document.getElementById('saved-card').style.display = 'none';
+  }
+  showToast('Container removed from saved list.', 'warning');
+}
+
+// ══════════════════════════════════════════
+//  Alert
+// ══════════════════════════════════════════
+function dismissAlert(id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.style.display = 'none', 320); }
+}
+
+function showDuplicateAlert(containerNo) {
+  const alert = document.getElementById('duplicate-alert');
+  document.getElementById('dup-file').textContent = blParam || 'EXP/ALISTAIR/25/053';
+  alert.style.display = 'flex';
+  alert.style.opacity = '1';
+}
+
+// ══════════════════════════════════════════
+//  Toast
+// ══════════════════════════════════════════
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const iconMap = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation' };
+  const toast = document.createElement('div');
+  toast.className = `erp-toast toast-${type}`;
+  toast.innerHTML = `<span class="toast-icon"><i class="fa-solid ${iconMap[type] || 'fa-circle-check'}"></i></span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 350); }, 3800);
+}
+
+// ══════════════════════════════════════════
+//  Init — start with one empty row
+// ══════════════════════════════════════════
+addRow();
+</script>
+</body>
+</html>

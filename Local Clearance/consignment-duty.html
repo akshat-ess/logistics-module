@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Local Clearance Cargo Consignment - Duty Payment</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-blue: #2a7ab5;
+    --erp-border: #dee2e6;
+    --erp-label-bg: #e8e8e8;
+  }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+
+  .top-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .top-navbar .user-info { color: var(--erp-blue); font-size: 13px; cursor: pointer; }
+
+  .main-content { padding: 16px 20px; }
+
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 22px; font-weight: 600; color: #222; margin: 0; }
+  .view-btn {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 4px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .view-btn:hover { background: #1a6aa0; }
+
+  .erp-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+  }
+  .erp-card-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-icon { color: var(--erp-blue); cursor: pointer; font-size: 12px; }
+
+  .top-fields { padding: 14px 14px 10px; }
+  .field-label-top { font-size: 11px; font-weight: 700; color: #444; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .form-select-erp {
+    font-size: 12px; height: 32px;
+    border: 1px solid #ccc; border-radius: 3px;
+    padding: 4px 8px; width: 100%;
+  }
+
+  /* Tabs */
+  .erp-tabs {
+    display: flex;
+    margin: 0 14px;
+    gap: 0;
+  }
+  .erp-tab {
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f0f0f0;
+    color: #555;
+    margin-right: 2px;
+    border-radius: 3px 3px 0 0;
+    text-decoration: none;
+    transition: background 0.15s;
+    display: inline-block;
+  }
+  .erp-tab.active { background: var(--erp-blue); color: #fff; border-color: var(--erp-blue); }
+  .erp-tab:hover:not(.active) { background: #dde; color: #333; }
+
+  /* Grid form */
+  .tab-content-panel {
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+  }
+  .form-grid { border-top: 1px solid #ccc; border-left: 1px solid #ccc; }
+  .form-grid-row { display: flex; border-bottom: 1px solid #ccc; }
+  .form-grid-cell {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .fgc-label {
+    background: var(--erp-label-bg);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .fgc-input {
+    padding: 4px 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+  }
+  .fgc-input input[type="date"],
+  .fgc-input input[type="text"],
+  .fgc-input textarea {
+    width: 100%;
+    font-size: 11px;
+    height: 26px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 2px 6px;
+    background: #fff;
+  }
+  .fgc-input textarea {
+    height: 50px;
+    resize: vertical;
+  }
+
+  /* Status badges for dates */
+  .date-status {
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+  .date-status.done { background: #d4edda; color: #155724; }
+  .date-status.pending { background: #fff3cd; color: #856404; }
+
+  /* Remarks cell (wider) */
+  .form-grid-cell.remarks-cell { flex: 2; }
+  .remarks-cell .fgc-input { align-items: flex-start; padding-top: 6px; }
+
+  /* Save bar */
+  .save-bar {
+    padding: 12px 14px;
+    border-top: 1px solid var(--erp-border);
+    background: #f8f9fa;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn-save {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-save:hover { background: #1a6aa0; }
+  .btn-cancel {
+    background: #6c757d; color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; cursor: pointer;
+  }
+  .btn-cancel:hover { background: #5a6268; }
+
+  /* Scroll bar indicator (right side, ERP style) */
+  .scroll-indicator {
+    position: absolute; right: -14px; top: 0;
+    width: 14px; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 2px;
+  }
+  .scroll-indicator span {
+    font-size: 8px; color: #888; cursor: pointer; line-height: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<!-- <div class="top-navbar">
+  <span class="user-info"><i class="fa fa-user-circle"></i> temp user <i class="fa fa-caret-down"></i></span>
+</div> -->
+
+<div class="main-content">
+
+  <div class="page-heading">
+    <h1>Add Local Clearance Cargo Consignment</h1>
+    <button class="view-btn" onclick="location.href='cargo-position.html'">View Consignments</button>
+  </div>
+
+  <div class="erp-card">
+    <div class="erp-card-header">
+      Cargo details <i class="fa fa-sync refresh-icon"></i>
+    </div>
+
+    <!-- Declarant / Port Agent -->
+    <div class="top-fields">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="field-label-top">DECLARANT</div>
+          <select class="form-select-erp">
+            <option value="">select...</option>
+            <option>JOHN MWANGI (JM/001)</option>
+            <option>SARAH KIMANI (SK/002)</option>
+            <option>PETER ODHIAMBO (PO/003)</option>
+            <option>GRACE ACHIENG (GA/004)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <div class="field-label-top">PORT AGENT</div>
+          <select class="form-select-erp">
+            <option value="">select...</option>
+            <option>FREIGHT MASTERS LTD</option>
+            <option>SEA BRIDGE AGENCIES</option>
+            <option>GLOBAL SHIPPING AGENTS</option>
+            <option>TRANS OCEAN SERVICES</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="erp-tabs">
+      <a href="consignment-file.html" class="erp-tab">FILE</a>
+      <a href="consignment-vessel.html" class="erp-tab">VESSEL</a>
+      <a href="consignment-duty.html" class="erp-tab active">DUTY PAYMENT</a>
+    </div>
+
+    <!-- Duty Payment Tab Content -->
+    <div class="tab-content-panel">
+      <div class="form-grid">
+
+        <!-- Row 1: Doc. Lodged Date | Assmnt Valu. Date | Duty Pay Date | Transf. Manifest Date -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">Doc. Lodged Date</div>
+            <div class="fgc-input"><input type="date" id="docLodgedDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Assmnt Valu. Date</div>
+            <div class="fgc-input"><input type="date" id="assmntValDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Duty Pay Date</div>
+            <div class="fgc-input"><input type="date" id="dutyPayDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Transf. Manifest Date</div>
+            <div class="fgc-input"><input type="date" id="transManiDate"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Verification Date | Wharfage Pay Date | RO Recd Date | Port Charge Pay Date -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">Verification Date</div>
+            <div class="fgc-input"><input type="date" id="verDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Wharfage Pay Date</div>
+            <div class="fgc-input"><input type="date" id="wharfDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">RO Recd Date</div>
+            <div class="fgc-input"><input type="date" id="roRecdDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Port Charge Pay Date</div>
+            <div class="fgc-input"><input type="date" id="portChargeDate"></div>
+          </div>
+        </div>
+
+        <!-- Row 3: ICD Charge Pay Date | Delivery Date | TFDA | TAEC -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">ICD Charge Pay Date</div>
+            <div class="fgc-input"><input type="date" id="icdChargeDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">Delivery Date</div>
+            <div class="fgc-input"><input type="date" id="deliveryDate"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">TFDA</div>
+            <div class="fgc-input"><input type="text" id="tfda" placeholder="TFDA Ref. No."></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">TAEC</div>
+            <div class="fgc-input"><input type="text" id="taec" placeholder="TAEC Ref. No."></div>
+          </div>
+        </div>
+
+        <!-- Row 4: CP | TBS | SADC | Remarks -->
+        <div class="form-grid-row">
+          <div class="form-grid-cell">
+            <div class="fgc-label">CP</div>
+            <div class="fgc-input"><input type="text" id="cp" placeholder="CP Number"></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">TBS</div>
+            <div class="fgc-input"><input type="text" id="tbs" placeholder="TBS Ref. No."></div>
+          </div>
+          <div class="form-grid-cell">
+            <div class="fgc-label">SADC</div>
+            <div class="fgc-input"><input type="text" id="sadc" placeholder="SADC Certificate No."></div>
+          </div>
+          <div class="form-grid-cell remarks-cell">
+            <div class="fgc-label">Remarks</div>
+            <div class="fgc-input" style="align-items:flex-start; padding-top:4px;">
+              <textarea id="remarks" rows="2" placeholder="Enter remarks..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Duty Completion Summary (bonus feature) -->
+      <div style="padding: 10px 14px; background: #f8f9fa; border-top: 1px solid #e0e0e0;">
+        <div style="font-size:11px; font-weight:600; color:#555; margin-bottom:6px;">
+          <i class="fa fa-check-circle text-success me-1"></i> Duty Payment Completion Status
+        </div>
+        <div class="d-flex flex-wrap gap-2" id="statusBadges">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Save Bar -->
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="location.href='cargo-position.html'">Cancel</button>
+        <button class="btn-save" onclick="saveDuty()">
+          <i class="fa fa-save me-1"></i>Save
+        </button>
+      </div>
+    </div><!-- /tab-content-panel -->
+
+  </div><!-- /erp-card -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Duty date fields with labels for status tracking
+const dutyFields = [
+  { id: 'docLodgedDate',   label: 'Doc Lodged' },
+  { id: 'assmntValDate',   label: 'Assessment Val' },
+  { id: 'dutyPayDate',     label: 'Duty Payment' },
+  { id: 'transManiDate',   label: 'Trans Manifest' },
+  { id: 'verDate',         label: 'Verification' },
+  { id: 'wharfDate',       label: 'Wharfage Pay' },
+  { id: 'roRecdDate',      label: 'RO Received' },
+  { id: 'portChargeDate',  label: 'Port Charges' },
+  { id: 'icdChargeDate',   label: 'ICD Charges' },
+  { id: 'deliveryDate',    label: 'Delivery' }
+];
+
+function updateStatusBadges() {
+  const container = document.getElementById('statusBadges');
+  container.innerHTML = dutyFields.map(f => {
+    const el = document.getElementById(f.id);
+    const filled = el && el.value;
+    return `<span style="font-size:10px; padding:2px 8px; border-radius:10px; 
+      background:${filled ? '#d4edda' : '#f0f0f0'};
+      color:${filled ? '#155724' : '#888'};
+      border: 1px solid ${filled ? '#c3e6cb' : '#ddd'};">
+      ${filled ? '✓' : '○'} ${f.label}
+    </span>`;
+  }).join('');
+}
+
+// Attach listeners
+dutyFields.forEach(f => {
+  const el = document.getElementById(f.id);
+  if (el) el.addEventListener('change', updateStatusBadges);
+});
+
+// Init
+updateStatusBadges();
+
+function saveDuty() {
+  const dutyPay = document.getElementById('dutyPayDate').value;
+  const delivery = document.getElementById('deliveryDate').value;
+  if (!dutyPay) {
+    alert('Duty Pay Date is required before saving.');
+    return;
+  }
+  if (delivery && dutyPay && new Date(delivery) < new Date(dutyPay)) {
+    alert('Warning: Delivery Date is before Duty Pay Date. Please verify.');
+    return;
+  }
+  alert('Duty Payment details saved successfully!');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Exports – FreightPro ERP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f0f2f5;
+    --erp-card-bg: #ffffff;
+    --erp-border: #dee2e6;
+    --erp-table-head: #f1f3f5;
+    --erp-table-hover: #f8f9fc;
+    --erp-text-primary: #212529;
+    --erp-text-muted: #6c757d;
+    --erp-text-small: 0.78rem;
+    --erp-font: 'IBM Plex Sans', sans-serif;
+    --erp-mono: 'IBM Plex Mono', monospace;
+    
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: var(--erp-font);
+    font-size: var(--erp-text-small);
+    background: var(--erp-bg);
+    color: var(--erp-text-primary);
+    margin: 0; padding: 0;
+  }
+
+  /* ── Main Content ────────────────────────── */
+  #erp-main {
+    margin-left: 0;
+    margin-top: 0;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  /* ── Page Header ─────────────────────────── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+  }
+  .page-header .page-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--erp-text-primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .page-header .page-title .title-icon {
+    width: 30px; height: 30px; background: #e7f0ff;
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #0d6efd;
+  }
+  .page-header .btn-group-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ── ERP Buttons ─────────────────────────── */
+  .btn-erp {
+    font-size: 0.75rem; font-weight: 500; padding: 5px 11px;
+    border-radius: 5px; display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid transparent; cursor: pointer; transition: all .15s;
+    white-space: nowrap;
+  }
+  .btn-erp-primary { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .btn-erp-primary:hover { background: #0b5ed7; border-color: #0b5ed7; }
+  .btn-erp-success { background: #198754; color: #fff; border-color: #198754; }
+  .btn-erp-success:hover { background: #157347; }
+  .btn-erp-warning { background: #fd7e14; color: #fff; border-color: #fd7e14; }
+  .btn-erp-warning:hover { background: #e8710a; }
+  .btn-erp-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
+  .btn-erp-danger:hover { background: #bb2d3b; }
+  .btn-erp-secondary { background: #6c757d; color: #fff; border-color: #6c757d; }
+  .btn-erp-secondary:hover { background: #5c636a; }
+  .btn-erp-outline {
+    background: #fff; color: #495057;
+    border-color: var(--erp-border);
+  }
+  .btn-erp-outline:hover { background: var(--erp-bg); }
+  .btn-erp-sm { font-size: 0.7rem; padding: 3px 8px; }
+  .btn-erp-xs { font-size: 0.68rem; padding: 2px 7px; border-radius: 4px; }
+
+  /* ── Card / Panel ────────────────────────── */
+  .erp-card {
+    background: var(--erp-card-bg);
+    border: 1px solid var(--erp-border);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .erp-card-header {
+    padding: 9px 14px;
+    background: #f8f9fa;
+    border-bottom: 1px solid var(--erp-border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.78rem; font-weight: 600; color: #495057;
+  }
+  .erp-card-header .header-icon { margin-right: 6px; color: #0d6efd; }
+  .erp-card-body { padding: 14px; }
+
+  /* ── Filter Bar ──────────────────────────── */
+  .filter-bar {
+    background: var(--erp-card-bg);
+    border: 1px solid var(--erp-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .filter-bar .filter-label {
+    font-size: 0.7rem; font-weight: 600; color: var(--erp-text-muted);
+    margin-bottom: 2px; display: block;
+  }
+  .filter-bar .erp-select, .filter-bar .erp-input {
+    font-size: 0.76rem; padding: 5px 8px;
+    border: 1px solid #ced4da; border-radius: 5px;
+    background: #fff; width: 100%; height: 30px;
+    color: var(--erp-text-primary);
+    transition: border-color .15s;
+  }
+  .filter-bar .erp-select:focus, .filter-bar .erp-input:focus {
+    outline: none; border-color: #86b7fe; box-shadow: 0 0 0 2px rgba(13,110,253,.15);
+  }
+  .filter-row {
+    display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
+  }
+  .filter-group { display: flex; flex-direction: column; min-width: 200px; flex: 1; }
+
+  /* ── Stats Bar ───────────────────────────── */
+  .stats-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; font-size: 0.74rem; color: var(--erp-text-muted);
+    flex-wrap: wrap; gap: 8px;
+  }
+  .stats-bar .stat-pill {
+    background: #e7f0ff; color: #0d6efd;
+    font-weight: 600; font-size: 0.7rem;
+    padding: 2px 8px; border-radius: 20px;
+    border: 1px solid #b8d0ff;
+  }
+
+  /* ── Table Controls ──────────────────────── */
+  .table-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+  }
+  .table-controls .records-per-page {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.74rem; color: var(--erp-text-muted);
+  }
+  .table-controls .records-per-page select {
+    font-size: 0.74rem; padding: 2px 6px;
+    border: 1px solid var(--erp-border); border-radius: 4px; height: 26px;
+    background: #fff; color: var(--erp-text-primary);
+  }
+  .table-search {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.74rem; color: var(--erp-text-muted);
+  }
+  .table-search input {
+    font-size: 0.74rem; padding: 3px 8px;
+    border: 1px solid var(--erp-border); border-radius: 4px; height: 26px;
+    background: #fff; color: var(--erp-text-primary); width: 180px;
+  }
+  .table-search input:focus {
+    outline: none; border-color: #86b7fe; box-shadow: 0 0 0 2px rgba(13,110,253,.12);
+  }
+
+  /* ── ERP Table ───────────────────────────── */
+  .erp-table-wrap { overflow-x: auto; }
+  .erp-table {
+    width: 100%; border-collapse: collapse; font-size: 0.74rem;
+  }
+  .erp-table thead th {
+    background: var(--erp-table-head);
+    color: #495057; font-weight: 600;
+    padding: 7px 10px;
+    border: 1px solid var(--erp-border);
+    white-space: nowrap; cursor: pointer;
+    user-select: none; position: relative;
+  }
+  .erp-table thead th:hover { background: #e9ecef; }
+  .erp-table thead th .sort-icon {
+    margin-left: 4px; font-size: 0.62rem; color: #adb5bd;
+  }
+  .erp-table thead th.sorted-asc .sort-icon::before { content: '▲'; color: #0d6efd; }
+  .erp-table thead th.sorted-desc .sort-icon::before { content: '▼'; color: #0d6efd; }
+  .erp-table tbody tr { border-bottom: 1px solid var(--erp-border); }
+  .erp-table tbody tr:hover td { background: var(--erp-table-hover); }
+  .erp-table tbody td {
+    padding: 6px 10px; border: 1px solid var(--erp-border);
+    vertical-align: middle; color: var(--erp-text-primary);
+  }
+  .erp-table tbody td.mono { font-family: var(--erp-mono); font-size: 0.71rem; }
+  .erp-table tbody tr:nth-child(even) td { background: #fafbfc; }
+  .erp-table tbody tr:nth-child(even):hover td { background: var(--erp-table-hover); }
+
+  /* ── Status badges ───────────────────────── */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.67rem; font-weight: 600; padding: 2px 7px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .badge-warning { background: #fff3cd; color: #856404; }
+  .badge-warning .status-dot { background: #ffc107; }
+  .badge-success { background: #d1e7dd; color: #0a3622; }
+  .badge-success .status-dot { background: #198754; }
+  .badge-info { background: #cff4fc; color: #055160; }
+  .badge-info .status-dot { background: #0dcaf0; }
+  .badge-secondary { background: #e2e3e5; color: #41464b; }
+  .badge-secondary .status-dot { background: #6c757d; }
+  .badge-danger { background: #f8d7da; color: #58151c; }
+  .badge-danger .status-dot { background: #dc3545; }
+
+  /* ── Action Buttons in rows ──────────────── */
+  .row-actions { display: flex; gap: 3px; flex-wrap: nowrap; align-items: center; }
+  .btn-action {
+    width: 26px; height: 24px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; border: 1px solid transparent;
+    cursor: pointer; transition: all .15s; text-decoration: none;
+  }
+  .btn-action:hover { transform: translateY(-1px); }
+  .btn-action-edit { background: #e7f0ff; color: #0d6efd; border-color: #b8d0ff; }
+  .btn-action-edit:hover { background: #0d6efd; color: #fff; }
+  .btn-action-approve { background: #d1e7dd; color: #198754; border-color: #a3cfbb; }
+  .btn-action-approve:hover { background: #198754; color: #fff; }
+  .btn-action-delete { background: #f8d7da; color: #dc3545; border-color: #f1aeb5; }
+  .btn-action-delete:hover { background: #dc3545; color: #fff; }
+  .btn-action-container { background: #fff3cd; color: #856404; border-color: #ffe69c; }
+  .btn-action-container:hover { background: #fd7e14; color: #fff; }
+  .btn-action-view { background: #cff4fc; color: #055160; border-color: #9eeaf9; }
+  .btn-action-view:hover { background: #0dcaf0; color: #fff; }
+  .btn-add-container {
+    font-size: 0.67rem; padding: 2px 7px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #198754; color: #fff; border: none; cursor: pointer;
+    transition: all .15s; white-space: nowrap;
+  }
+  .btn-add-container:hover { background: #157347; }
+  .btn-view-container {
+    font-size: 0.67rem; padding: 2px 7px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #fd7e14; color: #fff; border: none; cursor: pointer;
+    transition: all .15s; white-space: nowrap;
+  }
+  .btn-view-container:hover { background: #e8710a; }
+
+  /* ── Pagination ──────────────────────────── */
+  .erp-pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; font-size: 0.74rem; color: var(--erp-text-muted);
+    border-top: 1px solid var(--erp-border); margin-top: 4px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .pagination-pages { display: flex; gap: 3px; }
+  .page-btn {
+    min-width: 26px; height: 26px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 500;
+    border: 1px solid var(--erp-border); background: #fff;
+    cursor: pointer; transition: all .15s; padding: 0 6px;
+    color: var(--erp-text-muted);
+  }
+  .page-btn:hover { background: var(--erp-bg); color: var(--erp-text-primary); }
+  .page-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .page-btn:disabled { opacity: .4; cursor: default; }
+
+  /* ── Toast ───────────────────────────────── */
+  .erp-toast-container {
+    position: fixed; top: 18px; right: 18px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .erp-toast {
+    background: #fff; border-radius: 7px; padding: 10px 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.14);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.78rem; border-left: 4px solid;
+    animation: slideIn .25s ease; min-width: 240px; max-width: 340px;
+  }
+  .erp-toast.toast-success { border-color: #198754; }
+  .erp-toast.toast-error { border-color: #dc3545; }
+  .erp-toast .toast-icon { font-size: 14px; }
+  .erp-toast.toast-success .toast-icon { color: #198754; }
+  .erp-toast.toast-error .toast-icon { color: #dc3545; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  /* ── Modal ───────────────────────────────── */
+  .erp-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 2000;
+    align-items: center; justify-content: center;
+  }
+  .erp-modal-overlay.show { display: flex; }
+  .erp-modal {
+    background: #fff; border-radius: 10px;
+    width: min(500px, 95vw); overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    animation: modalIn .2s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+  .erp-modal-header {
+    padding: 12px 16px; background: #f8f9fa;
+    border-bottom: 1px solid var(--erp-border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.84rem; font-weight: 600; color: #212529;
+  }
+  .erp-modal-body { padding: 16px; font-size: 0.78rem; }
+  .erp-modal-footer {
+    padding: 10px 16px; background: #f8f9fa;
+    border-top: 1px solid var(--erp-border);
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .modal-close-btn {
+    background: none; border: none; font-size: 16px;
+    color: #6c757d; cursor: pointer; padding: 0 4px; line-height: 1;
+  }
+
+  /* ── Vessel ETB dot ──────────────────────── */
+  .etb-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+  .etb-dot.green { background: #198754; }
+  .etb-dot.red { background: #dc3545; }
+  .etb-dot.orange { background: #fd7e14; }
+
+  /* ── Empty state ─────────────────────────── */
+  .empty-state {
+    text-align: center; padding: 30px 20px; color: var(--erp-text-muted);
+  }
+  .empty-state i { font-size: 2rem; margin-bottom: 8px; display: block; color: #dee2e6; }
+
+  /* ── Responsive ──────────────────────────── */
+  @media (max-width: 768px) {
+    
+    
+    .filter-row { flex-direction: column; }
+    .filter-group { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ MAIN CONTENT ═══════ -->
+<main id="erp-main">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <div class="title-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+      Transit Exports
+    </div>
+    <div class="btn-group-actions">
+      <button class="btn-erp btn-erp-secondary" onclick="printFilewise()">
+        <i class="fa-solid fa-print"></i> Print Filewise
+      </button>
+      <button class="btn-erp btn-erp-warning" onclick="printContainerwise()">
+        <i class="fa-solid fa-box"></i> Print Containerwise
+      </button>
+      <button class="btn-erp btn-erp-success" onclick="markDelivered()">
+        <i class="fa-solid fa-circle-check"></i> Delivered
+      </button>
+      <button class="btn-erp btn-erp-primary" onclick="window.location.href='add-consignment-doc.html'">
+        <i class="fa-solid fa-plus"></i> Create Consignment
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-label"><i class="fa-solid fa-filter" style="font-size:9px;margin-right:3px;"></i>Search Consignee</span>
+        <select class="erp-select" id="filter-consignee">
+          <option value="">— All Consignees —</option>
+          <option>SHAYONA CEMENT CORPORATION</option>
+          <option>IMPERIAL ROAD HAULAGE LTD</option>
+          <option>ALISTAIR LOGISTICS</option>
+          <option>AFCONS INFRASTRUCTURE LTD</option>
+          <option>GLOBAL TRANSIT CO</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label"><i class="fa-solid fa-id-card" style="font-size:9px;margin-right:3px;"></i>Search UIN</span>
+        <select class="erp-select" id="filter-uin">
+          <option value="">— All UINs —</option>
+          <option>IMPERIAL</option>
+          <option>SHAYONA</option>
+          <option>ALISTAIR</option>
+          <option>AFCONS</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:6px;flex-shrink:0;">
+        <button class="btn-erp btn-erp-primary" onclick="applyFilters()">
+          <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
+        <button class="btn-erp btn-erp-outline" onclick="clearFilters()">
+          <i class="fa-solid fa-xmark"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Panel -->
+  <div class="erp-card">
+    <div class="erp-card-header">
+      <span><i class="fa-solid fa-table-list header-icon"></i> All Jobs</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div class="stats-bar" style="margin-bottom:0;">
+          <span class="stat-pill"><i class="fa-solid fa-layer-group" style="font-size:9px;margin-right:3px;"></i> <span id="total-items">8</span> Items</span>
+          <span class="stat-pill" style="background:#e8f5e9;color:#1b5e20;border-color:#c8e6c9;"><i class="fa-solid fa-container-storage" style="font-size:9px;margin-right:3px;"></i> <span id="total-containers">14</span> Containers</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="erp-card-body">
+      <!-- Table Controls -->
+      <div class="table-controls">
+        <div class="records-per-page">
+          Show
+          <select id="per-page" onchange="changePerPage(this.value)">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          records per page
+        </div>
+        <div class="table-search">
+          <label for="table-search-input" style="white-space:nowrap;">Search:</label>
+          <input type="text" id="table-search-input" placeholder="Filter records..." oninput="filterTable(this.value)">
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="erp-table-wrap">
+        <table class="erp-table" id="main-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">UIN <span class="sort-icon"></span></th>
+              <th onclick="sortTable(1)">File No <span class="sort-icon"></span></th>
+              <th onclick="sortTable(2)">Refer. Number <span class="sort-icon"></span></th>
+              <th onclick="sortTable(3)">Tansad No <span class="sort-icon"></span></th>
+              <th onclick="sortTable(4)">Shipper <span class="sort-icon"></span></th>
+              <th onclick="sortTable(5)">Vessel <span class="sort-icon"></span></th>
+              <th onclick="sortTable(6)">ETB <span class="sort-icon"></span></th>
+              <th onclick="sortTable(7)">Containers <span class="sort-icon"></span></th>
+              <th onclick="sortTable(8)">Remarks <span class="sort-icon"></span></th>
+              <th style="min-width:200px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        No records match your search criteria.
+      </div>
+
+      <!-- Pagination -->
+      <div class="erp-pagination" id="pagination-bar">
+        <span id="pagination-info">Showing 1 to 8 of 8 entries</span>
+        <div class="pagination-pages" id="pagination-pages"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════ DELETE CONFIRM MODAL ═══════ -->
+<div class="erp-modal-overlay" id="delete-modal">
+  <div class="erp-modal">
+    <div class="erp-modal-header">
+      <span><i class="fa-solid fa-triangle-exclamation" style="color:#dc3545;margin-right:6px;"></i> Confirm Delete</span>
+      <button class="modal-close-btn" onclick="closeModal('delete-modal')">✕</button>
+    </div>
+    <div class="erp-modal-body">
+      <p style="margin:0 0 6px;">Are you sure you want to delete consignment <strong id="delete-fileno"></strong>?</p>
+      <p style="color:#6c757d;margin:0;font-size:0.72rem;">This action will permanently remove the record and all associated containers.</p>
+    </div>
+    <div class="erp-modal-footer">
+      <button class="btn-erp btn-erp-outline" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn-erp btn-erp-danger" onclick="confirmDelete()"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TOAST CONTAINER ═══════ -->
+<div class="erp-toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+let tableData = [
+  { uin:'',         fileno:'EXPTRS/SHAYONA/2026/0005',   refer:'', tansad:'', shipper:'SHAYONA CEMENT CORPORATION',     vessel:'MSC AURORA',    etb:'green',  containers:2,  remarks:'AWAITING ORIGINAL DOCUMENTS' },
+  { uin:'IMPERIAL', fileno:'EXPTRS/IMPERIAL/2026/0006',  refer:'IMP-2026-001', tansad:'TSD-9921', shipper:'IMPERIAL ROAD HAULAGE LTD', vessel:'MAERSK KENYA',  etb:'green',  containers:4,  remarks:'UNDER CUSTOMS DOCUMENTATION' },
+  { uin:'ALISTAIR', fileno:'EXPTRS/ALISTAIR/2026/0007', refer:'AL-2026-054', tansad:'TSD-9934', shipper:'ALISTAIR LOGISTICS LTD',    vessel:'EVER GIVEN',    etb:'orange', containers:1,  remarks:'PENDING STUFFING' },
+  { uin:'AFCONS',   fileno:'EXPTRS/AFCONS/2026/0008',   refer:'AF-2026-019', tansad:'TSD-9978', shipper:'AFCONS INFRASTRUCTURE LTD', vessel:'COSCO PRIDE',   etb:'green',  containers:3,  remarks:'CARGO AT CFS READY' },
+  { uin:'GLOBAL',   fileno:'EXPTRS/GLOBAL/2026/0009',   refer:'GL-2026-088', tansad:'TSD-0011', shipper:'GLOBAL TRANSIT CO',         vessel:'CMA CGM TITUS', etb:'red',    containers:0,  remarks:'ETB DELAYED' },
+  { uin:'',         fileno:'EXPTRS/MISC/2026/0010',     refer:'', tansad:'', shipper:'TRANSCOM FREIGHT SERVICES',   vessel:'',              etb:'orange', containers:0,  remarks:'NEW FILE - PENDING DETAILS' },
+  { uin:'IMPERIAL', fileno:'EXPTRS/IMPERIAL/2026/0011', refer:'IMP-2026-002', tansad:'TSD-0021', shipper:'IMPERIAL ROAD HAULAGE LTD', vessel:'MAERSK KENYA',  etb:'green',  containers:3,  remarks:'DOCS SUBMITTED TO KRA' },
+  { uin:'SHAYONA',  fileno:'EXPTRS/SHAYONA/2026/0012',  refer:'SH-2026-033', tansad:'TSD-0044', shipper:'SHAYONA CEMENT CORPORATION', vessel:'MSC AURORA',    etb:'green',  containers:1,  remarks:'SOB RECEIVED' },
+];
+let filteredData = [...tableData];
+let currentPage = 1;
+let perPage = 10;
+let sortCol = -1;
+let sortDir = 'asc';
+let deleteTarget = null;
+
+// ═══════════════════════════════════════════
+//  RENDER TABLE
+// ═══════════════════════════════════════════
+function renderTable() {
+  const start = (currentPage - 1) * perPage;
+  const end   = start + perPage;
+  const slice = filteredData.slice(start, end);
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  if (slice.length === 0) {
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('pagination-bar').style.display = 'none';
+    return;
+  }
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('pagination-bar').style.display = 'flex';
+  slice.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="mono" style="color:#0d6efd;font-weight:600;">${row.uin || '<span style="color:#adb5bd;font-style:italic;">—</span>'}</td>
+      <td class="mono" style="color:#212529;">${row.fileno}</td>
+      <td>${row.refer || '<span style="background:#fff3cd;color:#856404;font-size:0.68rem;padding:1px 5px;border-radius:3px;">Pending</span>'}</td>
+      <td>${row.tansad || '<span style="background:#fff3cd;color:#856404;font-size:0.68rem;padding:1px 5px;border-radius:3px;">Pending</span>'}</td>
+      <td style="font-weight:500;">${row.shipper}</td>
+      <td>${row.vessel || '—'}</td>
+      <td style="text-align:center;"><span class="etb-dot ${row.etb}" title="ETB: ${row.etb.toUpperCase()}"></span></td>
+      <td style="text-align:center;">
+        ${row.containers > 0
+          ? `<span style="background:#0d6efd;color:#fff;font-size:0.68rem;font-weight:700;padding:1px 8px;border-radius:20px;">${row.containers}</span>`
+          : `<span style="color:#adb5bd;">0</span>`}
+      </td>
+      <td>
+        <span class="status-badge ${getRemarkClass(row.remarks)}">
+          <span class="status-dot"></span>${row.remarks}
+        </span>
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-action btn-action-edit" title="Edit" onclick="editRow('${row.fileno}')"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn-action btn-action-approve" title="Approve" onclick="approveRow('${row.fileno}')"><i class="fa-solid fa-check"></i></button>
+          <button class="btn-add-container" title="Add Container" onclick="addContainer('${row.fileno}')"><i class="fa-solid fa-plus"></i> +Containers</button>
+          <button class="btn-view-container" title="View Containers" onclick="viewContainers('${row.fileno}')"><i class="fa-solid fa-eye"></i> Containers</button>
+          <button class="btn-action btn-action-delete" title="Delete" onclick="deleteRow('${row.fileno}')"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  renderPagination();
+  document.getElementById('total-items').textContent = filteredData.length;
+  const totalContainers = filteredData.reduce((s,r)=>s+r.containers,0);
+  document.getElementById('total-containers').textContent = totalContainers;
+}
+
+function getRemarkClass(remark) {
+  if (!remark) return 'badge-secondary';
+  const r = remark.toUpperCase();
+  if (r.includes('AWAITING') || r.includes('PENDING') || r.includes('DELAYED')) return 'badge-warning';
+  if (r.includes('SUBMITTED') || r.includes('RECEIVED') || r.includes('READY') || r.includes('SOB')) return 'badge-success';
+  if (r.includes('CUSTOMS') || r.includes('STUFFING') || r.includes('DETAILS')) return 'badge-info';
+  return 'badge-secondary';
+}
+
+// ═══════════════════════════════════════════
+//  PAGINATION
+// ═══════════════════════════════════════════
+function renderPagination() {
+  const total = filteredData.length;
+  const totalPages = Math.ceil(total / perPage);
+  const start = (currentPage - 1) * perPage + 1;
+  const end = Math.min(currentPage * perPage, total);
+  document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${total} entries`;
+  const pp = document.getElementById('pagination-pages');
+  pp.innerHTML = '';
+  const prev = document.createElement('button');
+  prev.className = 'page-btn'; prev.textContent = '‹';
+  prev.disabled = currentPage === 1;
+  prev.onclick = () => { currentPage--; renderTable(); };
+  pp.appendChild(prev);
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderTable(); };
+    pp.appendChild(btn);
+  }
+  const next = document.createElement('button');
+  next.className = 'page-btn'; next.textContent = '›';
+  next.disabled = currentPage === totalPages || totalPages === 0;
+  next.onclick = () => { currentPage++; renderTable(); };
+  pp.appendChild(next);
+}
+
+// ═══════════════════════════════════════════
+//  SEARCH / FILTER
+// ═══════════════════════════════════════════
+function filterTable(q) {
+  const query = q.toLowerCase().trim();
+  filteredData = tableData.filter(row =>
+    Object.values(row).join(' ').toLowerCase().includes(query)
+  );
+  currentPage = 1;
+  renderTable();
+}
+
+function applyFilters() {
+  const consignee = document.getElementById('filter-consignee').value.toLowerCase();
+  const uin = document.getElementById('filter-uin').value.toLowerCase();
+  filteredData = tableData.filter(row => {
+    const matchC = !consignee || row.shipper.toLowerCase().includes(consignee);
+    const matchU = !uin || row.uin.toLowerCase().includes(uin);
+    return matchC && matchU;
+  });
+  currentPage = 1;
+  renderTable();
+  showToast('Filters applied — ' + filteredData.length + ' record(s) found.', 'success');
+}
+
+function clearFilters() {
+  document.getElementById('filter-consignee').value = '';
+  document.getElementById('filter-uin').value = '';
+  document.getElementById('table-search-input').value = '';
+  filteredData = [...tableData];
+  currentPage = 1;
+  renderTable();
+  showToast('Filters cleared.', 'success');
+}
+
+// ═══════════════════════════════════════════
+//  SORT
+// ═══════════════════════════════════════════
+function sortTable(col) {
+  const keys = ['uin','fileno','refer','tansad','shipper','vessel','etb','containers','remarks'];
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  filteredData.sort((a, b) => {
+    let av = a[keys[col]] ?? ''; let bv = b[keys[col]] ?? '';
+    if (typeof av === 'number') return sortDir === 'asc' ? av - bv : bv - av;
+    return sortDir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+  });
+  document.querySelectorAll('.erp-table thead th').forEach((th, i) => {
+    th.className = i === col ? (sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
+  });
+  renderTable();
+}
+
+function changePerPage(val) {
+  perPage = parseInt(val);
+  currentPage = 1;
+  renderTable();
+}
+
+// ═══════════════════════════════════════════
+//  ROW ACTIONS
+// ═══════════════════════════════════════════
+function editRow(fileno) {
+  window.location.href = 'add-consignment-doc.html?edit=' + encodeURIComponent(fileno);
+}
+function approveRow(fileno) {
+  showToast('Consignment ' + fileno + ' approved successfully.', 'success');
+}
+function addContainer(fileno) {
+  window.location.href = 'add-container.html?bl=' + encodeURIComponent(fileno);
+}
+function viewContainers(fileno) {
+  showToast('Loading containers for ' + fileno + '...', 'success');
+}
+function deleteRow(fileno) {
+  deleteTarget = fileno;
+  document.getElementById('delete-fileno').textContent = fileno;
+  document.getElementById('delete-modal').classList.add('show');
+}
+function confirmDelete() {
+  tableData = tableData.filter(r => r.fileno !== deleteTarget);
+  filteredData = filteredData.filter(r => r.fileno !== deleteTarget);
+  closeModal('delete-modal');
+  renderTable();
+  showToast('Record ' + deleteTarget + ' deleted.', 'error');
+  deleteTarget = null;
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ═══════════════════════════════════════════
+//  TOP BUTTONS
+// ═══════════════════════════════════════════
+function printFilewise() { showToast('Generating filewise print report…', 'success'); }
+function printContainerwise() { showToast('Generating containerwise print report…', 'success'); }
+function markDelivered() { showToast('Selected consignments marked as Delivered.', 'success'); }
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `erp-toast toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon"><i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i></span>
+    <span>${msg}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 350); }, 3500);
+}
+
+// ═══════════════════════════════════════════
+//  REFRESH
+// ═══════════════════════════════════════════
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  const icon = document.querySelector('#btn-refresh i');
+  icon.style.animation = 'spin 0.5s linear';
+  setTimeout(() => { icon.style.animation = ''; showToast('Data refreshed.', 'success'); }, 600);
+});
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+renderTable();
+</script>
+
+<style>
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+</body>
+</html>

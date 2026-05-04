@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Clearance Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #333; min-height: 100vh; }
+
+  /* TOP NAV */
+  .topnav { background: #1a2940; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 52px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .topnav .brand { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
+  .topnav .brand span { color: #4db8ff; }
+  .topnav .nav-right { display: flex; align-items: center; gap: 18px; font-size: 13px; }
+  .topnav .nav-right a { color: #cdd8e8; text-decoration: none; transition: color .2s; }
+  .topnav .nav-right a:hover { color: #fff; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #4db8ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+  /* SIDEBAR */
+  .layout { display: flex; min-height: calc(100vh - 52px); }
+  .sidebar { width: 220px; background: #1e3050; color: #cdd8e8; flex-shrink: 0; padding-top: 12px; }
+  .sidebar-menu { list-style: none; }
+  .sidebar-menu li a { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 13px; color: #cdd8e8; text-decoration: none; transition: background .2s, color .2s; border-left: 3px solid transparent; }
+  .sidebar-menu li a:hover, .sidebar-menu li a.active { background: #253d5e; color: #fff; border-left-color: #4db8ff; }
+  .sidebar-menu li a .icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #7a94b0; padding: 16px 20px 6px; }
+
+  /* MAIN CONTENT */
+  .main { flex: 1; padding: 28px 32px; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #1a2940; }
+  .page-header p { color: #6b7a8d; font-size: 13px; margin-top: 4px; }
+
+  /* BREADCRUMB */
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #7a94b0; margin-bottom: 20px; }
+  .breadcrumb a { color: #4db8ff; text-decoration: none; }
+  .breadcrumb span { color: #cdd; }
+
+  /* STATS ROW */
+  .stats-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 24px; flex: 1; min-width: 160px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 16px; border-top: 3px solid #4db8ff; }
+  .stat-card.green { border-top-color: #28a745; }
+  .stat-card.orange { border-top-color: #fd7e14; }
+  .stat-card.purple { border-top-color: #6f42c1; }
+  .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .stat-icon.blue-bg { background: #e7f3ff; }
+  .stat-icon.green-bg { background: #e6f9ed; }
+  .stat-icon.orange-bg { background: #fff3e0; }
+  .stat-icon.purple-bg { background: #f3eeff; }
+  .stat-info .val { font-size: 24px; font-weight: 700; color: #1a2940; }
+  .stat-info .lbl { font-size: 12px; color: #7a94b0; margin-top: 2px; }
+
+  /* MAIN VEHICLE CLEARANCE CARD */
+  .vc-card { background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); border-radius: 14px; padding: 28px 32px; display: flex; align-items: center; gap: 24px; box-shadow: 0 6px 24px rgba(46,125,50,0.30); margin-bottom: 28px; color: #fff; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+  .vc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(46,125,50,0.38); }
+  .vc-card-icon { width: 72px; height: 72px; background: rgba(255,255,255,0.18); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 38px; flex-shrink: 0; }
+  .vc-card-body h2 { font-size: 30px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 8px; }
+  .vc-card-body .stats { display: flex; gap: 28px; }
+  .vc-card-body .stats .s { font-size: 14px; opacity: 0.92; }
+  .vc-card-body .stats .s strong { font-weight: 700; }
+
+  /* MODULE GRID */
+  .modules-title { font-size: 15px; font-weight: 600; color: #1a2940; margin-bottom: 16px; }
+  .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .module-card { background: #fff; border-radius: 10px; padding: 20px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); cursor: pointer; text-decoration: none; color: #333; transition: box-shadow .2s, transform .2s; display: flex; flex-direction: column; gap: 10px; border: 1px solid #eaf0f8; }
+  .module-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.12); transform: translateY(-2px); border-color: #4db8ff; }
+  .module-card .mc-icon { font-size: 26px; }
+  .module-card .mc-name { font-size: 13px; font-weight: 600; color: #1a2940; }
+  .module-card .mc-count { font-size: 11px; color: #7a94b0; }
+
+  /* RECENT TABLE */
+  .card { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #eaf0f8; }
+  .card-header h3 { font-size: 15px; font-weight: 600; color: #1a2940; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background .2s, transform .1s; text-decoration: none; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: #007bff; color: #fff; }
+  .btn-primary:hover { background: #0069d9; }
+  .btn-success { background: #28a745; color: #fff; }
+  .btn-success:hover { background: #218838; }
+  .btn-outline { background: transparent; color: #007bff; border: 1px solid #007bff; }
+  .btn-outline:hover { background: #007bff; color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f8fafd; font-weight: 600; color: #4a5568; padding: 10px 14px; text-align: left; border-bottom: 2px solid #eaf0f8; white-space: nowrap; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f4fa; vertical-align: middle; }
+  tbody tr:hover { background: #f7fbff; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #e6f9ed; color: #1a7a38; }
+  .badge-orange { background: #fff3cd; color: #856404; }
+  .badge-blue { background: #e7f3ff; color: #0056b3; }
+  .badge-red { background: #ffe6e6; color: #a02020; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">&#9783; <span>ClearPort</span> ERP</div>
+  <div class="nav-right">
+    <a href="#">Dashboard</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+    <div class="avatar">JD</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Main Menu</div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html" class="active"><span class="icon">🏠</span> Dashboard</a></li>
+      <li><a href="cargo-position.html"><span class="icon">🚢</span> Cargo Position</a></li>
+      <li><a href="consignment-file.html"><span class="icon">📄</span> Consignments</a></li>
+      <li><a href="#"><span class="icon">📦</span> Inventory</a></li>
+      <li><a href="#"><span class="icon">🔖</span> Tariff Codes</a></li>
+    </ul>
+    <div class="sidebar-section">Reports</div>
+    <ul class="sidebar-menu">
+      <li><a href="#"><span class="icon">📊</span> Analytics</a></li>
+      <li><a href="#"><span class="icon">🖨️</span> Print Reports</a></li>
+      <li><a href="#"><span class="icon">📁</span> Archives</a></li>
+    </ul>
+    <div class="sidebar-section">Settings</div>
+    <ul class="sidebar-menu">
+      <li><a href="#"><span class="icon">⚙️</span> Configuration</a></li>
+      <li><a href="#"><span class="icon">👥</span> Users</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <div class="breadcrumb">
+      <a href="#">Home</a> <span>›</span> <span>Vehicle Clearance</span>
+    </div>
+    <div class="page-header">
+      <h1>Vehicle Clearance Dashboard</h1>
+      <p>Overview of all vehicle clearance operations and status</p>
+    </div>
+
+    <!-- MAIN VC CARD -->
+    <a href="cargo-position.html" style="text-decoration:none;">
+      <div class="vc-card">
+        <div class="vc-card-icon">📂</div>
+        <div class="vc-card-body">
+          <h2>Vehicle Clearance</h2>
+          <div class="stats">
+            <div class="s">Vehicle Clearance Items: <strong>22</strong></div>
+            <div class="s">Active Units: <strong>89</strong></div>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon blue-bg">📋</div>
+        <div class="stat-info"><div class="val">22</div><div class="lbl">Total Consignments</div></div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green-bg">✅</div>
+        <div class="stat-info"><div class="val">14</div><div class="lbl">Active</div></div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon orange-bg">⏳</div>
+        <div class="stat-info"><div class="val">5</div><div class="lbl">Pending Docs</div></div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon purple-bg">🚗</div>
+        <div class="stat-info"><div class="val">89</div><div class="lbl">Active Units</div></div>
+      </div>
+    </div>
+
+    <!-- MODULE GRID -->
+    <div class="modules-title">Quick Access</div>
+    <div class="modules-grid">
+      <a href="cargo-position.html" class="module-card">
+        <div class="mc-icon">🗂️</div>
+        <div class="mc-name">Cargo Position</div>
+        <div class="mc-count">22 items</div>
+      </a>
+      <a href="consignment-file.html" class="module-card">
+        <div class="mc-icon">➕</div>
+        <div class="mc-name">Add Consignment</div>
+        <div class="mc-count">Create new</div>
+      </a>
+      <a href="#" class="module-card" onclick="alert('Lodged Documents module')">
+        <div class="mc-icon">📑</div>
+        <div class="mc-name">Lodged Docs</div>
+        <div class="mc-count">8 documents</div>
+      </a>
+      <a href="#" class="module-card" onclick="alert('Delivered module')">
+        <div class="mc-icon">✔️</div>
+        <div class="mc-name">Delivered</div>
+        <div class="mc-count">3 completed</div>
+      </a>
+      <a href="#" class="module-card" onclick="alert('Print Reports module')">
+        <div class="mc-icon">🖨️</div>
+        <div class="mc-name">Print Reports</div>
+        <div class="mc-count">Generate reports</div>
+      </a>
+    </div>
+
+    <!-- RECENT CONSIGNMENTS TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Consignments</h3>
+        <a href="cargo-position.html" class="btn btn-primary">View All →</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>UIN</th><th>File No</th><th>Supplier</th><th>Consignee</th><th>Vessel</th><th>ETA</th><th>Units</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>GFT</td><td>VC/GFT/2026/0032</td><td>FAW Trucks International Co., Ltd</td><td>GF Trucks and Equipment Ltd</td><td>MV CATHY OCEAN</td><td>04-Mar</td><td>15</td><td><span class="badge badge-orange">Doc Valuation</span></td></tr>
+          <tr><td>GFT</td><td>VC/GFT/2026/0033</td><td>FAW Trucks International Co., Ltd</td><td>GF Trucks and Equipment Ltd</td><td>MV CATHY OCEAN</td><td>04-Mar</td><td>2</td><td><span class="badge badge-orange">Await Vessel</span></td></tr>
+          <tr><td>GFT</td><td>VC/GFT/2026/0034</td><td>FAW Trucks International Co., Ltd</td><td>GF Trucks and Equipment Ltd</td><td>MV CATHY OCEAN</td><td>04-Mar</td><td>2</td><td><span class="badge badge-blue">Under Valuation</span></td></tr>
+          <tr><td>GFT</td><td>VC/GFT/2026/0035</td><td>Sinotruk (HK) Int'l Co., Ltd</td><td>Trucks Direct Ltd</td><td>MV PACIFIC STAR</td><td>10-Mar</td><td>8</td><td><span class="badge badge-green">Active</span></td></tr>
+          <tr><td>KEN</td><td>VC/KEN/2026/0011</td><td>Toyota Tsusho Africa</td><td>Kenya Motors Ltd</td><td>MV HORIZON GLORY</td><td>15-Mar</td><td>20</td><td><span class="badge badge-green">Active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

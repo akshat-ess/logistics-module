@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Transporter Master - ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  body{background:#f0f2f5;font-family:'Segoe UI',sans-serif;font-size:13px;}
+  .erp-header{background:#1a3c6e;color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .erp-header .brand{font-size:18px;font-weight:700;}
+  .page-title{font-size:24px;font-weight:600;padding:15px 20px 5px;color:#222;}
+  .left-card{background:#fff;border:1px solid #dde;border-radius:4px;padding:15px;}
+  .left-card-title{font-weight:600;font-size:13px;margin-bottom:12px;color:#333;border-bottom:1px solid #eee;padding-bottom:6px;}
+  .right-card{background:#fff;border:1px solid #dde;border-radius:4px;}
+  .right-card-header{background:#f5f6f8;border-bottom:1px solid #dde;padding:8px 14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .form-label{font-size:12px;font-weight:500;margin-bottom:3px;color:#444;}
+  .form-control,.form-select{font-size:12px;height:30px;border-radius:3px;border:1px solid #ccc;}
+  .btn-add{background:#337ab7;color:#fff;font-size:12px;border-radius:3px;padding:5px 14px;border:none;margin-top:6px;}
+  .btn-edit{background:#337ab7;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;display:block;margin-bottom:2px;}
+  .btn-delete{background:#d9534f;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;display:block;}
+  .btn-cfd-add{background:#337ab7;color:#fff;font-size:11px;padding:2px 7px;border-radius:3px;border:none;}
+  .btn-plus-email{background:#5bc0de;color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:12px;cursor:pointer;}
+  table.dataTable thead th{background:#f5f6f8;font-size:12px;font-weight:600;border-bottom:2px solid #dde;white-space:nowrap;}
+  table.dataTable tbody td{font-size:12px;vertical-align:top;padding-top:6px!important;}
+  .btn-refresh{background:none;border:none;color:#337ab7;font-size:14px;cursor:pointer;}
+  .cfd-entry{display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:11px;}
+  .cfd-entry .cfd-label{background:#ccc;padding:2px 6px;border-radius:3px;min-width:60px;font-size:11px;}
+  .cfd-entry .cfd-days{background:#eee;padding:2px 6px;border-radius:3px;min-width:30px;font-size:11px;}
+  .cfd-new-row{display:flex;align-items:center;gap:4px;margin-top:2px;}
+  .cfd-new-row select{height:26px;font-size:11px;border:1px solid #ccc;border-radius:3px;width:100px;}
+  .cfd-new-row input{height:26px;font-size:11px;border:1px solid #ccc;border-radius:3px;width:55px;padding:0 4px;}
+  .email-list{font-size:11px;color:#337ab7;}
+</style>
+</head>
+<body>
+<!-- <div class="erp-header">
+  <div class="brand"><i class="fa fa-cube me-2"></i>HONEST LOGISTICS LTD</div>
+  <div><a href="#" style="color:#cde;text-decoration:none;font-size:12px;">Master ▾</a></div>
+  <div style="font-size:12px;color:#acd;"><i class="fa fa-user-circle me-1"></i>temp user</div>
+</div> -->
+
+<div class="page-title">Transporter</div>
+
+<div class="px-3 pb-3 d-flex gap-3 align-items-start">
+  <div style="width:300px;flex-shrink:0;">
+    <div class="left-card">
+      <div class="left-card-title">Add Transporter</div>
+      <div class="mb-2"><label class="form-label">Name</label><input type="text" id="f_name" class="form-control"/></div>
+      <div class="mb-2">
+        <label class="form-label">Division</label>
+        <select id="f_division" class="form-select">
+          <option value="">Select Division...</option>
+          <option>TRANSIT</option><option>LOCAL CLEARANCE</option>
+          <option>NAS</option><option>VEHICLE CLEARANCE</option><option>EXPORTS</option>
+        </select>
+      </div>
+      <button class="btn-add" onclick="saveRecord()">Add Transporter</button>
+    </div>
+  </div>
+  <div class="flex-grow-1">
+    <div class="right-card">
+      <div class="right-card-header">All Transporters <button class="btn-refresh" onclick="buildTable()"><i class="fa fa-sync-alt"></i></button></div>
+      <div class="p-2">
+        <table id="mainTable" class="table table-bordered table-hover table-sm w-100">
+          <thead><tr><th>Name</th><th>Division</th><th>Email</th><th>Container Free Days</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header py-2"><h6 class="modal-title">Edit Transporter</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editIndex"/>
+      <div class="mb-2"><label class="form-label">Name</label><input id="e_name" class="form-control"/></div>
+      <div class="mb-2">
+        <label class="form-label">Division</label>
+        <select id="e_division" class="form-select">
+          <option value="">Select Division...</option>
+          <option>TRANSIT</option><option>LOCAL CLEARANCE</option>
+          <option>NAS</option><option>VEHICLE CLEARANCE</option><option>EXPORTS</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer py-1">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="updateRecord()">Save</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal fade" id="emailModal" tabindex="-1">
+  <div class="modal-dialog modal-sm"><div class="modal-content">
+    <div class="modal-header py-2"><h6 class="modal-title">Add Email</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="emailRowIndex"/>
+      <label class="form-label">Email Address</label>
+      <input type="email" id="emailInput" class="form-control"/>
+    </div>
+    <div class="modal-footer py-1">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addEmail()">Add</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm"><div class="modal-content">
+    <div class="modal-header py-2"><h6 class="modal-title">Confirm Delete</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><p class="mb-0">Delete this transporter?</p></div>
+    <div class="modal-footer py-1">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+<script>
+const SK='erp_transporters';let delIdx=-1;
+const COUNTRIES=['Afghanistan','Albania','Algeria','Angola','Argentina','Australia','Austria','Belgium','Brazil','Canada','Chile','China','Colombia','CONGO','Denmark','Egypt','Ethiopia','Finland','France','GERMANY','Ghana','Greece','Hungary','India','Indonesia','Iran','Iraq','Ireland','Italy','Japan','Jordan','Kenya','Kuwait','Libya','Madagascar','Malawi','Malaysia','Mali','Mexico','Morocco','Mozambique','Netherlands','Nigeria','Norway','Pakistan','Peru','Philippines','Poland','Portugal','Qatar','Rwanda','Saudi Arabia','Senegal','Singapore','Somalia','South Africa','Spain','Sudan','Sweden','Switzerland','Tanzania','Thailand','Tunisia','Turkey','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Vietnam','Zambia','Zimbabwe'].sort();
+
+const def=[
+  {name:'7 ELEVEN TRANSPORTER',division:'TRANSIT',emails:[],cfd:[]},
+  {name:'A.F.T COMPANY',division:'TRANSIT',emails:[],cfd:[]},
+  {name:'A.F.T COMPANY LIMITED',division:'TRANSIT',emails:[],cfd:[]},
+  {name:'A.Gure Transport Ltd',division:'',emails:[],cfd:[{country:'CONGO',days:'45'}]},
+  {name:'A.J SALUM(BAF TRUCK)',division:'TRANSIT',emails:[],cfd:[]},
+  {name:'A.M COACH COMPANY LIMITED',division:'',emails:[],cfd:[]},
+];
+
+function getData(){const s=localStorage.getItem(SK);return s?JSON.parse(s):[...def];}
+function saveData(d){localStorage.setItem(SK,JSON.stringify(d));}
+
+function countryOptions(selected=''){
+  return `<option value="">Country...</option>`+COUNTRIES.map(c=>`<option${c===selected?' selected':''}>${c}</option>`).join('');
+}
+
+let dt;
+function buildTable(){
+  const data=getData();if(dt){dt.destroy();}
+  const tbody=$('#mainTable tbody');tbody.empty();
+  data.forEach((r,i)=>{
+    const emailHtml=r.emails.length>0?`<div class="email-list">${r.emails.map(e=>`<div>${e}</div>`).join('')}</div>`:'';
+    let cfdHtml='';
+    r.cfd.forEach((c,ci)=>{
+      cfdHtml+=`<div class="cfd-entry"><span class="cfd-label">${c.country}</span><span class="cfd-days">${c.days}</span>
+        <button style="background:#337ab7;color:#fff;border:none;border-radius:3px;font-size:10px;padding:1px 5px;" onclick="editCfd(${i},${ci})">Edit</button>
+      </div>`;
+    });
+    cfdHtml+=`<div class="cfd-new-row">
+      <select id="cfd_country_${i}">${countryOptions()}</select>
+      <input type="number" id="cfd_days_${i}" placeholder="days"/>
+      <button class="btn-cfd-add" onclick="addCfd(${i})">Add</button>
+    </div>`;
+    tbody.append(`<tr>
+      <td>${r.name}</td>
+      <td>${r.division}</td>
+      <td>${emailHtml}<button class="btn-plus-email" onclick="openEmail(${i})"><i class="fa fa-plus"></i></button></td>
+      <td>${cfdHtml}</td>
+      <td>
+        <button class="btn-edit" onclick="editRec(${i})">Edit</button>
+        <button class="btn-delete" onclick="openDel(${i})">Delete</button>
+      </td>
+    </tr>`);
+  });
+  dt=$('#mainTable').DataTable({pageLength:10,order:[[0,'asc']],columnDefs:[{orderable:false,targets:[2,3,4]}]});
+}
+
+function addCfd(i){
+  const country=$(`#cfd_country_${i}`).val();
+  const days=$(`#cfd_days_${i}`).val().trim();
+  if(!country||!days){alert('Select country and enter days');return;}
+  const data=getData();data[i].cfd.push({country,days});saveData(data);buildTable();
+}
+function editCfd(i,ci){
+  const data=getData();const c=data[i].cfd[ci];
+  const nd=prompt('Edit days:',c.days);if(nd===null)return;
+  data[i].cfd[ci].days=nd;saveData(data);buildTable();
+}
+
+function saveRecord(){
+  const name=$('#f_name').val().trim();if(!name){alert('Name required');return;}
+  const data=getData();
+  data.push({name,division:$('#f_division').val(),emails:[],cfd:[]});
+  saveData(data);$('#f_name').val('');$('#f_division').val('');buildTable();
+}
+function editRec(i){
+  const data=getData();const r=data[i];
+  $('#editIndex').val(i);$('#e_name').val(r.name);$('#e_division').val(r.division);
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+function updateRecord(){
+  const data=getData();const i=parseInt($('#editIndex').val());
+  data[i]={...data[i],name:$('#e_name').val().trim(),division:$('#e_division').val()};
+  saveData(data);bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();buildTable();
+}
+function openEmail(i){$('#emailRowIndex').val(i);$('#emailInput').val('');new bootstrap.Modal(document.getElementById('emailModal')).show();}
+function addEmail(){
+  const email=$('#emailInput').val().trim();if(!email){alert('Enter email');return;}
+  const data=getData();data[parseInt($('#emailRowIndex').val())].emails.push(email);saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('emailModal')).hide();buildTable();
+}
+function openDel(i){delIdx=i;new bootstrap.Modal(document.getElementById('deleteModal')).show();}
+function confirmDelete(){
+  const data=getData();data.splice(delIdx,1);saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();buildTable();
+}
+$(()=>buildTable());
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+You are a senior frontend ERP UI developer.
+
+Create fully working, production-grade HTML pages using:
+- HTML5
+- CSS3 (Bootstrap 5 or Tailwind preferred)
+- Vanilla JavaScript (no frameworks unless necessary)
+
+The UI must replicate real ERP transactional screens similar to SAP / logistics ERP systems.
+
+========================
+🎯 OBJECTIVE
+========================
+Build the following pages EXACTLY like an ERP system:
+
+1. Export Listing Page (Grid View)
+2. Add Export Consignment Page (DOCS Tab)
+3. Add Export Consignment Page (OPS Tab)
+4. Add Local Export Container Page
+
+Each page must be separate and downloadable as individual HTML files.
+
+========================
+🎨 DESIGN REQUIREMENTS
+========================
+- Clean corporate ERP theme
+- Light grey background with white cards
+- Bootstrap grid-based responsive layout
+- Compact spacing (ERP style, not modern SaaS spacing)
+- Small font sizes (12px–14px)
+- Use table-heavy UI
+- Use subtle borders and minimal shadows
+- Use color-coded buttons like:
+  - Blue → Primary actions
+  - Green → Success
+  - Orange → Secondary actions
+  - Red → Errors
+
+========================
+📄 PAGE 1: EXPORT LISTING
+========================
+Include:
+
+HEADER:
+- Title: "Exports"
+- Buttons:
+  - Print Filewise
+  - Print Containerwise
+  - Print Master
+  - Delivered
+  - Create Consignment (right aligned)
+
+FILTER SECTION:
+- Search Consignee dropdown
+- Search UIN dropdown
+- Search button
+
+TABLE GRID:
+Columns:
+- UIN
+- File No
+- Refer Number
+- Tansad No
+- Shipper
+- Vessel
+- ETB (with green indicator)
+- Containers
+- Remarks
+- Action
+
+FEATURES:
+- Pagination (records per page)
+- Search box (top right)
+- Action buttons:
+  - Edit (icon)
+  - Approve (check icon)
+  - +Containers (green button)
+  - Containers (orange button)
+
+========================
+📄 PAGE 2: ADD EXPORT CONSIGNMENT (DOCS TAB)
+========================
+Section: Cargo Details
+
+FIELDS:
+- Declarant (dropdown)
+- UIN (dropdown)
+- Billing Customer (dropdown)
+- Mode (text)
+- Refer Number
+- Tansad No
+- Lodge Date
+
+NEXT ROW:
+- Invoice No
+- Shipper
+- Consignee (dropdown)
+- Shipping Order BL
+- POD/Country (dropdown)
+
+NEXT ROW:
+- Material Description
+- Size 20
+- Size 40
+- S/Line (dropdown)
+- Terminal
+
+NEXT ROW:
+- Vessel
+- Voyage
+- CFS
+- Cargo at CFS
+- Empty Placement
+
+FINAL:
+- Original Document Received (textarea)
+
+========================
+📄 PAGE 3: ADD EXPORT CONSIGNMENT (OPS TAB)
+========================
+FIELDS:
+- ETA
+- ETB
+- Release Order
+- Loading Permit
+
+NEXT ROW:
+- Stuffing Date
+- Delivery to Port
+- SOB
+- File Closed On
+- Remarks
+
+Include tab switching between DOCS and OPS using JS.
+
+========================
+📄 PAGE 4: ADD LOCAL EXPORT CONTAINER
+========================
+HEADER:
+- Title: Add Local Export Container for BL NO
+
+ERROR ALERT:
+- Show red alert:
+  "Container number exists for File number..."
+
+TABLE:
+Columns:
+- Container No (text input)
+- Size 20 (checkbox)
+- Size 40 (checkbox)
+
+BUTTON:
+- Save (blue)
+
+========================
+⚙️ FUNCTIONALITY (JS REQUIRED)
+========================
+- Dropdown selections (static data OK)
+- Tab switching (Docs / Ops)
+- Add row for container dynamically
+- Form validation:
+  - Required fields
+  - Show error alerts
+- Table search filter
+- Pagination (basic JS)
+
+========================
+📦 OUTPUT FORMAT
+========================
+Provide:
+- 4 separate HTML files:
+  1. export-list.html
+  2. export-consignment-docs.html
+  3. export-consignment-ops.html
+  4. export-container.html
+
+- Include internal CSS + JS (no external dependencies except Bootstrap CDN)
+
+- Code must be:
+  - Clean
+  - Well commented
+  - Ready to use
+  - Fully responsive
+
+========================
+🚀 BONUS (IMPORTANT)
+========================
+- Add reusable components:
+  - Header bar
+  - Buttons
+  - Form controls
+- Use icons (Bootstrap Icons or FontAwesome)
+- Make UI look like enterprise ERP (not modern app)
+
+========================
+❗ IMPORTANT
+========================
+Do NOT simplify layout.
+Match ERP complexity exactly like real logistics system.

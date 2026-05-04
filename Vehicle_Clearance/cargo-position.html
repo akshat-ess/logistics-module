@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicles Clearance Cargo Position</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #333; min-height: 100vh; font-size: 13px; }
+
+  .topnav { background: #1a2940; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 50px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .topnav .brand { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .topnav .brand span { color: #4db8ff; }
+  .topnav .nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+  .topnav .nav-right a { color: #cdd8e8; text-decoration: none; }
+  .topnav .nav-right a:hover { color: #fff; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #4db8ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+  .layout { display: flex; min-height: calc(100vh - 50px); }
+  .sidebar { width: 210px; background: #1e3050; color: #cdd8e8; flex-shrink: 0; padding-top: 10px; }
+  .sidebar-menu { list-style: none; }
+  .sidebar-menu li a { display: flex; align-items: center; gap: 9px; padding: 10px 18px; font-size: 13px; color: #cdd8e8; text-decoration: none; transition: background .2s; border-left: 3px solid transparent; }
+  .sidebar-menu li a:hover, .sidebar-menu li a.active { background: #253d5e; color: #fff; border-left-color: #4db8ff; }
+  .sidebar-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #7a94b0; padding: 14px 18px 5px; }
+
+  .main { flex: 1; padding: 20px 24px; overflow: hidden; }
+
+  /* PAGE TITLE BAR */
+  .title-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .title-bar h1 { font-size: 20px; font-weight: 700; color: #1a2940; }
+  .title-bar .left-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; transition: background .15s, transform .1s; text-decoration: none; white-space: nowrap; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: #007bff; color: #fff; }
+  .btn-primary:hover { background: #0069d9; }
+  .btn-success { background: #28a745; color: #fff; }
+  .btn-success:hover { background: #218838; }
+  .btn-warning { background: #fd7e14; color: #fff; }
+  .btn-warning:hover { background: #e86c00; }
+  .btn-info { background: #17a2b8; color: #fff; }
+  .btn-info:hover { background: #138496; }
+  .btn-outline { background: transparent; color: #007bff; border: 1px solid #007bff; }
+  .btn-outline:hover { background: #007bff; color: #fff; }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+  .btn-icon { padding: 4px 8px; font-size: 13px; background: transparent; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+  .btn-icon:hover { background: #eee; }
+
+  /* SEARCH SECTION */
+  .search-section { background: #fff; border-radius: 8px; padding: 14px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px; }
+  .search-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .search-top .label { font-size: 13px; font-weight: 600; color: #1a2940; }
+  .refresh-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #007bff; }
+  .search-row { display: flex; align-items: center; gap: 10px; }
+  select, input[type="text"], input[type="date"], input[type="number"] {
+    border: 1px solid #ced4da; border-radius: 4px; padding: 6px 10px; font-size: 13px; font-family: inherit; background: #fff; color: #333; outline: none; transition: border-color .2s;
+  }
+  select:focus, input:focus { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,0.15); }
+  .search-consignee { flex: 1; }
+
+  /* TABLE TOOLBAR */
+  .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+  .table-toolbar .info { font-size: 12px; color: #555; }
+  .table-toolbar .right { display: flex; align-items: center; gap: 10px; }
+  .per-page-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #555; }
+  .search-filter { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .search-filter input { width: 180px; padding: 4px 8px; font-size: 12px; }
+
+  /* TABLE */
+  .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1300px; }
+  thead { position: sticky; top: 0; z-index: 2; }
+  thead th { background: #f8fafd; font-weight: 600; color: #4a5568; padding: 9px 10px; text-align: left; border-bottom: 2px solid #e2e8f0; border-right: 1px solid #e2e8f0; white-space: nowrap; user-select: none; cursor: pointer; }
+  thead th:last-child { border-right: none; }
+  thead th .sort-icon { margin-left: 4px; font-size: 10px; color: #aaa; }
+  thead th:hover { background: #eef3ff; }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid #f0f4fa; border-right: 1px solid #f0f4fa; vertical-align: middle; }
+  tbody td:last-child { border-right: none; }
+  tbody tr:hover { background: #f0f7ff; }
+  tbody tr:nth-child(even) { background: #fafbfd; }
+  tbody tr:nth-child(even):hover { background: #f0f7ff; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-green { background: #28a745; color: #fff; }
+  .badge-orange { background: #fd7e14; color: #fff; }
+  .badge-blue { background: #007bff; color: #fff; }
+
+  /* PAGINATION */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 8px; }
+  .pagination .info { font-size: 12px; color: #555; }
+  .pager { display: flex; gap: 3px; }
+  .pager button { min-width: 30px; height: 30px; border: 1px solid #dee2e6; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer; transition: background .15s; }
+  .pager button:hover { background: #e7f0ff; border-color: #007bff; }
+  .pager button.active { background: #007bff; color: #fff; border-color: #007bff; }
+  .pager button:disabled { opacity: 0.4; cursor: default; }
+
+  .action-cell { display: flex; flex-direction: column; gap: 3px; }
+  .detail-cell { display: flex; flex-direction: column; gap: 3px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">&#9783; <span>ClearPort</span> ERP</div>
+  <div class="nav-right">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="#">Reports</a>
+    <div class="avatar">JD</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Main Menu</div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html"><span>🏠</span> Dashboard</a></li>
+      <li><a href="cargo-position.html" class="active"><span>🚢</span> Cargo Position</a></li>
+      <li><a href="consignment-file.html"><span>📄</span> Consignments</a></li>
+      <li><a href="#"><span>📦</span> Inventory</a></li>
+    </ul>
+    <div class="sidebar-section">Reports</div>
+    <ul class="sidebar-menu">
+      <li><a href="#"><span>📊</span> Analytics</a></li>
+      <li><a href="#"><span>🖨️</span> Print Reports</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <!-- TITLE BAR -->
+    <div class="title-bar">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <h1>Vehicles Clearance Cargo Position</h1>
+        <div class="left-btns">
+          <button class="btn btn-primary" onclick="alert('Printing...')">🖨️ Print</button>
+          <button class="btn btn-success" onclick="filterStatus('active')">Active</button>
+          <button class="btn btn-warning" onclick="filterStatus('lodged')">Lodged Docs</button>
+          <button class="btn btn-info" onclick="filterStatus('delivered')">Delivered</button>
+        </div>
+      </div>
+      <a href="consignment-file.html" class="btn btn-primary" style="font-size:13px;padding:8px 18px;">Create Consignment</a>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+      <div class="search-top">
+        <span class="label">All Jobs</span>
+        <button class="refresh-btn" onclick="loadTable()" title="Refresh">🔄</button>
+      </div>
+      <div class="search-row">
+        <select class="search-consignee" id="consigneeFilter">
+          <option value="">Search Consignee...</option>
+          <option>GF Trucks and Equipment Ltd</option>
+          <option>Trucks Direct Ltd</option>
+          <option>Kenya Motors Ltd</option>
+          <option>Africa Auto Distributors</option>
+          <option>Nairobi Vehicle Imports</option>
+        </select>
+        <button class="btn btn-primary" onclick="applySearch()">Search</button>
+      </div>
+    </div>
+
+    <!-- TABLE TOOLBAR -->
+    <div class="table-toolbar">
+      <div class="info" id="tableInfo">Total items: 22 / Total Units: 89</div>
+      <div class="right">
+        <div class="per-page-row">
+          <select id="perPage" onchange="changePerPage()">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>records per page</span>
+        </div>
+        <div class="search-filter">
+          <label>Search:</label>
+          <input type="text" id="tableSearch" placeholder="" oninput="filterTable()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">UIN <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(1)">File No <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(2)">Refer. Number <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(3)">Tansad No <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(4)">Supplier <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(5)">Consignee <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(6)">B/L Number <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(7)">Units <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(8)">S Line <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(9)">Vessel <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(10)">ETA <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(11)">ETB <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable(12)">DO Date <span class="sort-icon">⇅</span></th>
+            <th>Remarks <span class="sort-icon">⇅</span></th>
+            <th>DETAILS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="pagination">
+        <div class="info" id="pageInfo">Showing 1–10 of 22 records</div>
+        <div class="pager" id="pager"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const allData = [
+  {uin:'GFT',file:'VC/GFT/2026/0032',refer:'26-9901035',tansad:'TZDL-26-1157085',supplier:'FAW Trucks International Co., Ltd',consignee:'GF Trucks and Equipment Ltd',bl:'RRNQINTAN464//SURRENDERED-PRIMEORE BOND NO. 784.',units:15,sline:'MSC',vessel:'MV CATHY OCEAN',eta:'04-Mar',etb:'23-Mar',dodate:'',remarks:'DOC UNDER VALUATION/AWAIT VESSEL TO BERTH',status:'active'},
+  {uin:'GFT',file:'VC/GFT/2026/0033',refer:'26-9901030',tansad:'TZDL-26-1154360',supplier:'FAW Trucks International Co., Ltd',consignee:'GF Trucks and Equipment Ltd',bl:'RRNQINTAN466//SURRENDERED-PRIMEORE BOND NO. 784.',units:2,sline:'CMA',vessel:'MV CATHY OCEAN',eta:'04-Mar',etb:'23-Mar',dodate:'',remarks:'DOC UNDER VALUATION/AWAIT VESSEL',status:'active'},
+  {uin:'GFT',file:'VC/GFT/2026/0034',refer:'26-9901033',tansad:'TZDA-1186638',supplier:'FAW Trucks International Co., Ltd',consignee:'GF Trucks and Equipment Ltd',bl:'RRNQINTAN465//SURRENDERED-PRIMEORE BOND NO. 784.',units:2,sline:'MSC',vessel:'MV CATHY OCEAN',eta:'04-Mar',etb:'23-Mar',dodate:'',remarks:'DOC UNDER VALUATION',status:'active'},
+  {uin:'GFT',file:'VC/GFT/2026/0035',refer:'26-9901040',tansad:'TZDL-26-1162000',supplier:'Sinotruk (HK) Int\'l Co., Ltd',consignee:'GF Trucks and Equipment Ltd',bl:'SINOBL202600123',units:8,sline:'Evergreen',vessel:'MV PACIFIC STAR',eta:'10-Mar',etb:'28-Mar',dodate:'30-Mar',remarks:'AWAITING DUTY PAYMENT',status:'lodged'},
+  {uin:'KEN',file:'VC/KEN/2026/0011',refer:'26-0011001',tansad:'TZDA-1200100',supplier:'Toyota Tsusho Africa',consignee:'Kenya Motors Ltd',bl:'TOYBL00226011',units:20,sline:'PIL',vessel:'MV HORIZON GLORY',eta:'15-Mar',etb:'02-Apr',dodate:'05-Apr',remarks:'CLEARED FOR DELIVERY',status:'delivered'},
+  {uin:'KEN',file:'VC/KEN/2026/0012',refer:'26-0011002',tansad:'TZDL-26-1170020',supplier:'Isuzu East Africa Ltd',consignee:'Trucks Direct Ltd',bl:'ISUBL00226012',units:12,sline:'MSC',vessel:'MV OASIS SEA',eta:'18-Mar',etb:'05-Apr',dodate:'',remarks:'DOCS SUBMITTED FOR ASSESSMENT',status:'lodged'},
+  {uin:'NBO',file:'VC/NBO/2026/0005',refer:'26-0050101',tansad:'TZDA-1201560',supplier:'Mitsubishi Motors Corp.',consignee:'Africa Auto Distributors',bl:'MITBL00226005',units:5,sline:'NYK',vessel:'MV YAMATO SPIRIT',eta:'20-Mar',etb:'08-Apr',dodate:'',remarks:'PENDING SHIPPING LINE INVOICE',status:'active'},
+  {uin:'NBO',file:'VC/NBO/2026/0006',refer:'26-0050102',tansad:'TZDL-26-1175000',supplier:'Mitsubishi Motors Corp.',consignee:'Nairobi Vehicle Imports',bl:'MITBL00226006',units:3,sline:'NYK',vessel:'MV YAMATO SPIRIT',eta:'20-Mar',etb:'08-Apr',dodate:'',remarks:'ORIGINAL DOCS RECEIVED',status:'active'},
+  {uin:'GFT',file:'VC/GFT/2026/0036',refer:'26-9901050',tansad:'TZDL-26-1180000',supplier:'SANY Heavy Truck Co.',consignee:'GF Trucks and Equipment Ltd',bl:'SANYBL00226036',units:6,sline:'CMA',vessel:'MV EVER LOTUS',eta:'25-Mar',etb:'12-Apr',dodate:'',remarks:'MANIFEST TRANSFERRED',status:'active'},
+  {uin:'GFT',file:'VC/GFT/2026/0037',refer:'26-9901055',tansad:'TZDA-1209000',supplier:'SANY Heavy Truck Co.',consignee:'GF Trucks and Equipment Ltd',bl:'SANYBL00226037',units:4,sline:'CMA',vessel:'MV EVER LOTUS',eta:'25-Mar',etb:'12-Apr',dodate:'',remarks:'AWAITING PORT RELEASE',status:'active'},
+  {uin:'JUA',file:'VC/JUA/2026/0002',refer:'26-0020010',tansad:'TZDL-26-1190100',supplier:'Dongfeng Motor Corporation',consignee:'Jumbo Autos Ltd',bl:'DFBL00226002',units:10,sline:'Hapag',vessel:'MV SINGAPORE BRIDGE',eta:'28-Mar',etb:'15-Apr',dodate:'',remarks:'COPY DOCS RECEIVED',status:'lodged'},
+  {uin:'JUA',file:'VC/JUA/2026/0003',refer:'26-0020011',tansad:'TZDL-26-1190200',supplier:'Dongfeng Motor Corporation',consignee:'Jumbo Autos Ltd',bl:'DFBL00226003',units:2,sline:'Hapag',vessel:'MV SINGAPORE BRIDGE',eta:'28-Mar',etb:'15-Apr',dodate:'',remarks:'WAITING TANSAD LODGE',status:'active'},
+];
+
+let currentPage = 1;
+let perPage = 10;
+let filteredData = [...allData];
+let sortCol = -1, sortAsc = true;
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const start = (currentPage-1)*perPage;
+  const end = start + perPage;
+  const pageData = filteredData.slice(start, end);
+  tbody.innerHTML = pageData.map(r => `
+    <tr>
+      <td>${r.uin}</td>
+      <td>${r.file}</td>
+      <td>${r.refer}</td>
+      <td>${r.tansad}</td>
+      <td>${r.supplier}</td>
+      <td>${r.consignee}</td>
+      <td>${r.bl}</td>
+      <td>${r.units}</td>
+      <td>${r.sline}</td>
+      <td>${r.vessel}</td>
+      <td>${r.eta ? `<span class="badge badge-green">${r.eta}</span>` : ''}</td>
+      <td>${r.etb ? `<span class="badge badge-green">${r.etb}</span>` : ''}</td>
+      <td>${r.dodate}</td>
+      <td style="max-width:160px;white-space:normal;">${r.remarks}</td>
+      <td class="detail-cell">
+        <a href="consignment-file.html" class="btn btn-info btn-sm">Cover Page</a>
+        <button class="btn-icon" title="View" onclick="alert('View details for ${r.file}')">👁️</button>
+      </td>
+      <td class="action-cell">
+        <button class="btn-icon" title="Edit" onclick="alert('Edit ${r.file}')">✏️</button>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('pageInfo').textContent = `Showing ${start+1}–${Math.min(end,filteredData.length)} of ${filteredData.length} records`;
+  renderPager();
+}
+
+function renderPager() {
+  const total = Math.ceil(filteredData.length / perPage);
+  const pager = document.getElementById('pager');
+  let html = `<button onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=total;i++){
+    html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button onclick="goPage(${currentPage+1})" ${currentPage===total||total===0?'disabled':''}>›</button>`;
+  pager.innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filteredData.length / perPage);
+  if(p < 1 || p > total) return;
+  currentPage = p;
+  renderTable();
+}
+
+function changePerPage() {
+  perPage = parseInt(document.getElementById('perPage').value);
+  currentPage = 1;
+  renderTable();
+}
+
+function filterTable() {
+  const q = document.getElementById('tableSearch').value.toLowerCase();
+  const consignee = document.getElementById('consigneeFilter').value.toLowerCase();
+  filteredData = allData.filter(r => {
+    const matchQ = !q || Object.values(r).some(v => String(v).toLowerCase().includes(q));
+    const matchC = !consignee || r.consignee.toLowerCase().includes(consignee);
+    return matchQ && matchC;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function applySearch() { filterTable(); }
+
+function filterStatus(s) {
+  filteredData = s === 'all' ? [...allData] : allData.filter(r => r.status === s);
+  currentPage = 1;
+  renderTable();
+}
+
+function sortTable(col) {
+  if(sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  const keys = ['uin','file','refer','tansad','supplier','consignee','bl','units','sline','vessel','eta','etb','dodate'];
+  const key = keys[col];
+  filteredData.sort((a,b) => {
+    const av = String(a[key]||''), bv = String(b[key]||'');
+    return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  renderTable();
+}
+
+function loadTable() {
+  filteredData = [...allData];
+  currentPage = 1;
+  document.getElementById('tableSearch').value = '';
+  document.getElementById('consigneeFilter').value = '';
+  renderTable();
+}
+
+loadTable();
+</script>
+</body>
+</html>

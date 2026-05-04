@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clients Master - ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  body{background:#f0f2f5;font-family:'Segoe UI',sans-serif;font-size:13px;}
+  .erp-header{background:#1a3c6e;color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .erp-header .brand{font-size:18px;font-weight:700;letter-spacing:1px;}
+  .erp-header nav a{color:#cde;text-decoration:none;margin:0 10px;font-size:12px;}
+  .erp-header .user-info{font-size:12px;color:#acd;}
+  .page-title{font-size:24px;font-weight:600;padding:15px 20px 5px;color:#222;}
+  .left-card{background:#fff;border:1px solid #dde;border-radius:4px;padding:15px;}
+  .left-card .card-header-label{font-weight:600;font-size:13px;margin-bottom:12px;color:#333;}
+  .right-card{background:#fff;border:1px solid #dde;border-radius:4px;}
+  .right-card-header{background:#f5f6f8;border-bottom:1px solid #dde;padding:8px 14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .form-label{font-size:12px;font-weight:500;margin-bottom:3px;color:#444;}
+  .form-control,.form-select{font-size:12px;height:30px;border-radius:3px;border:1px solid #ccc;}
+  textarea.form-control{height:auto;}
+  .btn-add-main{background:#1a3c6e;color:#fff;font-size:12px;border-radius:3px;padding:5px 14px;}
+  .btn-add-main:hover{background:#14305a;color:#fff;}
+  .btn-edit{background:#337ab7;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  .btn-delete{background:#d9534f;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  .badge-active{background:#5cb85c;color:#fff;padding:2px 7px;border-radius:3px;font-size:11px;}
+  .badge-inactive{background:#d9534f;color:#fff;padding:2px 7px;border-radius:3px;font-size:11px;}
+  .email-link{color:#337ab7;text-decoration:none;}
+  .btn-add-plus{background:#1a3c6e;color:#fff;border:none;padding:4px 12px;border-radius:3px;font-size:13px;}
+  table.dataTable thead th{background:#f5f6f8;font-size:12px;font-weight:600;border-bottom:2px solid #dde;white-space:nowrap;}
+  table.dataTable tbody td{font-size:12px;vertical-align:middle;}
+  .dataTables_wrapper .dataTables_filter label{font-size:12px;}
+  .dataTables_wrapper .dataTables_length label{font-size:12px;}
+  .dataTables_wrapper .dataTables_info{font-size:12px;}
+  .btn-refresh{background:none;border:none;color:#337ab7;font-size:14px;cursor:pointer;}
+  .total-balance{font-size:12px;color:#555;}
+  #clientsTable_wrapper .dataTables_filter{text-align:right;}
+</style>
+</head>
+<body>
+<!-- <div class="erp-header">
+  <div class="brand"><i class="fa fa-cube me-2"></i>HONEST LOGISTICS LTD</div>
+  <nav>
+    <a href="#"><i class="fa fa-anchor me-1"></i>CARGO POSITION</a>
+    <a href="#"><i class="fa fa-chart-bar me-1"></i>TRANSIT DASHBOARD</a>
+    <a href="#"><i class="fa fa-chart-line me-1"></i>IMPORT DASHBOARD</a>
+    <a href="#">Master ▾</a>
+  </nav>
+  <div class="user-info"><i class="fa fa-user-circle me-1"></i>temp user</div>
+</div> -->
+
+<div class="d-flex align-items-center justify-content-between px-3 pt-3 pb-1">
+  <div class="page-title mb-0">Clients</div>
+  <button class="btn btn-add-plus" data-bs-toggle="modal" data-bs-target="#addClientModal"><i class="fa fa-plus me-1"></i>Add Client</button>
+</div>
+
+<div class="px-3 pb-3">
+  <div class="right-card">
+    <div class="right-card-header">
+      All Clients <button class="btn-refresh" onclick="refreshTable()"><i class="fa fa-sync-alt"></i></button>
+      <span class="ms-auto total-balance">Total balance:</span>
+    </div>
+    <div class="p-2">
+      <table id="clientsTable" class="table table-bordered table-hover table-sm w-100">
+        <thead>
+          <tr>
+            <th>Name</th><th>Code</th><th>VRN</th><th>TIN</th><th>Phone</th><th>Email</th><th>Address</th><th>Managed By</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title" id="clientModalTitle">Add Client</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editIndex" value="-1"/>
+        <div class="mb-2">
+          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" id="clientName" class="form-control" placeholder=""/>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Managed By:</label><br/>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="managedBy" id="mbSuperAdmin" value="Super Admin" checked/>
+            <label class="form-check-label" for="mbSuperAdmin">Super Admin</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="managedBy" id="mbAdmin" value="Admin"/>
+            <label class="form-check-label" for="mbAdmin">Admin</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer py-1">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveClient()">Add Client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title">Confirm Delete</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><p class="mb-0">Are you sure you want to delete this record?</p></div>
+      <div class="modal-footer py-1">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+<script>
+const STORAGE_KEY = 'erp_clients';
+let deleteIndex = -1;
+
+const defaultData = [
+  {name:'AFLEOP',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'AFS',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'APOLLO',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'AQUARIUS',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:''},
+  {name:'ATHENA',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'BNBSYB',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'BRA',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:'Super Admin'},
+  {name:'BTBN',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:''},
+  {name:'CEIL',code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy:''},
+];
+
+function getData(){
+  const s=localStorage.getItem(STORAGE_KEY);
+  return s?JSON.parse(s):[...defaultData];
+}
+function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}
+
+let dt;
+function buildTable(){
+  const data=getData();
+  if(dt){dt.destroy();}
+  const tbody=$('#clientsTable tbody');tbody.empty();
+  data.forEach((r,i)=>{
+    tbody.append(`<tr>
+      <td>${r.name}</td><td>${r.code}</td><td>${r.vrn}</td><td>${r.tin}</td>
+      <td>${r.phone}</td>
+      <td><a class="email-link" href="mailto:${r.email}">${r.email}</a></td>
+      <td>${r.address}</td>
+      <td>${r.managedBy}</td>
+      <td>
+        <button class="btn-edit me-1" onclick="editClient(${i})">Edit</button>
+        <button class="btn-delete" onclick="openDelete(${i})">Delete</button>
+      </td>
+    </tr>`);
+  });
+  dt=$('#clientsTable').DataTable({pageLength:10,order:[[0,'asc']],columnDefs:[{orderable:false,targets:8}]});
+}
+
+function saveClient(){
+  const name=$('#clientName').val().trim();
+  if(!name){alert('Name is required');return;}
+  const managedBy=$('input[name="managedBy"]:checked').val();
+  const data=getData();
+  const idx=parseInt($('#editIndex').val());
+  if(idx>=0){
+    data[idx]={...data[idx],name,managedBy};
+  } else {
+    data.push({name,code:'0',vrn:'0',tin:'0',phone:'0',email:'0',address:'0',managedBy});
+  }
+  saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('addClientModal')).hide();
+  buildTable();
+}
+
+function editClient(i){
+  const data=getData();
+  const r=data[i];
+  $('#editIndex').val(i);
+  $('#clientName').val(r.name);
+  $(`input[name="managedBy"][value="${r.managedBy}"]`).prop('checked',true);
+  $('#clientModalTitle').text('Edit Client');
+  $('#addClientModal .modal-footer button:last').text('Save Changes');
+  new bootstrap.Modal(document.getElementById('addClientModal')).show();
+}
+
+function openDelete(i){deleteIndex=i;new bootstrap.Modal(document.getElementById('deleteModal')).show();}
+function confirmDelete(){
+  const data=getData();data.splice(deleteIndex,1);saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+  buildTable();
+}
+function refreshTable(){buildTable();}
+
+document.getElementById('addClientModal').addEventListener('show.bs.modal',function(e){
+  if(!e.relatedTarget)return;
+  $('#editIndex').val(-1);$('#clientName').val('');
+  $('input[name="managedBy"][value="Super Admin"]').prop('checked',true);
+  $('#clientModalTitle').text('Add Client');
+  $('#addClientModal .modal-footer button:last').text('Add Client');
+});
+
+$(()=>buildTable());
+</script>
+</body>
+</html>

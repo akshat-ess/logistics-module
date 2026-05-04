@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Consignee Master - ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  body{background:#f0f2f5;font-family:'Segoe UI',sans-serif;font-size:13px;}
+  .erp-header{background:#1a3c6e;color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .erp-header .brand{font-size:18px;font-weight:700;letter-spacing:1px;}
+  .page-title{font-size:24px;font-weight:600;padding:15px 20px 5px;color:#222;}
+  .left-card{background:#fff;border:1px solid #dde;border-radius:4px;padding:15px;}
+  .left-card-title{font-weight:600;font-size:13px;margin-bottom:12px;color:#333;border-bottom:1px solid #eee;padding-bottom:6px;}
+  .right-card{background:#fff;border:1px solid #dde;border-radius:4px;}
+  .right-card-header{background:#f5f6f8;border-bottom:1px solid #dde;padding:8px 14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .form-label{font-size:12px;font-weight:500;margin-bottom:3px;color:#444;}
+  .form-control,.form-select{font-size:12px;border-radius:3px;border:1px solid #ccc;}
+  input.form-control{height:30px;}
+  select[multiple]{height:100px;}
+  .btn-add{background:#337ab7;color:#fff;font-size:12px;border-radius:3px;padding:5px 14px;border:none;margin-top:6px;}
+  .btn-add:hover{background:#285f99;}
+  .btn-edit{background:#337ab7;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  .btn-delete{background:#d9534f;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;border:none;}
+  .badge-active{background:#5cb85c;color:#fff;padding:2px 7px;border-radius:3px;font-size:11px;}
+  .badge-inactive{background:#d9534f;color:#fff;padding:2px 7px;border-radius:3px;font-size:11px;}
+  .btn-plus-email{background:#5bc0de;color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:12px;cursor:pointer;}
+  table.dataTable thead th{background:#f5f6f8;font-size:12px;font-weight:600;border-bottom:2px solid #dde;white-space:nowrap;}
+  table.dataTable tbody td{font-size:12px;vertical-align:middle;}
+  .btn-refresh{background:none;border:none;color:#337ab7;font-size:14px;cursor:pointer;}
+  .email-list{font-size:11px;color:#337ab7;}
+  .email-list div{line-height:1.4;}
+</style>
+</head>
+<body>
+<!-- <div class="erp-header">
+  <div class="brand"><i class="fa fa-cube me-2"></i>HONEST LOGISTICS LTD</div>
+  <div><a href="#" style="color:#cde;text-decoration:none;font-size:12px;">Master ▾</a></div>
+  <div style="font-size:12px;color:#acd;"><i class="fa fa-user-circle me-1"></i>temp user</div>
+</div> -->
+
+<div class="page-title">Consignee</div>
+
+<div class="px-3 pb-3 d-flex gap-3 align-items-start">
+  <!-- Left Form -->
+  <div style="width:300px;flex-shrink:0;">
+    <div class="left-card">
+      <div class="left-card-title">Add Consignee</div>
+      <div class="mb-2">
+        <label class="form-label">Name</label>
+        <input type="text" id="f_name" class="form-control"/>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Address</label>
+        <input type="text" id="f_address" class="form-control"/>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Code</label>
+        <input type="text" id="f_code" class="form-control"/>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Telephone</label>
+        <input type="text" id="f_telephone" class="form-control"/>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Division</label>
+        <select id="f_division" multiple class="form-control">
+          <option>NAS</option>
+          <option>LOCAL CLEARANCE</option>
+          <option>TRANSIT</option>
+          <option>VEHICLE CLEARANCE</option>
+          <option>VEHICLE REGISTRATION</option>
+          <option>EXPORTS</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Status</label>
+        <select id="f_status" class="form-select">
+          <option value="">select...</option>
+          <option>Active</option>
+          <option>Inactive</option>
+        </select>
+      </div>
+      <button class="btn-add" onclick="saveConsignee()">Add Consignee</button>
+    </div>
+  </div>
+
+  <!-- Right Table -->
+  <div class="flex-grow-1">
+    <div class="right-card">
+      <div class="right-card-header">
+        All Consignees <button class="btn-refresh" onclick="buildTable()"><i class="fa fa-sync-alt"></i></button>
+      </div>
+      <div class="p-2">
+        <table id="consigneeTable" class="table table-bordered table-hover table-sm w-100">
+          <thead>
+            <tr>
+              <th>Name</th><th>Address</th><th>Code</th><th>Email</th><th>Telephone</th><th>Division</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal fade" id="emailModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title">Add Email</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="emailRowIndex"/>
+        <label class="form-label">Email Address</label>
+        <input type="email" id="emailInput" class="form-control"/>
+      </div>
+      <div class="modal-footer py-1">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="addEmail()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+<script>
+const STORAGE_KEY='erp_consignees';
+const defaultData=[
+  {name:'11 GARH RIF',address:'',code:'',telephone:'0',emails:[],division:['TRANSIT'],status:'Active'},
+  {name:'3ELEMENT PRODUCTS LIMITED',address:'',code:'',telephone:'0',emails:[],division:[],status:'Active'},
+  {name:'4002019 SOMALILAND BEVERAGES INDUSTRIES',address:'SOMALILAND',code:'',telephone:'0',emails:[],division:['EXPORTS'],status:'Active'},
+  {name:'5 ELEMENTS ENTERPRISES LIMITED',address:'',code:'',telephone:'0',emails:['accounts@5elementsenterprises.com','kvcsap@googlemail.com','jayachowdary2003@yahoo.com'],division:['LOCAL CLEARANCE'],status:'Active'},
+  {name:'A MENSIEUR TATA MUTANGILUA PRINCE',address:'',code:'',telephone:'0',emails:[],division:[],status:'Active'},
+  {name:'A ONE BUILDERS SARL',address:'',code:'',telephone:'0',emails:[],division:['TRANSIT'],status:'Active'},
+  {name:'A TO Z TEXTILES MILLS LTD',address:'',code:'',telephone:'0',emails:[],division:[],status:'Active'},
+  {name:'A TO Z TEXTILE MILLS LTD',address:'',code:'',telephone:'0',emails:['george@atoz.co.tz','hardik@ffltz.com','lmpexmgr@atoz.co.tz','lmpexmgr@red-earth.africa','lmports@atoz.co.tz','lmports1@atoz.co.tz'],division:['LOCAL CLEARANCE'],status:'Active'},
+];
+
+function getData(){const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):[...defaultData];}
+function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}
+
+let dt;
+function buildTable(){
+  const data=getData();
+  if(dt){dt.destroy();}
+  const tbody=$('#consigneeTable tbody');tbody.empty();
+  data.forEach((r,i)=>{
+    const emailHtml=r.emails.length>0?`<div class="email-list">${r.emails.map(e=>`<div>${e}</div>`).join('')}</div>`:'';
+    const badge=r.status==='Active'?'<span class="badge-active">A</span>':'<span class="badge-inactive">I</span>';
+    const divText=r.division.length>0?JSON.stringify(r.division):'false';
+    tbody.append(`<tr>
+      <td>${r.name}</td>
+      <td>${r.address}</td>
+      <td>${r.code}</td>
+      <td>${emailHtml}<button class="btn-plus-email" onclick="openEmail(${i})"><i class="fa fa-plus"></i></button></td>
+      <td>${r.telephone}</td>
+      <td>${divText}</td>
+      <td>${badge}</td>
+    </tr>`);
+  });
+  dt=$('#consigneeTable').DataTable({pageLength:10,order:[[0,'asc']]});
+}
+
+function saveConsignee(){
+  const name=$('#f_name').val().trim();
+  if(!name){alert('Name is required');return;}
+  const division=Array.from(document.getElementById('f_division').selectedOptions).map(o=>o.value);
+  const data=getData();
+  data.push({name,address:$('#f_address').val().trim(),code:$('#f_code').val().trim(),telephone:$('#f_telephone').val().trim()||'0',emails:[],division,status:$('#f_status').val()||'Active'});
+  saveData(data);
+  $('#f_name,#f_address,#f_code,#f_telephone').val('');
+  $('#f_status').val('');
+  buildTable();
+}
+
+function openEmail(i){$('#emailRowIndex').val(i);$('#emailInput').val('');new bootstrap.Modal(document.getElementById('emailModal')).show();}
+function addEmail(){
+  const email=$('#emailInput').val().trim();
+  if(!email){alert('Enter a valid email');return;}
+  const data=getData();
+  const i=parseInt($('#emailRowIndex').val());
+  data[i].emails.push(email);saveData(data);
+  bootstrap.Modal.getInstance(document.getElementById('emailModal')).hide();
+  buildTable();
+}
+
+$(()=>buildTable());
+</script>
+</body>
+</html>

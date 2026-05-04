@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Transit Exports Consignment – FreightPro ERP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f0f2f5;
+    --erp-card-bg: #ffffff;
+    --erp-border: #dee2e6;
+    --erp-table-head: #f1f3f5;
+    --erp-text-primary: #212529;
+    --erp-text-muted: #6c757d;
+    --erp-text-small: 0.78rem;
+    --erp-font: 'IBM Plex Sans', sans-serif;
+    --erp-mono: 'IBM Plex Mono', monospace;
+    
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: var(--erp-font); font-size: var(--erp-text-small); background: var(--erp-bg); color: var(--erp-text-primary); margin: 0; padding: 0; }
+
+  /* Main */
+  #erp-main { margin-left: 0; margin-top: 0; padding: 20px; min-height: 100vh; }
+
+  /* Page Header */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .page-header .page-title { font-size: 1.1rem; font-weight: 700; color: var(--erp-text-primary); display: flex; align-items: center; gap: 8px; }
+  .page-header .page-title .title-icon { width: 30px; height: 30px; background: #e7f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #0d6efd; }
+
+  /* Buttons */
+  .btn-erp { font-size: 0.75rem; font-weight: 500; padding: 5px 11px; border-radius: 5px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .btn-erp-primary { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .btn-erp-primary:hover { background: #0b5ed7; }
+  .btn-erp-success { background: #198754; color: #fff; border-color: #198754; }
+  .btn-erp-success:hover { background: #157347; }
+  .btn-erp-secondary { background: #6c757d; color: #fff; border-color: #6c757d; }
+  .btn-erp-secondary:hover { background: #5c636a; }
+  .btn-erp-outline { background: #fff; color: #495057; border-color: var(--erp-border); }
+  .btn-erp-outline:hover { background: var(--erp-bg); }
+  .btn-erp-warning { background: #fd7e14; color: #fff; border-color: #fd7e14; }
+  .btn-erp-warning:hover { background: #e8710a; }
+
+  /* Card */
+  .erp-card { background: var(--erp-card-bg); border: 1px solid var(--erp-border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+  .erp-card-header { padding: 9px 14px; background: #f8f9fa; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; font-weight: 600; color: #495057; }
+  .erp-card-header .header-icon { margin-right: 6px; color: #0d6efd; }
+  .erp-card-body { padding: 16px 14px; }
+
+  /* Tabs */
+  .erp-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--erp-border); margin-bottom: 16px; }
+  .erp-tab-btn {
+    padding: 7px 18px; font-size: 0.78rem; font-weight: 600;
+    border: 1px solid var(--erp-border); border-bottom: none;
+    background: #f8f9fa; color: var(--erp-text-muted);
+    cursor: pointer; transition: all .15s;
+    border-radius: 6px 6px 0 0; margin-right: 3px;
+    position: relative; bottom: -2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .erp-tab-btn:hover { background: #e9ecef; color: var(--erp-text-primary); }
+  .erp-tab-btn.active {
+    background: #fff; color: #0d6efd;
+    border-color: var(--erp-border) var(--erp-border) #fff var(--erp-border);
+    border-bottom: 2px solid #fff;
+  }
+  .erp-tab-pane { display: none; }
+  .erp-tab-pane.active { display: block; }
+
+  /* Form Grid */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 14px; }
+  .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; }
+  .form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; }
+  .form-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px 14px; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.span-2 { grid-column: span 2; }
+  .form-group.span-3 { grid-column: span 3; }
+  .form-label {
+    font-size: 0.7rem; font-weight: 600; color: #495057;
+    margin-bottom: 3px; display: flex; align-items: center; gap: 4px;
+  }
+  .form-label .required { color: #dc3545; font-size: 0.7rem; }
+  .erp-input, .erp-select, .erp-textarea {
+    font-size: 0.76rem; font-family: var(--erp-font);
+    padding: 5px 9px; height: 30px;
+    border: 1px solid #ced4da; border-radius: 5px;
+    background: #fff; color: var(--erp-text-primary);
+    transition: border-color .15s; width: 100%;
+  }
+  .erp-input:focus, .erp-select:focus {
+    outline: none; border-color: #86b7fe; box-shadow: 0 0 0 2px rgba(13,110,253,.15);
+  }
+  .erp-input.is-invalid { border-color: #dc3545; }
+  .erp-input.is-invalid:focus { box-shadow: 0 0 0 2px rgba(220,53,69,.15); }
+  .invalid-feedback { font-size: 0.68rem; color: #dc3545; margin-top: 2px; display: none; }
+  .was-validated .erp-input.is-invalid + .invalid-feedback { display: block; }
+  .erp-textarea { height: auto; min-height: 56px; resize: vertical; }
+  .erp-checkbox-group { display: flex; align-items: center; gap: 6px; height: 30px; }
+  .erp-checkbox-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: #0d6efd; cursor: pointer; }
+  .erp-checkbox-group label { font-size: 0.75rem; color: var(--erp-text-primary); cursor: pointer; margin: 0; }
+
+  /* Section Divider */
+  .section-divider { border: none; border-top: 1px solid var(--erp-border); margin: 14px 0; }
+  .section-title { font-size: 0.74rem; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .section-title::after { content: ''; flex: 1; border-top: 1px solid #e3eaf3; }
+
+  /* Declarant Section */
+  .declarant-bar { background: #f0f6ff; border: 1px solid #b8d0ff; border-radius: 7px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .declarant-bar .dec-label { font-size: 0.7rem; font-weight: 700; color: #0a58ca; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .declarant-bar .erp-select { max-width: 320px; }
+
+  /* CFS toggle */
+  .cfs-toggle { display: flex; gap: 0; margin-bottom: 12px; }
+  .cfs-btn { padding: 5px 18px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--erp-border); cursor: pointer; transition: all .15s; background: #fff; color: #6c757d; }
+  .cfs-btn:first-child { border-radius: 5px 0 0 5px; }
+  .cfs-btn:last-child { border-radius: 0 5px 5px 0; }
+  .cfs-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+
+  /* Toast */
+  .erp-toast-container { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
+  .erp-toast { background: #fff; border-radius: 7px; padding: 10px 14px; box-shadow: 0 4px 18px rgba(0,0,0,.14); display: flex; align-items: center; gap: 10px; font-size: 0.78rem; border-left: 4px solid; animation: slideIn .25s ease; min-width: 240px; max-width: 340px; }
+  .erp-toast.toast-success { border-color: #198754; }
+  .erp-toast.toast-error { border-color: #dc3545; }
+  .erp-toast .toast-icon { font-size: 14px; }
+  .erp-toast.toast-success .toast-icon { color: #198754; }
+  .erp-toast.toast-error .toast-icon { color: #dc3545; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  /* Form footer */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #f8f9fa; border-top: 1px solid var(--erp-border); margin-top: 0; flex-wrap: wrap; gap: 8px; }
+  .form-footer-left { font-size: 0.72rem; color: var(--erp-text-muted); }
+
+  @media (max-width: 768px) {
+    
+    
+    .form-grid, .form-grid-3, .form-grid-4, .form-grid-5 { grid-template-columns: 1fr 1fr; }
+    .form-group.span-2, .form-group.span-3 { grid-column: span 1; }
+  }
+  @media (max-width: 480px) {
+    .form-grid, .form-grid-3, .form-grid-4, .form-grid-5 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<main id="erp-main">
+
+  <div class="page-header">
+    <div class="page-title">
+      <div class="title-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+      Add Transit Exports Consignment
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn-erp btn-erp-outline" onclick="window.location.href='transit-exports-list.html'">
+        <i class="fa-solid fa-list"></i> View Consignments
+      </button>
+    </div>
+  </div>
+
+  <!-- CARGO DETAILS CARD -->
+  <div class="erp-card">
+    <div class="erp-card-header">
+      <span><i class="fa-solid fa-boxes-stacked header-icon"></i> Cargo Details</span>
+      <span style="font-size:0.68rem;color:#6c757d;font-weight:400;">
+        <i class="fa-solid fa-asterisk" style="color:#dc3545;font-size:9px;"></i> Required fields
+      </span>
+    </div>
+    <div class="erp-card-body">
+
+      <!-- Declarant -->
+      <div class="declarant-bar">
+        <span class="dec-label"><i class="fa-solid fa-id-badge"></i> Declarant</span>
+        <select class="erp-select" id="declarant" style="max-width:320px;">
+          <option value="">— Select Declarant —</option>
+          <option>KENYA REVENUE AUTHORITY - KRA</option>
+          <option>KENYA PORTS AUTHORITY - KPA</option>
+          <option>CUSTOMS AGENT - FREIGHT CLEARERS</option>
+          <option>TRANSCOM FREIGHT SERVICES</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <div class="cfs-toggle">
+            <button class="cfs-btn active" id="btn-doc" onclick="switchCFS('DOC')">DOC</button>
+            <button class="cfs-btn" id="btn-cfs" onclick="switchCFS('CFS')">CFS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="erp-tabs">
+        <button class="erp-tab-btn active" id="tab-doc" onclick="switchTab('doc')">
+          <i class="fa-solid fa-file-lines"></i> DOC
+        </button>
+        <button class="erp-tab-btn" id="tab-ops" onclick="window.location.href='add-consignment-ops.html'">
+          <i class="fa-solid fa-gears"></i> OPS
+        </button>
+      </div>
+
+      <!-- DOC TAB CONTENT -->
+      <div class="erp-tab-pane active" id="pane-doc">
+        <form id="doc-form" novalidate>
+
+          <!-- Row 1: Invoice | UIN | Billing Customer | Mode -->
+          <div class="section-title"><i class="fa-solid fa-file-invoice"></i> Basic Information</div>
+          <div class="form-grid-4">
+            <div class="form-group">
+              <label class="form-label" for="invoice">Invoice No</label>
+              <input type="text" class="erp-input" id="invoice" placeholder="e.g. INV-2026-001">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="uin">UIN <span class="required">*</span></label>
+              <select class="erp-select" id="uin" required>
+                <option value="">select...</option>
+                <option>IMPERIAL</option>
+                <option>SHAYONA</option>
+                <option>ALISTAIR</option>
+                <option>AFCONS</option>
+                <option>GLOBAL</option>
+              </select>
+              <div class="invalid-feedback">UIN is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="billing-customer">Billing Customer <span class="required">*</span></label>
+              <select class="erp-select" id="billing-customer" required>
+                <option value="">select...</option>
+                <option>SHAYONA CEMENT CORPORATION</option>
+                <option>IMPERIAL ROAD HAULAGE LTD</option>
+                <option>ALISTAIR LOGISTICS LTD</option>
+                <option>AFCONS INFRASTRUCTURE LTD</option>
+                <option>GLOBAL TRANSIT CO</option>
+              </select>
+              <div class="invalid-feedback">Billing Customer is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mode">Mode</label>
+              <input type="text" class="erp-input" id="mode" placeholder="e.g. FCL / LCL">
+            </div>
+          </div>
+
+          <hr class="section-divider">
+
+          <!-- Row 2: Refer No | Tansad No | Lodge Date | Shipper | Consignee -->
+          <div class="section-title"><i class="fa-solid fa-tag"></i> Reference & Parties</div>
+          <div class="form-grid-5">
+            <div class="form-group">
+              <label class="form-label" for="refer-number">Refer. Number</label>
+              <input type="text" class="erp-input" id="refer-number" placeholder="e.g. REF-2026-001">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tansad-no">Tansad No.</label>
+              <input type="text" class="erp-input" id="tansad-no" placeholder="e.g. TSD-9921">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lodge-date">Lodge Date</label>
+              <input type="date" class="erp-input" id="lodge-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="shipper">Shipper <span class="required">*</span></label>
+              <input type="text" class="erp-input" id="shipper" placeholder="Shipper name" required>
+              <div class="invalid-feedback">Shipper is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="consignee">Consignee <span class="required">*</span></label>
+              <select class="erp-select" id="consignee" required>
+                <option value="">select...</option>
+                <option>SHAYONA CEMENT CORPORATION</option>
+                <option>IMPERIAL ROAD HAULAGE LTD</option>
+                <option>ALISTAIR LOGISTICS LTD</option>
+                <option>AFCONS INFRASTRUCTURE LTD</option>
+                <option>GLOBAL TRANSIT CO</option>
+                <option>PORT AUTHORITY MOMBASA</option>
+              </select>
+              <div class="invalid-feedback">Consignee is required.</div>
+            </div>
+          </div>
+
+          <hr class="section-divider">
+
+          <!-- Row 3: Shipping Order BL | POD/Country | Material Descr | Size20 | Size40 -->
+          <div class="section-title"><i class="fa-solid fa-ship"></i> Shipping Details</div>
+          <div class="form-grid-5">
+            <div class="form-group">
+              <label class="form-label" for="shipping-order-bl">Shipping Order BL</label>
+              <input type="text" class="erp-input" id="shipping-order-bl" placeholder="BL Number">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="pod-country">POD / Country</label>
+              <select class="erp-select" id="pod-country">
+                <option value="">select...</option>
+                <option>MOMBASA / KENYA</option>
+                <option>DAR ES SALAAM / TANZANIA</option>
+                <option>BEIRA / MOZAMBIQUE</option>
+                <option>DURBAN / SOUTH AFRICA</option>
+                <option>DJIBOUTI / DJIBOUTI</option>
+                <option>SHANGHAI / CHINA</option>
+                <option>ROTTERDAM / NETHERLANDS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="material-descr">Material Descr.</label>
+              <input type="text" class="erp-input" id="material-descr" placeholder="Cargo description">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="size-20">Size 20</label>
+              <input type="number" class="erp-input" id="size-20" placeholder="0" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="size-40">Size 40</label>
+              <input type="number" class="erp-input" id="size-40" placeholder="0" min="0" value="0">
+            </div>
+          </div>
+
+          <hr class="section-divider">
+
+          <!-- Row 4: S/Line | Terminal | Vessel | Voyage | CFS -->
+          <div class="section-title"><i class="fa-solid fa-anchor"></i> Vessel & Terminal</div>
+          <div class="form-grid-5">
+            <div class="form-group">
+              <label class="form-label" for="sline">S/Line <span class="required">*</span></label>
+              <select class="erp-select" id="sline" required>
+                <option value="">select...</option>
+                <option>MAERSK LINE</option>
+                <option>MSC – MED SHIPPING</option>
+                <option>CMA CGM</option>
+                <option>COSCO SHIPPING</option>
+                <option>EVERGREEN MARINE</option>
+                <option>HAPAG-LLOYD</option>
+                <option>ONE OCEAN NETWORK</option>
+              </select>
+              <div class="invalid-feedback">Shipping Line is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="terminal">Terminal</label>
+              <input type="text" class="erp-input" id="terminal" placeholder="Terminal name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="vessel">Vessel</label>
+              <input type="text" class="erp-input" id="vessel" placeholder="Vessel name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="voyage">Voyage</label>
+              <input type="text" class="erp-input" id="voyage" placeholder="Voyage number">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cfs">CFS</label>
+              <input type="text" class="erp-input" id="cfs" placeholder="CFS location">
+            </div>
+          </div>
+
+          <hr class="section-divider">
+
+          <!-- Original Document Received -->
+          <div class="section-title"><i class="fa-solid fa-file-circle-check"></i> Document Status</div>
+          <div class="form-grid-4">
+            <div class="form-group">
+              <label class="form-label">Original Document Received</label>
+              <div class="erp-checkbox-group">
+                <input type="checkbox" id="orig-doc" name="orig-doc">
+                <label for="orig-doc">Yes – Original Documents Received</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="orig-doc-date">Date Received</label>
+              <input type="date" class="erp-input" id="orig-doc-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="remarks-doc">Remarks</label>
+              <input type="text" class="erp-input" id="remarks-doc" placeholder="Any additional remarks">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="file-status">File Status</label>
+              <select class="erp-select" id="file-status">
+                <option value="">select...</option>
+                <option>AWAITING ORIGINAL DOCUMENTS</option>
+                <option>UNDER CUSTOMS DOCUMENTATION</option>
+                <option>PENDING STUFFING</option>
+                <option>CARGO AT CFS READY</option>
+                <option>DOCS SUBMITTED TO KRA</option>
+                <option>SOB RECEIVED</option>
+                <option>DELIVERED</option>
+              </select>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Form Footer -->
+    <div class="form-footer">
+      <div class="form-footer-left">
+        <i class="fa-solid fa-circle-info" style="color:#0d6efd;margin-right:4px;"></i>
+        All fields marked with <span style="color:#dc3545;">*</span> are mandatory.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-erp btn-erp-outline" onclick="resetForm()">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+        <button class="btn-erp btn-erp-secondary" onclick="saveDraft()">
+          <i class="fa-solid fa-floppy-disk"></i> Save Draft
+        </button>
+        <button class="btn-erp btn-erp-success" onclick="saveAndNext()">
+          <i class="fa-solid fa-arrow-right"></i> Save & Go to OPS
+        </button>
+        <button class="btn-erp btn-erp-primary" onclick="submitForm()">
+          <i class="fa-solid fa-paper-plane"></i> Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="erp-toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let cfsMode = 'DOC';
+
+function switchCFS(mode) {
+  cfsMode = mode;
+  document.getElementById('btn-doc').className = 'cfs-btn' + (mode === 'DOC' ? ' active' : '');
+  document.getElementById('btn-cfs').className = 'cfs-btn' + (mode === 'CFS' ? ' active' : '');
+  showToast('Mode switched to ' + mode, 'success');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.erp-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.erp-tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  document.getElementById('pane-' + tab)?.classList.add('active');
+}
+
+function validateForm() {
+  let valid = true;
+  const requiredIds = ['uin','billing-customer','shipper','consignee','sline'];
+  requiredIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!el.value.trim()) {
+      el.classList.add('is-invalid');
+      valid = false;
+    } else {
+      el.classList.remove('is-invalid');
+    }
+  });
+  return valid;
+}
+
+function submitForm() {
+  if (!validateForm()) {
+    showToast('Please fill all required fields before submitting.', 'error');
+    document.querySelector('.erp-input.is-invalid, .erp-select.is-invalid')?.focus();
+    return;
+  }
+  showToast('Consignment saved successfully! File no. generated.', 'success');
+  setTimeout(() => { window.location.href = 'transit-exports-list.html'; }, 1800);
+}
+
+function saveDraft() {
+  showToast('Draft saved successfully.', 'success');
+}
+
+function saveAndNext() {
+  if (!validateForm()) {
+    showToast('Please fill required fields first.', 'error');
+    return;
+  }
+  showToast('DOC section saved. Loading OPS tab…', 'success');
+  setTimeout(() => { window.location.href = 'add-consignment-ops.html'; }, 1000);
+}
+
+function resetForm() {
+  document.getElementById('doc-form').reset();
+  document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+  showToast('Form reset.', 'success');
+}
+
+// Auto-fill billing customer from UIN
+document.getElementById('uin').addEventListener('change', function() {
+  const map = {
+    'IMPERIAL': 'IMPERIAL ROAD HAULAGE LTD',
+    'SHAYONA': 'SHAYONA CEMENT CORPORATION',
+    'ALISTAIR': 'ALISTAIR LOGISTICS LTD',
+    'AFCONS': 'AFCONS INFRASTRUCTURE LTD',
+    'GLOBAL': 'GLOBAL TRANSIT CO',
+  };
+  if (map[this.value]) {
+    document.getElementById('billing-customer').value = map[this.value];
+    document.getElementById('consignee').value = map[this.value];
+  }
+});
+
+// Remove invalid class on input
+document.querySelectorAll('.erp-input, .erp-select').forEach(el => {
+  el.addEventListener('input', () => el.classList.remove('is-invalid'));
+  el.addEventListener('change', () => el.classList.remove('is-invalid'));
+});
+
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `erp-toast toast-${type}`;
+  toast.innerHTML = `<span class="toast-icon"><i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i></span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 350); }, 3500);
+}
+
+// Pre-fill today date
+document.getElementById('lodge-date').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>

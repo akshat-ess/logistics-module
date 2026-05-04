@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Return - Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f4f6f9;
+    --erp-sidebar: #2c3e50;
+    --erp-header: #ffffff;
+    --erp-primary: #3498db;
+    --erp-success: #27ae60;
+    --erp-danger: #e74c3c;
+    --erp-warning: #f39c12;
+    --erp-text: #2c3e50;
+    --erp-border: #dee2e6;
+    --erp-card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  body { background: var(--erp-bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--erp-text); margin: 0; }
+
+  /* TOP NAV */
+  .top-nav { background: var(--erp-sidebar); color: #fff; padding: 0 20px; height: 50px; display: flex; align-items: center; justify-content: space-between; }
+  .top-nav .brand { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+  .top-nav .nav-right { display: flex; align-items: center; gap: 15px; font-size: 13px; }
+  .top-nav .nav-right i { cursor: pointer; }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; background: #fff; height: calc(100vh - 50px); border-right: 1px solid var(--erp-border); position: fixed; top: 50px; left: 0; overflow-y: auto; z-index: 100; }
+  .sidebar .menu-section { padding: 8px 0; }
+  .sidebar .menu-label { font-size: 10px; font-weight: 700; color: #999; padding: 8px 16px 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .sidebar .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #555; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .sidebar .menu-item:hover, .sidebar .menu-item.active { background: #e8f4fd; color: var(--erp-primary); }
+  .sidebar .menu-item i { width: 18px; font-size: 14px; }
+
+  /* MAIN */
+  .main-content { margin-left: 220px; padding: 24px; min-height: calc(100vh - 50px); }
+
+  /* BREADCRUMB */
+  .breadcrumb-bar { margin-bottom: 20px; }
+  .breadcrumb-bar .breadcrumb { margin: 0; font-size: 13px; background: none; padding: 0; }
+  .breadcrumb-item a { color: var(--erp-primary); text-decoration: none; }
+  .breadcrumb-item.active { color: #888; }
+
+  /* PAGE TITLE */
+  .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--erp-text); }
+
+  /* TRANSIT RETURN CARD - matching screenshot */
+  .transit-card {
+    background: #fce4e4;
+    border: 1px solid #f5c6c6;
+    border-radius: 8px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    max-width: 420px;
+    box-shadow: var(--erp-card-shadow);
+  }
+  .transit-card .icon-area { font-size: 48px; color: #c0392b; }
+  .transit-card .info-area .card-title { font-size: 28px; font-weight: 700; color: #c0392b; margin: 0 0 4px; }
+  .transit-card .info-area .kpi-text { font-size: 13px; color: #c0392b; margin-bottom: 14px; }
+  .transit-card .info-area .btn-return { background: #27ae60; color: #fff; border: none; padding: 6px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-right: 8px; cursor: pointer; }
+  .transit-card .info-area .btn-coffee { background: #2980b9; color: #fff; border: none; padding: 6px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .transit-card .info-area .btn-return:hover { background: #219a52; }
+  .transit-card .info-area .btn-coffee:hover { background: #2471a3; }
+
+  /* KPI CARDS ROW */
+  .kpi-card { background: #fff; border-radius: 8px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--erp-card-shadow); border-left: 4px solid var(--erp-primary); }
+  .kpi-card.green { border-left-color: var(--erp-success); }
+  .kpi-card.orange { border-left-color: var(--erp-warning); }
+  .kpi-card.red { border-left-color: var(--erp-danger); }
+  .kpi-card .kpi-icon { font-size: 30px; color: var(--erp-primary); width: 44px; }
+  .kpi-card.green .kpi-icon { color: var(--erp-success); }
+  .kpi-card.orange .kpi-icon { color: var(--erp-warning); }
+  .kpi-card.red .kpi-icon { color: var(--erp-danger); }
+  .kpi-card .kpi-value { font-size: 26px; font-weight: 700; line-height: 1; }
+  .kpi-card .kpi-label { font-size: 12px; color: #888; margin-top: 2px; }
+
+  /* RECENT TABLE */
+  .section-card { background: #fff; border-radius: 8px; box-shadow: var(--erp-card-shadow); margin-top: 28px; }
+  .section-header { padding: 14px 20px; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; justify-content: space-between; }
+  .section-header h6 { margin: 0; font-weight: 700; font-size: 14px; }
+  .erp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .erp-table thead th { background: #f8f9fa; padding: 10px 14px; font-weight: 600; border-bottom: 2px solid var(--erp-border); white-space: nowrap; }
+  .erp-table tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .erp-table tbody tr:hover { background: #f0f7ff; }
+  .badge-border { background: #856404; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 12px; }
+  .badge-status { font-size: 11px; padding: 3px 10px; border-radius: 12px; }
+  .status-offloaded { background: #d4edda; color: #155724; }
+  .status-transit { background: #fff3cd; color: #856404; }
+  .status-delivered { background: #cce5ff; color: #004085; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="brand"><i class="fas fa-shipping-fast me-2"></i>TransitERP &mdash; Cargo Management System</div>
+  <div class="nav-right">
+    <span><i class="fas fa-bell"></i></span>
+    <span><i class="fas fa-user-circle me-1"></i>Admin User</span>
+    <span><i class="fas fa-sign-out-alt"></i></span>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="menu-section">
+    <div class="menu-label">Main</div>
+    <a href="dashboard.html" class="menu-item active"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="consignment-list.html" class="menu-item"><i class="fas fa-list-alt"></i>Consignments</a>
+    <a href="add-consignment-file.html" class="menu-item"><i class="fas fa-plus-circle"></i>New Return Cargo</a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">Reports</div>
+    <a href="#" class="menu-item"><i class="fas fa-print"></i>Print Reports</a>
+    <a href="#" class="menu-item"><i class="fas fa-chart-bar"></i>Analytics</a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">Settings</div>
+    <a href="#" class="menu-item"><i class="fas fa-cog"></i>Settings</a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <div class="breadcrumb-bar">
+    <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#">Home</a></li><li class="breadcrumb-item active">Transit Return</li></ol></nav>
+  </div>
+
+  <!-- TRANSIT RETURN HERO CARD (matches screenshot) -->
+  <div class="transit-card mb-4">
+    <div class="icon-area"><i class="fas fa-directions"></i></div>
+    <div class="info-area">
+      <div class="card-title">Transit Return</div>
+      <div class="kpi-text">Active Containers: <strong>137</strong></div>
+      <button class="btn-return" onclick="window.location.href='consignment-list.html'">RETURN</button>
+      <button class="btn-coffee" onclick="window.location.href='consignment-list.html?type=coffee'">COFFEE</button>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="row g-3 mb-2">
+    <div class="col-md-3">
+      <div class="kpi-card">
+        <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
+        <div><div class="kpi-value">137</div><div class="kpi-label">Active Containers</div></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="kpi-card green">
+        <div class="kpi-icon"><i class="fas fa-truck"></i></div>
+        <div><div class="kpi-value">89</div><div class="kpi-label">In Transit</div></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="kpi-card orange">
+        <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+        <div><div class="kpi-value">24</div><div class="kpi-label">Pending Clearance</div></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="kpi-card red">
+        <div class="kpi-icon"><i class="fas fa-ban"></i></div>
+        <div><div class="kpi-value">6</div><div class="kpi-label">Cancelled</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT CONSIGNMENTS TABLE -->
+  <div class="section-card">
+    <div class="section-header">
+      <h6><i class="fas fa-list me-2 text-primary"></i>Recent Consignments</h6>
+      <a href="consignment-list.html" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="p-0" style="overflow-x:auto;">
+      <table class="erp-table">
+        <thead>
+          <tr>
+            <th>UIN</th><th>File No</th><th>Client</th><th>Destination</th><th>Truck Details</th><th>Remarks</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>BRIDGE</td><td>TRU/HLL/BRIDGESHIPPI/2026/299</td><td>BRIDGE SHIPPING</td><td>IRINGA, TANZANIA</td><td>CAC1880ZM / CAC1884ZM <span class="badge-border ms-2">5 Border Days</span></td><td>Offloaded</td><td><span class="badge badge-status status-offloaded">Offloaded</span></td></tr>
+          <tr><td>BRIDGE</td><td>TRU/HLL/BRIDGESHIPPI/2026/329</td><td>BRIDGE SHIPPING</td><td>DAR ES SALAAM, TANZANIA</td><td>T254DWU / T257DWU <span class="badge-border ms-2">7 Border Days</span></td><td>Offloaded</td><td><span class="badge badge-status status-offloaded">Offloaded</span></td></tr>
+          <tr><td>BRIDGE</td><td>TRU/HLL/BRIDGESHIPPI/2026/384</td><td>BRIDGE SHIPPING</td><td>DAR ES SALAAM, TANZANIA</td><td>CAC1881ZM / CAC1883ZM</td><td>Offloaded</td><td><span class="badge badge-status status-offloaded">Offloaded</span></td></tr>
+          <tr><td>SIMBA</td><td>TRU/HLL/SIMBASUPPLY/2026/112</td><td>SIMBA SUPPLY CHAIN</td><td>LUSAKA, ZAMBIA</td><td>ZMB4421A / ZMB4425A</td><td>In Transit</td><td><span class="badge badge-status status-transit">In Transit</span></td></tr>
+          <tr><td>IMP</td><td>TRU/HLL/IMPERIALROAD/2026/078</td><td>IMPERIAL ROAD HAULAGE</td><td>NAIROBI, KENYA</td><td>KCA234B / KCA238B</td><td>Delivered</td><td><span class="badge badge-status status-delivered">Delivered</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Consignment – OPS | FreightPro ERP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --erp-bg: #f0f2f5;
+    --erp-card-bg: #ffffff;
+    --erp-border: #dee2e6;
+    --erp-text-primary: #212529;
+    --erp-text-muted: #6c757d;
+    --erp-text-small: 0.78rem;
+    --erp-font: 'IBM Plex Sans', sans-serif;
+    --erp-mono: 'IBM Plex Mono', monospace;
+    
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: var(--erp-font); font-size: var(--erp-text-small); background: var(--erp-bg); color: var(--erp-text-primary); margin: 0; padding: 0; }
+
+  /* Main */
+  #erp-main { margin-left: 0; margin-top: 0; padding: 20px; min-height: 100vh; }
+
+  /* Page Header */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .page-header .page-title { font-size: 1.1rem; font-weight: 700; color: var(--erp-text-primary); display: flex; align-items: center; gap: 8px; }
+  .page-header .page-title .title-icon { width: 30px; height: 30px; background: #e7f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #0d6efd; }
+
+  /* Buttons */
+  .btn-erp { font-size: 0.75rem; font-weight: 500; padding: 5px 11px; border-radius: 5px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .btn-erp-primary { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .btn-erp-primary:hover { background: #0b5ed7; }
+  .btn-erp-success { background: #198754; color: #fff; border-color: #198754; }
+  .btn-erp-success:hover { background: #157347; }
+  .btn-erp-secondary { background: #6c757d; color: #fff; border-color: #6c757d; }
+  .btn-erp-secondary:hover { background: #5c636a; }
+  .btn-erp-outline { background: #fff; color: #495057; border-color: var(--erp-border); }
+  .btn-erp-outline:hover { background: var(--erp-bg); }
+  .btn-erp-warning { background: #fd7e14; color: #fff; border-color: #fd7e14; }
+  .btn-erp-warning:hover { background: #e8710a; }
+
+  /* Card */
+  .erp-card { background: var(--erp-card-bg); border: 1px solid var(--erp-border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+  .erp-card-header { padding: 9px 14px; background: #f8f9fa; border-bottom: 1px solid var(--erp-border); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; font-weight: 600; color: #495057; }
+  .erp-card-header .header-icon { margin-right: 6px; color: #0d6efd; }
+  .erp-card-body { padding: 16px 14px; }
+
+  /* Tabs */
+  .erp-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--erp-border); margin-bottom: 16px; }
+  .erp-tab-btn { padding: 7px 18px; font-size: 0.78rem; font-weight: 600; border: 1px solid var(--erp-border); border-bottom: none; background: #f8f9fa; color: var(--erp-text-muted); cursor: pointer; transition: all .15s; border-radius: 6px 6px 0 0; margin-right: 3px; position: relative; bottom: -2px; display: flex; align-items: center; gap: 6px; }
+  .erp-tab-btn:hover { background: #e9ecef; color: var(--erp-text-primary); }
+  .erp-tab-btn.active { background: #fff; color: #0d6efd; border-color: var(--erp-border) var(--erp-border) #fff var(--erp-border); border-bottom: 2px solid #fff; }
+
+  /* Declarant bar */
+  .declarant-bar { background: #f0f6ff; border: 1px solid #b8d0ff; border-radius: 7px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .declarant-bar .dec-label { font-size: 0.7rem; font-weight: 700; color: #0a58ca; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .declarant-bar .erp-select { max-width: 320px; }
+
+  /* CFS toggle */
+  .cfs-toggle { display: flex; gap: 0; }
+  .cfs-btn { padding: 5px 18px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--erp-border); cursor: pointer; transition: all .15s; background: #fff; color: #6c757d; }
+  .cfs-btn:first-child { border-radius: 5px 0 0 5px; }
+  .cfs-btn:last-child { border-radius: 0 5px 5px 0; }
+  .cfs-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+
+  /* Form */
+  .form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; }
+  .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; }
+  .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.span-2 { grid-column: span 2; }
+  .form-label { font-size: 0.7rem; font-weight: 600; color: #495057; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
+  .form-label .required { color: #dc3545; font-size: 0.7rem; }
+  .erp-input, .erp-select, .erp-textarea { font-size: 0.76rem; font-family: var(--erp-font); padding: 5px 9px; height: 30px; border: 1px solid #ced4da; border-radius: 5px; background: #fff; color: var(--erp-text-primary); transition: border-color .15s; width: 100%; }
+  .erp-input:focus, .erp-select:focus { outline: none; border-color: #86b7fe; box-shadow: 0 0 0 2px rgba(13,110,253,.15); }
+  .erp-input.is-invalid { border-color: #dc3545; }
+  .invalid-feedback { font-size: 0.68rem; color: #dc3545; margin-top: 2px; display: none; }
+  .erp-textarea { height: auto; min-height: 56px; resize: vertical; }
+  .section-divider { border: none; border-top: 1px solid var(--erp-border); margin: 14px 0; }
+  .section-title { font-size: 0.74rem; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .section-title::after { content: ''; flex: 1; border-top: 1px solid #e3eaf3; }
+
+  /* Progress tracker */
+  .ops-progress { display: flex; align-items: center; gap: 0; margin-bottom: 18px; }
+  .ops-step { display: flex; align-items: center; }
+  .ops-step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; flex-shrink: 0; border: 2px solid; }
+  .ops-step-dot.done { background: #198754; color: #fff; border-color: #198754; }
+  .ops-step-dot.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .ops-step-dot.pending { background: #fff; color: #adb5bd; border-color: #dee2e6; }
+  .ops-step-label { font-size: 0.68rem; font-weight: 600; margin-left: 6px; }
+  .ops-step-label.done { color: #198754; }
+  .ops-step-label.active { color: #0d6efd; }
+  .ops-step-label.pending { color: #adb5bd; }
+  .ops-step-line { flex: 1; height: 2px; background: #dee2e6; margin: 0 8px; min-width: 30px; }
+  .ops-step-line.done { background: #198754; }
+
+  /* Info card */
+  .info-summary-card { background: #f0f6ff; border: 1px solid #b8d0ff; border-radius: 7px; padding: 10px 14px; margin-bottom: 14px; }
+  .info-summary-card .info-row { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 0.73rem; }
+  .info-summary-card .info-item { display: flex; gap: 5px; align-items: center; }
+  .info-summary-card .info-label { color: #6c757d; font-weight: 500; }
+  .info-summary-card .info-value { color: #0a58ca; font-weight: 700; font-family: var(--erp-mono); }
+
+  /* Form footer */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #f8f9fa; border-top: 1px solid var(--erp-border); flex-wrap: wrap; gap: 8px; }
+  .form-footer-left { font-size: 0.72rem; color: var(--erp-text-muted); }
+
+  /* Toast */
+  .erp-toast-container { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
+  .erp-toast { background: #fff; border-radius: 7px; padding: 10px 14px; box-shadow: 0 4px 18px rgba(0,0,0,.14); display: flex; align-items: center; gap: 10px; font-size: 0.78rem; border-left: 4px solid; animation: slideIn .25s ease; min-width: 240px; max-width: 340px; }
+  .erp-toast.toast-success { border-color: #198754; }
+  .erp-toast.toast-error { border-color: #dc3545; }
+  .erp-toast .toast-icon { font-size: 14px; }
+  .erp-toast.toast-success .toast-icon { color: #198754; }
+  .erp-toast.toast-error .toast-icon { color: #dc3545; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  @media (max-width: 768px) {
+    
+    
+    .form-grid-4, .form-grid-3 { grid-template-columns: 1fr 1fr; }
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .form-group.span-2 { grid-column: span 1; }
+  }
+  @media (max-width: 480px) {
+    .form-grid-4, .form-grid-3, .form-grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<main id="erp-main">
+
+  <div class="page-header">
+    <div class="page-title">
+      <div class="title-icon"><i class="fa-solid fa-gears"></i></div>
+      Add Transit Exports Consignment
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn-erp btn-erp-outline" onclick="window.location.href='transit-exports-list.html'">
+        <i class="fa-solid fa-list"></i> View Consignments
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="ops-progress" style="margin-bottom:14px;">
+    <div class="ops-step">
+      <div class="ops-step-dot done"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
+      <span class="ops-step-label done">DOC Details</span>
+    </div>
+    <div class="ops-step-line done"></div>
+    <div class="ops-step">
+      <div class="ops-step-dot active">2</div>
+      <span class="ops-step-label active">OPS Details</span>
+    </div>
+    <div class="ops-step-line"></div>
+    <div class="ops-step">
+      <div class="ops-step-dot pending">3</div>
+      <span class="ops-step-label pending">Containers</span>
+    </div>
+    <div class="ops-step-line"></div>
+    <div class="ops-step">
+      <div class="ops-step-dot pending">4</div>
+      <span class="ops-step-label pending">Confirm</span>
+    </div>
+  </div>
+
+  <!-- Info Summary -->
+  <div class="info-summary-card">
+    <div class="info-row">
+      <div class="info-item"><span class="info-label">File No:</span><span class="info-value">EXPTRS/IMPERIAL/2026/0006</span></div>
+      <div class="info-item"><span class="info-label">UIN:</span><span class="info-value">IMPERIAL</span></div>
+      <div class="info-item"><span class="info-label">Shipper:</span><span class="info-value">IMPERIAL ROAD HAULAGE LTD</span></div>
+      <div class="info-item"><span class="info-label">S/Line:</span><span class="info-value">MAERSK LINE</span></div>
+      <div class="info-item"><span class="info-label">Vessel:</span><span class="info-value">MAERSK KENYA</span></div>
+    </div>
+  </div>
+
+  <!-- CARGO DETAILS CARD -->
+  <div class="erp-card">
+    <div class="erp-card-header">
+      <span><i class="fa-solid fa-gears header-icon"></i> Cargo Details – OPS Section</span>
+      <span style="font-size:0.68rem;color:#6c757d;font-weight:400;">
+        <i class="fa-solid fa-asterisk" style="color:#dc3545;font-size:9px;"></i> Required fields
+      </span>
+    </div>
+    <div class="erp-card-body">
+
+      <!-- Declarant -->
+      <div class="declarant-bar">
+        <span class="dec-label"><i class="fa-solid fa-id-badge"></i> Declarant</span>
+        <select class="erp-select" id="declarant">
+          <option>KENYA REVENUE AUTHORITY - KRA</option>
+          <option>KENYA PORTS AUTHORITY - KPA</option>
+          <option>CUSTOMS AGENT - FREIGHT CLEARERS</option>
+        </select>
+        <div style="margin-left:auto;">
+          <div class="cfs-toggle">
+            <button class="cfs-btn" onclick="window.location.href='add-consignment-doc.html'">DOC</button>
+            <button class="cfs-btn active">CFS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="erp-tabs">
+        <button class="erp-tab-btn" onclick="window.location.href='add-consignment-doc.html'">
+          <i class="fa-solid fa-file-lines"></i> DOC
+        </button>
+        <button class="erp-tab-btn active" id="tab-ops">
+          <i class="fa-solid fa-gears"></i> OPS
+        </button>
+      </div>
+
+      <form id="ops-form" novalidate>
+
+        <!-- Row 1: CFS | Empty Placement | ETA | ETB -->
+        <div class="section-title"><i class="fa-solid fa-warehouse"></i> Cargo & Vessel Timing</div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label class="form-label" for="cargo-cfs">Cargo at CFS <span class="required">*</span></label>
+            <input type="date" class="erp-input" id="cargo-cfs" required>
+            <div class="invalid-feedback">Cargo at CFS date is required.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="empty-placement">Empty Placement</label>
+            <input type="date" class="erp-input" id="empty-placement">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="eta">ETA (Est. Time Arrival) <span class="required">*</span></label>
+            <input type="date" class="erp-input" id="eta" required>
+            <div class="invalid-feedback">ETA is required.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="etb">ETB (Est. Time Berthing)</label>
+            <input type="date" class="erp-input" id="etb">
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Row 2: Release Order | Loading Permit | Stuffing Date | Delivery to Port -->
+        <div class="section-title"><i class="fa-solid fa-clipboard-check"></i> Permits & Operations</div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label class="form-label" for="release-order">Release Order</label>
+            <input type="text" class="erp-input" id="release-order" placeholder="Release order no.">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loading-permit">Loading Permit</label>
+            <input type="text" class="erp-input" id="loading-permit" placeholder="Loading permit no.">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stuffing-date">Stuffing Date</label>
+            <input type="date" class="erp-input" id="stuffing-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="delivery-port">Delivery to Port</label>
+            <input type="date" class="erp-input" id="delivery-port">
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Row 3: SOB | File Closed On | Remarks -->
+        <div class="section-title"><i class="fa-solid fa-flag-checkered"></i> Completion & Closure</div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label" for="sob">SOB (Shipped On Board)</label>
+            <input type="date" class="erp-input" id="sob">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="file-closed">File Closed On</label>
+            <input type="date" class="erp-input" id="file-closed">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="remarks">Remarks</label>
+            <input type="text" class="erp-input" id="remarks" placeholder="Operational remarks">
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Checklist Panel -->
+        <div class="section-title"><i class="fa-solid fa-list-check"></i> OPS Checklist</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;">
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> Release Order Issued
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> Loading Permit Obtained
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> Cargo Stuffed in Container
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> Container Delivered to Port
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> SOB Confirmed by S/Line
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> BL Draft Received
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> Final BL Issued
+          </label>
+          <label class="ops-check-item" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid var(--erp-border);border-radius:5px;padding:7px 10px;cursor:pointer;font-size:0.75rem;">
+            <input type="checkbox" style="width:14px;height:14px;accent-color:#0d6efd;"> File Closed & Archived
+          </label>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Form Footer -->
+    <div class="form-footer">
+      <div class="form-footer-left">
+        <i class="fa-solid fa-arrow-left" style="color:#6c757d;margin-right:4px;"></i>
+        <a href="add-consignment-doc.html" style="color:#0d6efd;text-decoration:none;font-size:0.72rem;">← Back to DOC section</a>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-erp btn-erp-outline" onclick="resetOps()">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+        <button class="btn-erp btn-erp-secondary" onclick="saveDraft()">
+          <i class="fa-solid fa-floppy-disk"></i> Save Draft
+        </button>
+        <button class="btn-erp btn-erp-warning" onclick="saveAndAddContainer()">
+          <i class="fa-solid fa-arrow-right"></i> Save & Add Containers
+        </button>
+        <button class="btn-erp btn-erp-primary" onclick="submitOps()">
+          <i class="fa-solid fa-paper-plane"></i> Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="erp-toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function validateOps() {
+  let valid = true;
+  ['cargo-cfs','eta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value) { el.classList.add('is-invalid'); valid = false; }
+    else { el.classList.remove('is-invalid'); }
+  });
+  return valid;
+}
+
+function submitOps() {
+  if (!validateOps()) {
+    showToast('Please fill required OPS fields.', 'error');
+    return;
+  }
+  showToast('OPS details saved successfully!', 'success');
+  setTimeout(() => { window.location.href = 'transit-exports-list.html'; }, 1600);
+}
+
+function saveDraft() { showToast('OPS draft saved.', 'success'); }
+
+function saveAndAddContainer() {
+  if (!validateOps()) { showToast('Please fill required OPS fields first.', 'error'); return; }
+  showToast('OPS saved. Loading container entry…', 'success');
+  setTimeout(() => { window.location.href = 'add-container.html'; }, 1000);
+}
+
+function resetOps() {
+  document.getElementById('ops-form').reset();
+  document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+  showToast('OPS form reset.', 'success');
+}
+
+document.querySelectorAll('.erp-input').forEach(el => {
+  el.addEventListener('input', () => el.classList.remove('is-invalid'));
+});
+
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `erp-toast toast-${type}`;
+  toast.innerHTML = `<span class="toast-icon"><i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i></span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 350); }, 3500);
+}
+
+// Checklist hover effect
+document.querySelectorAll('.ops-check-item').forEach(item => {
+  item.addEventListener('change', function() {
+    const cb = this.querySelector('input');
+    this.style.background = cb.checked ? '#d1e7dd' : '#f8f9fa';
+    this.style.borderColor = cb.checked ? '#a3cfbb' : 'var(--erp-border)';
+    this.style.color = cb.checked ? '#0a3622' : '';
+  });
+});
+</script>
+</body>
+</html>

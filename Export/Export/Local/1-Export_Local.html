@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exports – ERP Logistics</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  /* ===== ERP BASE THEME ===== */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* ===== TOP NAV BAR ===== */
+  .erp-topbar {
+    background: #1a5276;
+    color: #fff;
+    padding: 0 18px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    gap: 20px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+  }
+  .erp-topbar .brand { font-weight: 700; font-size: 13px; letter-spacing: .5px; }
+  .erp-topbar nav a {
+    color: #cce5ff;
+    text-decoration: none;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  .erp-topbar nav a:hover { color: #fff; }
+  .erp-topbar .user-info { margin-left: auto; font-size: 12px; }
+
+  /* ===== MAIN WRAPPER ===== */
+  .erp-main { 
+    /* margin-top: 36px;  */
+    padding: 14px 18px; }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    background: #fff;
+    border: 1px solid #d0d6dc;
+    border-radius: 3px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .page-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a3a5c;
+    margin: 0;
+    margin-right: 6px;
+  }
+  .btn-erp {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+  }
+  .btn-erp-primary   { background:#2980b9; color:#fff; border-color:#2471a3; }
+  .btn-erp-primary:hover { background:#1f6fa1; color:#fff; }
+  .btn-erp-success   { background:#27ae60; color:#fff; border-color:#1e8449; }
+  .btn-erp-success:hover { background:#1e8449; color:#fff; }
+  .btn-erp-warning   { background:#e67e22; color:#fff; border-color:#ca6f1e; }
+  .btn-erp-warning:hover { background:#ca6f1e; color:#fff; }
+  .btn-erp-secondary { background:#7f8c8d; color:#fff; border-color:#717d7e; }
+  .btn-erp-secondary:hover { background:#717d7e; color:#fff; }
+  .btn-erp-danger    { background:#e74c3c; color:#fff; border-color:#cb4335; }
+  .ms-auto-erp { margin-left: auto; }
+
+  /* ===== FILTER CARD ===== */
+  .filter-card {
+    background: #fff;
+    border: 1px solid #d0d6dc;
+    border-radius: 3px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+  .filter-card .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-card .form-select, .filter-card .form-control {
+    font-size: 12px;
+    height: 30px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid #bdc3c7;
+  }
+  .filter-card .form-select:focus, .filter-card .form-control:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 2px rgba(41,128,185,.15);
+  }
+
+  /* ===== GRID CARD ===== */
+  .grid-card {
+    background: #fff;
+    border: 1px solid #d0d6dc;
+    border-radius: 3px;
+  }
+  .grid-toolbar {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #e0e5ea;
+    flex-wrap: wrap;
+  }
+  .grid-info { font-size: 12px; color: #555; font-weight: 500; }
+  .grid-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 12px;
+  }
+  .grid-search label { font-weight: 500; color: #333; }
+  .grid-search input {
+    height: 26px;
+    font-size: 12px;
+    padding: 2px 7px;
+    border: 1px solid #bdc3c7;
+    border-radius: 3px;
+    width: 160px;
+  }
+  .per-page-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .per-page-ctrl select {
+    height: 26px;
+    font-size: 12px;
+    padding: 2px 5px;
+    border: 1px solid #bdc3c7;
+    border-radius: 3px;
+    width: 60px;
+  }
+
+  /* ===== ERP TABLE ===== */
+  .erp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .erp-table thead tr { background: #dce3ea; }
+  .erp-table thead th {
+    padding: 7px 10px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: 1px solid #c5cdd5;
+    white-space: nowrap;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .erp-table thead th .sort-icon { font-size: 10px; color: #7f8c8d; margin-left: 3px; }
+  .erp-table tbody tr { border-bottom: 1px solid #e8ecef; }
+  .erp-table tbody tr:hover { background: #f5f8fa; }
+  .erp-table tbody td {
+    padding: 6px 10px;
+    border-right: 1px solid #e8ecef;
+    vertical-align: middle;
+    color: #2c3e50;
+  }
+  .erp-table tbody td:last-child { border-right: none; }
+
+  /* ===== STATUS INDICATORS ===== */
+  .etb-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #27ae60; }
+  .etb-dot.orange { background: #e67e22; }
+  .etb-dot.red { background: #e74c3c; }
+
+  /* ===== ACTION BUTTONS in table ===== */
+  .action-group { display: flex; flex-wrap: wrap; gap: 3px; }
+  .btn-icon {
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-icon-edit    { background:#2980b9; color:#fff; border-color:#2471a3; }
+  .btn-icon-approve { background:#27ae60; color:#fff; border-color:#1e8449; }
+  .btn-add-cont     { background:#27ae60; color:#fff; font-size:11px; padding:3px 7px; border-radius:3px; white-space:nowrap; border:none; cursor:pointer; }
+  .btn-cont         { background:#e67e22; color:#fff; font-size:11px; padding:3px 7px; border-radius:3px; white-space:nowrap; border:none; cursor:pointer; }
+
+  /* ===== PAGINATION ===== */
+  .erp-pagination {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e0e5ea;
+    font-size: 12px;
+  }
+  .erp-pagination .page-info { color: #555; }
+  .erp-pagination .pages { display: flex; gap: 3px; }
+  .erp-pagination .pages button {
+    min-width: 28px; height: 28px;
+    border: 1px solid #bdc3c7;
+    background: #fff;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #333;
+  }
+  .erp-pagination .pages button.active { background: #2980b9; color: #fff; border-color: #2471a3; }
+  .erp-pagination .pages button:hover:not(.active) { background: #eaf2f8; }
+
+  /* ===== HIGHLIGHT row ===== */
+  .row-highlight td { background: #fff9c4 !important; }
+
+  /* ===== SCROLLABLE TABLE WRAPPER ===== */
+  .table-wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<!-- <div class="erp-topbar">
+  <span class="brand">🚢 LogiERP</span>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#">Imports</a>
+    <a href="#" style="color:#fff;font-weight:600;border-bottom:2px solid #5dade2;">Exports</a>
+    <a href="#">Vessels</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+  <span class="user-info"><i class="bi bi-person-circle"></i> ADMIN &nbsp;|&nbsp; <i class="bi bi-building"></i> HQ Branch</span>
+</div> -->
+
+<!-- MAIN -->
+<div class="erp-main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Exports</h1>
+    <button class="btn-erp btn-erp-primary"><i class="bi bi-printer"></i> Print Filewise</button>
+    <button class="btn-erp btn-erp-warning"><i class="bi bi-printer"></i> Print Containerwise</button>
+    <button class="btn-erp btn-erp-success"><i class="bi bi-printer"></i> Print Master</button>
+    <button class="btn-erp btn-erp-secondary"><i class="bi bi-check2-circle"></i> Delivered</button>
+    <button class="btn-erp btn-erp-primary ms-auto-erp" onclick="window.location='2-Export_Local_Create_Consignment(Docs).html'">
+      <i class="bi bi-plus-circle"></i> Create Consignment
+    </button>
+  </div>
+
+  <!-- FILTER SECTION -->
+  <div class="filter-card">
+    <div class="filter-label"><i class="bi bi-funnel"></i> All Jobs &nbsp;<i class="bi bi-arrow-clockwise" style="cursor:pointer;color:#2980b9;" title="Refresh"></i></div>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5">
+        <select class="form-select" id="filterConsignee">
+          <option value="">Search Consignee...</option>
+          <option>YASMIN PEERMOHAMMAD</option>
+          <option>ALLIANCE ONE TOBACCO TANZANIA LIMITED</option>
+          <option>PAN AFRICA ENTERPRISES LIMITED</option>
+          <option>EAST AFRICA TRADING CO.</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn-erp btn-erp-primary" onclick="applyFilter()"><i class="bi bi-search"></i> Search</button>
+      </div>
+      <div class="col-md-5">
+        <select class="form-select" id="filterUIN">
+          <option value="">Search UIN...</option>
+          <option>EXP/YASMIN/AIR/2026/0015</option>
+          <option>EXP/ALLIANCE/2026/0016</option>
+          <option>EXP/PANAFRICA/2026/0017</option>
+          <option>EXP/EASTAFR/2026/0018</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn-erp btn-erp-primary" onclick="applyFilter()"><i class="bi bi-search"></i> Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-card">
+
+    <!-- TOOLBAR -->
+    <div class="grid-toolbar">
+      <span class="grid-info" id="gridInfo">Total items: 5 / Total Containers: 12</span>
+      <div class="per-page-ctrl">
+        <select id="perPage" onchange="renderTable()">
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+        <span>records per page</span>
+      </div>
+      <div class="grid-search">
+        <label>Search:</label>
+        <input type="text" id="gridSearch" placeholder="" oninput="renderTable()">
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table class="erp-table" id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">UIN <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(1)">File No <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(2)">Refer. Number <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(3)">Tansad No <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(4)">Shipper <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(5)">Vessel <span class="sort-icon">⇕</span></th>
+            <th style="text-align:center;">ETB <span class="sort-icon">⇕</span></th>
+            <th style="text-align:center;">Containers <span class="sort-icon">⇕</span></th>
+            <th onclick="sortTable(8)">Remarks <span class="sort-icon">⇕</span></th>
+            <th style="text-align:center;">ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="erp-pagination">
+      <span class="page-info" id="pageInfo">Showing 1 to 5 of 5 entries</span>
+      <div class="pages" id="paginationBtns"></div>
+    </div>
+  </div><!-- /grid-card -->
+
+</div><!-- /erp-main -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ===== DATA ===== */
+const allData = [
+  { uin:'EXP/YASMIN/AIR/2026/0015', fileNo:'EXP/YASMIN/AIR/2026/0015', refer:'', tansad:'', shipper:'YASMIN PEERMOHAMMAD', vessel:'BY AIR', etb:'green', containers:0, remarks:'UNDER CUSTOMS DOCUMENTATION' },
+  { uin:'EXP/ALLIANCE/2026/0016', fileNo:'EXP/ALLIANCE/2026/0016', refer:'26-9901254', tansad:'TZDL-26-1201809', shipper:'ALLIANCE ONE TOBACCO TANZANIA LIMITED', vessel:'MAERSK CHESAPEAKE', etb:'green', containers:3, remarks:'CONTAINERS INSIDE THE PORT AWAITING VESSEL TO LOAD' },
+  { uin:'EXP/PANAFRICA/2026/0017', fileNo:'EXP/PANAFRICA/2026/0017', refer:'26-9901310', tansad:'TZDL-26-1201269', shipper:'PAN AFRICA ENTERPRISES LIMITED', vessel:'MSC GRENADA III', etb:'green', containers:2, remarks:'UNDER CUSTOMS DOCUMENTATION' },
+  { uin:'EXP/EASTAFR/2026/0018', fileNo:'EXP/EASTAFR/2026/0018', refer:'26-9901421', tansad:'TZDL-26-1201500', shipper:'EAST AFRICA TRADING CO.', vessel:'CMA CGM TANYA', etb:'orange', containers:4, remarks:'VESSEL ARRIVED – LOADING IN PROGRESS' },
+  { uin:'EXP/HARBOUR/2026/0019', fileNo:'EXP/HARBOUR/2026/0019', refer:'26-9901599', tansad:'TZDL-26-1201700', shipper:'HARBOUR FREIGHT SERVICES', vessel:'MSC MIRIAM', etb:'red', containers:3, remarks:'AWAITING CUSTOMS CLEARANCE' },
+];
+
+let filtered = [...allData];
+let currentPage = 1;
+let sortCol = -1, sortDir = 1;
+
+function applyFilter() {
+  const consignee = document.getElementById('filterConsignee').value.toLowerCase();
+  const uin = document.getElementById('filterUIN').value.toLowerCase();
+  filtered = allData.filter(r =>
+    (!consignee || r.shipper.toLowerCase().includes(consignee)) &&
+    (!uin || r.uin.toLowerCase().includes(uin))
+  );
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const search = document.getElementById('gridSearch').value.toLowerCase();
+  const perPage = parseInt(document.getElementById('perPage').value);
+
+  let rows = filtered.filter(r =>
+    Object.values(r).some(v => String(v).toLowerCase().includes(search))
+  );
+
+  // Sort
+  if (sortCol >= 0) {
+    const keys = ['uin','fileNo','refer','tansad','shipper','vessel','etb','containers','remarks'];
+    rows.sort((a,b) => {
+      const av = String(a[keys[sortCol]]).toLowerCase();
+      const bv = String(b[keys[sortCol]]).toLowerCase();
+      return av < bv ? -sortDir : av > bv ? sortDir : 0;
+    });
+  }
+
+  const total = rows.length;
+  const totalConts = rows.reduce((s,r) => s + r.containers, 0);
+  document.getElementById('gridInfo').textContent = `Total items: ${total} / Total Containers: ${totalConts}`;
+
+  const start = (currentPage - 1) * perPage;
+  const pageRows = rows.slice(start, start + perPage);
+  const end = Math.min(start + perPage, total);
+  document.getElementById('pageInfo').textContent = `Showing ${total ? start+1 : 0} to ${end} of ${total} entries`;
+
+  // Build rows
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  if (pageRows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:#888;">No records found</td></tr>';
+  }
+  pageRows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    if (i % 2 === 1) tr.style.background = '#fafcfe';
+    tr.innerHTML = `
+      <td><a href="#" style="color:#2471a3;font-size:12px;">${r.uin}</a></td>
+      <td style="font-size:11px;">${r.fileNo}</td>
+      <td>${r.refer}</td>
+      <td>${r.tansad}</td>
+      <td>${r.shipper}</td>
+      <td>${r.vessel}</td>
+      <td style="text-align:center;"><span class="etb-dot ${r.etb==='green'?'':''}${r.etb==='orange'?'orange':''}${r.etb==='red'?'red':''}"></span></td>
+      <td style="text-align:center;">${r.containers || ''}</td>
+      <td style="font-size:11px;max-width:220px;">${r.remarks}</td>
+      <td>
+        <div class="action-group">
+          <a class="btn-icon btn-icon-edit" title="Edit" href="2-Export_Local_Create_Consignment(Docs).html"><i class="bi bi-pencil-square"></i></a>
+          <a class="btn-icon btn-icon-approve" title="Approve"><i class="bi bi-check-lg"></i></a>
+          <button class="btn-add-cont" onclick="window.location='export-container.html'"><i class="bi bi-plus"></i>Containers</button>
+          <button class="btn-cont">Containers</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(total / perPage);
+  const pDiv = document.getElementById('paginationBtns');
+  pDiv.innerHTML = '';
+  const addBtn = (label, page, disabled) => {
+    const b = document.createElement('button');
+    b.innerHTML = label;
+    b.disabled = disabled;
+    if (page === currentPage) b.classList.add('active');
+    b.onclick = () => { currentPage = page; renderTable(); };
+    pDiv.appendChild(b);
+  };
+  addBtn('«', 1, currentPage===1);
+  addBtn('‹', currentPage-1, currentPage===1);
+  for (let p = Math.max(1,currentPage-2); p <= Math.min(totalPages, currentPage+2); p++) addBtn(p, p, false);
+  addBtn('›', currentPage+1, currentPage===totalPages||totalPages===0);
+  addBtn('»', totalPages||1, currentPage===totalPages||totalPages===0);
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+  renderTable();
+}
+
+renderTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,3255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C&F ERP — Menu Screen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* ── TITLE BAR ──────────────────────────────────────── */
+  .title-bar {
+    background: linear-gradient(90deg, #0d2f6e 0%, #1565C0 60%, #1E88E5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 46px;
+    user-select: none;
+  }
+  .title-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .title-bar-logo-img {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 5px;
+    padding: 3px 7px;
+  }
+  .title-bar-name {
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .title-bar-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255,255,255,0.3);
+  }
+  .title-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+  .title-bar-clock {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+  }
+  .title-bar-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+  }
+
+  /* ── TOP NAV TABS ───────────────────────────────────── */
+  .top-tabs {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+  }
+  .top-tab {
+    padding: 0 40px;
+    height: 48px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+  }
+  .top-tab.active {
+    background: #1565c0;
+    color: #fff;
+    border-bottom-color: #1565c0;
+    font-weight: 600;
+  }
+  .top-tab:not(.active):hover {
+    background: #f5f5f5;
+    color: #1565c0;
+  }
+
+  /* ── PAGE HEADER ─────────────────────────────────────── */
+  .page-header {
+    padding: 14px 20px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    background: #f0f2f5;
+  }
+
+  /* ── MAIN CONTENT AREA ───────────────────────────────── */
+  .content-area {
+    padding: 12px 16px 24px;
+    display: none;
+  }
+  .content-area.active { display: block; }
+
+  /* ── TWO-COLUMN LAYOUT ───────────────────────────────── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ── MODULE PANEL ────────────────────────────────────── */
+  .module-panel {
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .module-header {
+    background: #2196F3;
+    color: #fff;
+    padding: 11px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .module-header .toggle-icon {
+    width: 22px;
+    height: 22px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* Color variants for module headers */
+  .module-header.green  { background: #1E88E5; }
+  .module-header.teal   { background: #00897B; }
+  .module-header.blue   { background: #1565C0; }
+  .module-header.amber  { background: #F57C00; }
+  .module-header.purple { background: #6A1B9A; }
+  .module-header.red    { background: #C62828; }
+  .module-header.indigo { background: #283593; }
+  .module-header.cyan   { background: #00838F; }
+
+  /* ── ITEMS GRID ──────────────────────────────────────── */
+  .items-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 6px 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .menu-item:hover { background: #e8f4fd; }
+  .menu-item:hover .item-name { color: #0d47a1; }
+
+  .menu-item:nth-child(odd) { border-right: 1px solid #f0f0f0; }
+
+  /* Remove bottom border from last 2 items */
+  .items-grid .menu-item:nth-last-child(-n+2) { border-bottom: none; }
+
+  .item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  /* Icon color variants */
+  .icon-blue   { background: #1565C0; }
+  .icon-green  { background: #2E7D32; }
+  .icon-teal   { background: #00695C; }
+  .icon-amber  { background: #E65100; }
+  .icon-purple { background: #6A1B9A; }
+  .icon-red    { background: #B71C1C; }
+  .icon-cyan   { background: #006064; }
+  .icon-indigo { background: #1A237E; }
+  .icon-gray   { background: #37474F; }
+  .icon-light-blue { background: #0277BD; }
+
+  .item-info { min-width: 0; }
+  .item-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1565C0;
+    line-height: 1.3;
+  }
+  .item-code {
+    font-size: 11px;
+    color: #888;
+    margin-top: 1px;
+  }
+
+  /* ── SINGLE-COLUMN ITEMS ─────────────────────────────── */
+  .items-single {
+    padding: 6px 0;
+  }
+  .items-single .menu-item {
+    border-right: none;
+  }
+  .items-single .menu-item:last-child { border-bottom: none; }
+
+  /* ── REPORTS PANEL (full width) ──────────────────────── */
+  .full-width { grid-column: 1 / -1; }
+  .items-grid-4col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 6px 0;
+  }
+  .items-grid-4col .menu-item:nth-child(odd) { border-right: none; }
+  .items-grid-4col .menu-item { border-right: 1px solid #f0f0f0; }
+  .items-grid-4col .menu-item:nth-child(4n) { border-right: none; }
+  .items-grid-4col .menu-item:nth-last-child(-n+4) { border-bottom: none; }
+
+  /* ── COLLAPSED STATE ─────────────────────────────────── */
+  .panel-body { overflow: hidden; }
+  .panel-body.collapsed { display: none; }
+
+  /* ── MODULE ROW (for extra groupings) ───────────────── */
+  .module-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 0;
+  }
+
+  .exit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 20px;
+    height: 48px;
+    font-size: 13px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    border-left: 1px solid #e0e0e0;
+    cursor: pointer;
+    color: #c62828;
+    transition: background 0.13s, color 0.13s;
+    user-select: none;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+  }
+  .exit-btn:hover { background: #fce4ec; color: #b71c1c; }
+  .exit-btn svg { stroke: currentColor; }
+
+  /* ── VIEW TOGGLE BUTTON ──────────────────────────────── */
+  .view-toggle-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  .view-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    color: #555;
+    transition: background 0.13s, color 0.13s;
+    user-select: none;
+    font-family: inherit;
+  }
+  .view-toggle-btn:hover { background: #f5f5f5; color: #1565C0; }
+  .view-toggle-btn.tree-active { background: #1565c0; color: #fff; border-bottom-color: #1565c0; }
+  .view-toggle-btn.tree-active svg { stroke: #fff; }
+
+  /* ── TREE VIEW PANEL ─────────────────────────────────── */
+  .tree-view-wrap {
+    display: none;
+    position: fixed;
+    top: 95px; /* title bar 46px + tabs bar 49px */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    border-top: 2px solid #1565C0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  .tree-view-wrap.visible { display: block; }
+
+  .tree-columns {
+    display: flex;
+    min-height: 100%;
+    border-top: 1px solid #e0e0e0;
+    overflow-x: auto;
+  }
+  .tree-col {
+    flex: 0 0 220px;
+    width: 220px;
+    border-right: 1px solid #e8e8e8;
+    min-width: 0;
+  }
+  .tree-col:last-child { border-right: none; }
+
+  .tree-col-header {
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #1E88E5;
+  }
+  .tree-col-header.teal   { background: #00897B; }
+  .tree-col-header.blue   { background: #1565C0; }
+  .tree-col-header.red    { background: #C62828; }
+  .tree-col-header.purple { background: #6A1B9A; }
+  .tree-col-header.indigo { background: #283593; }
+  .tree-col-header.amber  { background: #F57C00; }
+  .tree-col-header.cyan   { background: #00838F; }
+
+  .tree-group-hdr {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #444;
+    background: #f9f9f9;
+    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 2px;
+  }
+  .tree-group-hdr:first-child { margin-top: 0; border-top: none; }
+
+  .tree-leaf {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px 5px 24px;
+    font-size: 12px;
+    color: #1565C0;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.1s;
+    min-width: 0;
+  }
+  .tree-leaf:last-child { border-bottom: none; }
+  .tree-leaf:hover { background: #e8f4fd; }
+  .tree-leaf-icon { font-size: 11px; color: #777; flex-shrink: 0; }
+  .tree-leaf-label { flex: 1; min-width: 0; }
+  .tree-leaf-code { font-size: 10px; color: #aaa; margin-left: auto; padding-left: 6px; flex-shrink: 0; }
+
+  /* flat items (no sub-group) */
+  .tree-flat {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #1565C0;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.1s;
+    min-width: 0;
+  }
+  .tree-flat:last-child { border-bottom: none; }
+  .tree-flat:hover { background: #e8f4fd; }
+  .tree-flat-label { flex: 1; min-width: 0; }
+  .tree-flat-code { font-size: 10px; color: #aaa; margin-left: auto; padding-left: 6px; flex-shrink: 0; }
+
+  /* ── DASHBOARD ─────────────────────────────────────── */
+  .dash-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    margin-top: 4px;
+  }
+  .dash-header-row h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a237e;
+    margin: 0;
+  }
+  .dash-date-badge {
+    font-size: 12px;
+    color: #666;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* KPI CARDS */
+  .dash-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .kpi-card {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+    padding: 16px 18px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent, #2196F3);
+  }
+  .kpi-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .kpi-icon {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: var(--icon-bg, #e3f2fd);
+    flex-shrink: 0;
+  }
+  .kpi-trend {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 12px;
+  }
+  .kpi-trend.up   { background: #e8f5e9; color: #2E7D32; }
+  .kpi-trend.down { background: #fce4ec; color: #C62828; }
+  .kpi-trend.warn { background: #fff3e0; color: #E65100; }
+  .kpi-value {
+    font-size: 30px;
+    font-weight: 800;
+    color: #1a237e;
+    line-height: 1;
+    margin: 10px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-label { font-size: 12px; color: #777; font-weight: 500; }
+  .kpi-sparkline { margin-top: 10px; }
+  .kpi-sparkline canvas { display: block; }
+
+  /* BOTTOM GRID: charts + table */
+  .dash-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .dash-panel {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .dash-panel-header {
+    padding: 12px 16px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a237e;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .dash-panel-header select {
+    font-size: 11px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: #555;
+    background: #fafafa;
+    cursor: pointer;
+  }
+  .dash-panel-body { padding: 12px 16px; }
+
+  /* DONUT */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+  }
+  .donut-legend { flex: 1; }
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #444;
+  }
+  .donut-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .donut-legend-val { margin-left: auto; font-weight: 700; color: #1a237e; font-size: 13px; }
+
+  /* BAR CHART */
+  .bar-chart-wrap { padding: 8px 16px 14px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+  .bar-label { font-size: 11px; color: #555; width: 90px; flex-shrink: 0; text-align: right; }
+  .bar-track {
+    flex: 1;
+    height: 18px;
+    background: #f0f0f0;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 9px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-num { font-size: 11px; font-weight: 700; color: #444; width: 28px; flex-shrink: 0; }
+
+  /* ACTIVITY FEED */
+  .activity-feed { padding: 0 16px 8px; max-height: 260px; overflow-y: auto; }
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .activity-body { flex: 1; }
+  .activity-title { font-size: 12px; font-weight: 600; color: #333; }
+  .activity-desc { font-size: 11px; color: #777; margin-top: 2px; }
+  .activity-time { font-size: 10px; color: #aaa; white-space: nowrap; margin-top: 4px; }
+
+  /* ACTIVITY TABLE */
+  .dash-table-wrap { margin-top: 0; }
+  .dash-filters {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+  }
+  .dash-filter-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    background: #fafafa;
+    color: #555;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.12s;
+  }
+  .dash-filter-btn.active { background: #1565C0; color: #fff; border-color: #1565C0; }
+  .dash-filter-btn:hover:not(.active) { background: #e8eaf6; }
+  .dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dash-table th { background: #f5f7ff; color: #1a237e; padding: 9px 14px; text-align: left; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e0e0e0; }
+  .dash-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; color: #444; }
+  .dash-table tr:last-child td { border-bottom: none; }
+  .dash-table tbody tr { cursor: pointer; transition: background 0.1s; }
+  .dash-table tbody tr:hover td { background: #e8f4fd; }
+  .dash-section-title { font-size: 13px; font-weight: 700; color: #1a237e; margin-bottom: 0; padding: 12px 16px 10px; border-bottom: 1px solid #f0f0f0; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-cleared  { background: #e8f5e9; color: #2E7D32; }
+  .badge-transit  { background: #e3f2fd; color: #1565C0; }
+  .badge-pending  { background: #fff3e0; color: #E65100; }
+  .badge-rejected { background: #fce4ec; color: #C62828; }
+
+  /* PROGRESS RING */
+  .ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+  }
+  .ring-label-set {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
+  }
+  .ring-label-item { text-align: center; }
+  .ring-label-item .rl-val { font-size: 16px; font-weight: 800; color: #1a237e; }
+  .ring-label-item .rl-key { font-size: 10px; color: #888; margin-top: 2px; }
+
+</style>
+</head>
+<body>
+
+<!-- TITLE BAR -->
+<div class="title-bar">
+  <div class="title-bar-left">
+    <div class="title-bar-logo-img"><img src="data:image/jpeg;base64,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" style="height:36px; display:block;" alt="ebizframe logo"></div>
+    <div class="title-bar-divider"></div>
+    <div class="title-bar-name">Clearing &amp; Forwarding Management System</div>
+  </div>
+  <div class="title-bar-right">
+    <span id="titleDate"></span>
+    <div class="title-bar-dot"></div>
+    <span class="title-bar-clock" id="titleClock"></span>
+  </div>
+</div>
+
+<!-- TOP TABS -->
+<div class="top-tabs">
+  <button class="view-toggle-btn" id="globalTreeBtn" onclick="toggleTreeView()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <div class="top-tab active" onclick="showTab('pages', this)">Pages</div>
+  <div class="top-tab" onclick="showTab('masters', this)">Masters</div>
+  <div class="top-tab" onclick="showTab('reports', this)">Reports</div>
+  <div class="top-tab" onclick="showTab('dashboard', this)">Dashboard</div>
+  <div style="margin-left:auto;">
+    <button class="exit-btn" onclick="if(confirm('Are you sure you want to exit?')) window.close()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Exit
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════ DASHBOARD TAB ════════════════ -->
+<div id="tab-dashboard" class="content-area">
+
+  <!-- Header row -->
+  <div class="dash-header-row">
+    <h2>Operations Overview</h2>
+    <div class="dash-date-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="dashDate"></span>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row -->
+  <div class="dash-kpi-grid">
+
+    <div class="kpi-card" style="--accent:#1565C0;--icon-bg:#e3f2fd;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">🚢</div>
+        <div class="kpi-trend up">↑ 14%</div>
+      </div>
+      <div class="kpi-value" data-target="24" id="kv1">0</div>
+      <div class="kpi-label">Local Clearances Today</div>
+      <div class="kpi-sparkline"><canvas id="spark1" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#00897B;--icon-bg:#e0f2f1;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">🛣️</div>
+        <div class="kpi-trend up">↑ 8%</div>
+      </div>
+      <div class="kpi-value" data-target="17" id="kv2">0</div>
+      <div class="kpi-label">Transit Clearances Today</div>
+      <div class="kpi-sparkline"><canvas id="spark2" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#F57C00;--icon-bg:#fff3e0;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-trend warn">● 8 open</div>
+      </div>
+      <div class="kpi-value" data-target="8" id="kv3">0</div>
+      <div class="kpi-label">Pending Consignments</div>
+      <div class="kpi-sparkline"><canvas id="spark3" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#C62828;--icon-bg:#fce4ec;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">🔒</div>
+        <div class="kpi-trend down">↑ 5%</div>
+      </div>
+      <div class="kpi-value" id="kv4">0%</div>
+      <div class="kpi-label">Bond Utilization</div>
+      <div class="kpi-sparkline"><canvas id="spark4" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#2E7D32;--icon-bg:#e8f5e9;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">🚗</div>
+        <div class="kpi-trend up">↑ 2</div>
+      </div>
+      <div class="kpi-value" data-target="12" id="kv5">0</div>
+      <div class="kpi-label">Vehicles in Transit</div>
+      <div class="kpi-sparkline"><canvas id="spark5" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#6A1B9A;--icon-bg:#f3e5f5;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-trend up">↑ 22%</div>
+      </div>
+      <div class="kpi-value" data-target="31" id="kv6">0</div>
+      <div class="kpi-label">Export Consignments (MTD)</div>
+      <div class="kpi-sparkline"><canvas id="spark6" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#00838F;--icon-bg:#e0f7fa;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-trend down">⚠ Expiring</div>
+      </div>
+      <div class="kpi-value" data-target="3" id="kv7">0</div>
+      <div class="kpi-label">Licenses Expiring (30d)</div>
+      <div class="kpi-sparkline"><canvas id="spark7" height="32"></canvas></div>
+    </div>
+
+    <div class="kpi-card" style="--accent:#283593;--icon-bg:#e8eaf6;">
+      <div class="kpi-card-top">
+        <div class="kpi-icon">⛽</div>
+        <div class="kpi-trend up">↑ 3</div>
+      </div>
+      <div class="kpi-value" data-target="9" id="kv8">0</div>
+      <div class="kpi-label">Fuel Distribution Entries</div>
+      <div class="kpi-sparkline"><canvas id="spark8" height="32"></canvas></div>
+    </div>
+
+  </div><!-- /kpi-grid -->
+
+  <!-- Bottom Row: Donut + Bar + Activity -->
+  <div class="dash-bottom">
+
+    <!-- Clearance Type Breakdown Donut -->
+    <div class="dash-panel">
+      <div class="dash-panel-header">
+        Clearance Breakdown
+        <select onchange="updateDonut(this.value)">
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+      <div class="donut-wrap">
+        <canvas id="donutChart" width="130" height="130"></canvas>
+        <div class="donut-legend">
+          <div class="donut-legend-item"><span class="donut-dot" style="background:#1565C0"></span>Local Clearance<span class="donut-legend-val" id="dl1">24</span></div>
+          <div class="donut-legend-item"><span class="donut-dot" style="background:#00897B"></span>Transit<span class="donut-legend-val" id="dl2">17</span></div>
+          <div class="donut-legend-item"><span class="donut-dot" style="background:#6A1B9A"></span>Vehicle<span class="donut-legend-val" id="dl3">12</span></div>
+          <div class="donut-legend-item"><span class="donut-dot" style="background:#F57C00"></span>Export<span class="donut-legend-val" id="dl4">8</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Volume Bar Chart -->
+    <div class="dash-panel">
+      <div class="dash-panel-header">Weekly Clearance Volume</div>
+      <div class="bar-chart-wrap" id="barChartWrap">
+        <div class="bar-row"><span class="bar-label">Mon</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#1565C0" data-w="72"></div></div><span class="bar-num">36</span></div>
+        <div class="bar-row"><span class="bar-label">Tue</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#00897B" data-w="84"></div></div><span class="bar-num">42</span></div>
+        <div class="bar-row"><span class="bar-label">Wed</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#1565C0" data-w="60"></div></div><span class="bar-num">30</span></div>
+        <div class="bar-row"><span class="bar-label">Thu</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#00897B" data-w="90"></div></div><span class="bar-num">45</span></div>
+        <div class="bar-row"><span class="bar-label">Fri</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#1565C0" data-w="78"></div></div><span class="bar-num">39</span></div>
+        <div class="bar-row"><span class="bar-label">Sat</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#F57C00" data-w="40"></div></div><span class="bar-num">20</span></div>
+        <div class="bar-row"><span class="bar-label">Today</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#C62828" data-w="82"></div></div><span class="bar-num">41</span></div>
+      </div>
+    </div>
+
+    <!-- Live Activity Feed -->
+    <div class="dash-panel">
+      <div class="dash-panel-header">
+        Live Activity Feed
+        <span style="font-size:10px;color:#2E7D32;font-weight:600;">● Live</span>
+      </div>
+      <div class="activity-feed" id="activityFeed">
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#e3f2fd;">🚢</div>
+          <div class="activity-body">
+            <div class="activity-title">Local Clearance Approved — L01-0024</div>
+            <div class="activity-desc">ABC Traders Ltd · BL-2024-0091</div>
+            <div class="activity-time">2 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#fff3e0;">⏳</div>
+          <div class="activity-body">
+            <div class="activity-title">Transit Pending — T01-0016</div>
+            <div class="activity-desc">East Africa Goods · BL-2024-0083</div>
+            <div class="activity-time">11 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#e8f5e9;">🚗</div>
+          <div class="activity-body">
+            <div class="activity-title">Vehicle Dispatched — V01-0012</div>
+            <div class="activity-desc">Port Motors Ltd · Route: Mombasa → Nairobi</div>
+            <div class="activity-time">24 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#e0f2f1;">🛣️</div>
+          <div class="activity-body">
+            <div class="activity-title">Transit Cleared — T01-0017</div>
+            <div class="activity-desc">XYZ Imports Co. · BL-2024-0088</div>
+            <div class="activity-time">38 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#fce4ec;">🔒</div>
+          <div class="activity-body">
+            <div class="activity-title">Bond Limit Warning — 73% utilized</div>
+            <div class="activity-desc">Remaining capacity: 27% · Review recommended</div>
+            <div class="activity-time">1 hr ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#f3e5f5;">📦</div>
+          <div class="activity-body">
+            <div class="activity-title">Export Consignment Filed — E01-0031</div>
+            <div class="activity-desc">Global Freight Inc · Destination: Rotterdam</div>
+            <div class="activity-time">2 hr ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dash-bottom -->
+
+  <!-- Recent Clearances Table with filter -->
+  <div class="dash-panel" style="margin-bottom:20px;">
+    <div class="dash-section-title">Recent Clearance Activity</div>
+    <div class="dash-filters">
+      <button class="dash-filter-btn active" onclick="filterTable('all',this)">All</button>
+      <button class="dash-filter-btn" onclick="filterTable('Local Clearance',this)">Local</button>
+      <button class="dash-filter-btn" onclick="filterTable('Transit Clearance',this)">Transit</button>
+      <button class="dash-filter-btn" onclick="filterTable('Vehicle Clearance',this)">Vehicle</button>
+      <button class="dash-filter-btn" onclick="filterTable('Cleared',this)">✔ Cleared</button>
+      <button class="dash-filter-btn" onclick="filterTable('Pending',this)">⏳ Pending</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="dash-table" id="actTable">
+        <thead><tr>
+          <th>Reference #</th><th>Type</th><th>Consignee</th><th>BL / Entry No.</th><th>Port</th><th>Date</th><th>Status</th>
+        </tr></thead>
+        <tbody id="actTableBody">
+          <tr data-type="Local Clearance" data-status="Cleared"><td>L01-0024</td><td>Local Clearance</td><td>ABC Traders Ltd</td><td>BL-2024-0091</td><td>Mombasa</td><td>2024-06-10</td><td><span class="badge badge-cleared">Cleared</span></td></tr>
+          <tr data-type="Transit Clearance" data-status="In Transit"><td>T01-0017</td><td>Transit Clearance</td><td>XYZ Imports Co.</td><td>BL-2024-0088</td><td>Dar es Salaam</td><td>2024-06-10</td><td><span class="badge badge-transit">In Transit</span></td></tr>
+          <tr data-type="Local Clearance" data-status="Cleared"><td>L01-0023</td><td>Local Clearance</td><td>Global Freight Inc</td><td>BL-2024-0085</td><td>Mombasa</td><td>2024-06-09</td><td><span class="badge badge-cleared">Cleared</span></td></tr>
+          <tr data-type="Transit Clearance" data-status="Pending"><td>T01-0016</td><td>Transit Clearance</td><td>East Africa Goods</td><td>BL-2024-0083</td><td>Kampala</td><td>2024-06-09</td><td><span class="badge badge-pending">Pending</span></td></tr>
+          <tr data-type="Vehicle Clearance" data-status="In Transit"><td>V01-0012</td><td>Vehicle Clearance</td><td>Port Motors Ltd</td><td>V-FILE-0044</td><td>Nairobi</td><td>2024-06-09</td><td><span class="badge badge-transit">Active</span></td></tr>
+          <tr data-type="Local Clearance" data-status="Pending"><td>L01-0022</td><td>Local Clearance</td><td>Sunrise Traders</td><td>BL-2024-0080</td><td>Mombasa</td><td>2024-06-08</td><td><span class="badge badge-pending">Pending</span></td></tr>
+          <tr data-type="Transit Clearance" data-status="Cleared"><td>T01-0015</td><td>Transit Clearance</td><td>Continental Cargo</td><td>BL-2024-0078</td><td>Bujumbura</td><td>2024-06-08</td><td><span class="badge badge-cleared">Cleared</span></td></tr>
+          <tr data-type="Vehicle Clearance" data-status="Cleared"><td>V01-0011</td><td>Vehicle Clearance</td><td>Apex Logistics</td><td>V-FILE-0043</td><td>Nairobi</td><td>2024-06-07</td><td><span class="badge badge-cleared">Cleared</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<!-- ════════════ END DASHBOARD TAB ════════════ -->
+
+
+<!-- ════════════════ PAGES TAB ════════════════ -->
+<div id="tab-pages" class="content-area active">
+  <div class="page-header">Pages</div>
+
+  <!-- TREE VIEW (hidden by default) -->
+  <div class="tree-view-wrap" id="pagesTree">
+    <div class="tree-columns">
+      <!-- Clearance -->
+      <div class="tree-col">
+        <div class="tree-col-header">📁 Clearance</div>
+        <div class="tree-group-hdr">📁 Local Clearance</div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Local Clearance</span><span class="tree-leaf-code">L01</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Local Clearance Consignment</span><span class="tree-leaf-code">L02</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Add Local Clearance</span><span class="tree-leaf-code">L03</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Add Local Clearance Container</span><span class="tree-leaf-code">L05</span></div>
+        <div class="tree-group-hdr">📁 Vehicle Clearance</div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicle Clearance Dashboard</span><span class="tree-leaf-code">V01</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicle Port Consignment (File)</span><span class="tree-leaf-code">V02</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicle Port Consignment (Vessel)</span><span class="tree-leaf-code">V03</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicle Port Consignment (Duty)</span><span class="tree-leaf-code">V04</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicles</span><span class="tree-leaf-code">V05</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Add Vehicle</span><span class="tree-leaf-code">V06</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Vehicles Clearance Cargo Position</span><span class="tree-leaf-code">V07</span></div>
+      </div>
+      <!-- Fuel Management (now side by side with Clearance) -->
+      <div class="tree-col">
+        <div class="tree-col-header indigo">📁 Fuel Management</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Distribution Fuel Report</span><span class="tree-flat-code">R02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Distribution Fuel Report (Detail)</span><span class="tree-flat-code">R03</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Add Distribution Fuel Management</span><span class="tree-flat-code">R04</span></div>
+      </div>
+      <!-- Transit -->
+      <div class="tree-col">
+        <div class="tree-col-header teal">📁 Transit</div>
+        <div class="tree-group-hdr">📁 Transit Clearance</div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Transit Clearance</span><span class="tree-leaf-code">T01</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Transit Cargo Consignment</span><span class="tree-leaf-code">T02</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Add Transit Container for BL</span><span class="tree-leaf-code">T05</span></div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Round Trip</span><span class="tree-leaf-code">T07</span></div>
+        <div class="tree-group-hdr">📁 Transit Return</div>
+        <div class="tree-leaf"><span class="tree-leaf-icon">≡</span><span class="tree-leaf-label">Transit Return</span><span class="tree-leaf-code">TR01</span></div>
+      </div>
+      <!-- Exports -->
+      <div class="tree-col">
+        <div class="tree-col-header amber">📁 Exports</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Exports</span><span class="tree-flat-code">E01</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Exports Local</span><span class="tree-flat-code">E02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Exports Transit</span><span class="tree-flat-code">E06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Return Transit Export</span><span class="tree-flat-code">E09</span></div>
+      </div>
+      <!-- Compliance -->
+      <div class="tree-col">
+        <div class="tree-col-header red">📁 Compliance</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Bond</span><span class="tree-flat-code">C01</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Bond Licenses</span><span class="tree-flat-code">C02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Add Bond Licenses</span><span class="tree-flat-code">C03</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Bond Utilization</span><span class="tree-flat-code">C04</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Licenses</span><span class="tree-flat-code">C05</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Add License</span><span class="tree-flat-code">C06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Vehicle Licenses</span><span class="tree-flat-code">C07</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Add Vehicle Licenses</span><span class="tree-flat-code">C08</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Statutory</span><span class="tree-flat-code">C09</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 1: Clearance & Transit -->
+  <div style="margin-top:12px;">
+    <div class="two-col">
+
+      <!-- ── CLEARANCE ── -->
+      <style>
+        .clr-banner {
+          background: linear-gradient(120deg, #00897B 0%, #00796B 50%, #004D40 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .clr-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .clr-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .clr-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .clr-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .clr-title-block { flex: 1; }
+        .clr-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .clr-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .clr-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .clr-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .clr-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .clr-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .clr-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .clr-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .clr-pill:active { transform: translateY(0); }
+        .clr-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .clr-pill-local { background: linear-gradient(135deg, #2E7D32, #1B5E20); }
+        .clr-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="clearance-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(0,121,107,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(0,121,107,0.4)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(0,121,107,0.28)';this.style.transform='translateY(0)'">
+        <div class="clr-banner">
+          <div class="clr-top-row">
+            <div class="clr-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="docG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#BBDEFB"/></linearGradient>
+                  <linearGradient id="stampG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A5D6A7"/><stop offset="100%" stop-color="#2E7D32"/></linearGradient>
+                </defs>
+                <rect x="20" y="14" width="42" height="54" rx="4" fill="rgba(0,0,0,0.15)"/>
+                <rect x="17" y="11" width="42" height="54" rx="4" fill="url(#docG)" stroke="#90CAF9" stroke-width="0.8"/>
+                <path d="M47 11 L59 23 L47 23 Z" fill="#E3F2FD"/>
+                <rect x="24" y="29" width="22" height="2.5" rx="1" fill="#90CAF9" opacity="0.8"/>
+                <rect x="24" y="35" width="28" height="2.5" rx="1" fill="#90CAF9" opacity="0.6"/>
+                <rect x="24" y="41" width="20" height="2.5" rx="1" fill="#90CAF9" opacity="0.6"/>
+                <rect x="24" y="47" width="25" height="2.5" rx="1" fill="#90CAF9" opacity="0.5"/>
+                <circle cx="47" cy="52" r="13" fill="url(#stampG)" opacity="0.92" stroke="#1B5E20" stroke-width="1"/>
+                <circle cx="47" cy="52" r="10" fill="none" stroke="#A5D6A7" stroke-width="1" stroke-dasharray="2 2"/>
+                <path d="M41 52 L45.5 57 L54 46" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="clr-title-block">
+              <div class="clr-title">Clearance</div>
+              <div class="clr-subtitle">Local Cargo Clearance Management</div>
+            </div>
+          </div>
+
+          <div class="clr-divider"></div>
+
+          <div class="clr-pills">
+            <div class="clr-pill clr-pill-local" onclick="window.location.href='cargo-position.html'">
+              <div class="clr-pill-icon">📋</div>
+              Local Clearance
+              <span class="clr-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ROUND TRIP ── -->
+      <style>
+        .rt-banner {
+          background: linear-gradient(120deg, #5C6BC0 0%, #3949AB 50%, #283593 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .rt-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .rt-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .rt-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .rt-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .rt-title-block { flex: 1; }
+        .rt-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .rt-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .rt-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .rt-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .rt-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .rt-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .rt-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .rt-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .rt-pill:active { transform: translateY(0); }
+        .rt-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .rt-pill-going  { background: linear-gradient(135deg, #7986CB, #3949AB); }
+        .rt-pill-return { background: linear-gradient(135deg, #26A69A, #00796B); }
+        .rt-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="roundtrip-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(57,73,171,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(57,73,171,0.4)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(57,73,171,0.28)';this.style.transform='translateY(0)'">
+        <div class="rt-banner">
+          <div class="rt-top-row">
+            <div class="rt-icon-wrap">
+              <!-- Circular arrows icon -->
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 4v6h6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M23 20v-6h-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="rt-title-block">
+              <div class="rt-title">Round Trip</div>
+              <div class="rt-subtitle">Going &amp; Return Transit Management</div>
+            </div>
+          </div>
+
+          <div class="rt-divider"></div>
+
+          <div class="rt-pills">
+            <div class="rt-pill rt-pill-going" onclick="window.location.href='transit-clearance.html'">
+              <div class="rt-pill-icon">➡</div>
+              Going
+              <span class="rt-pill-arrow">›</span>
+            </div>
+            <div class="rt-pill rt-pill-return" onclick="window.location.href='return-clearance.html'">
+              <div class="rt-pill-icon">↩</div>
+              Return
+              <span class="rt-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 2: Exports & Compliance -->
+  <div style="margin-top:16px;">
+    <div class="two-col">
+
+      <!-- ── EXPORTS ── -->
+      <style>
+        .exp-banner {
+          background: linear-gradient(120deg, #1565C0 0%, #0D47A1 50%, #01579B 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        /* subtle animated shimmer */
+        .exp-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        @keyframes expShimmer {
+          0%   { transform: translateX(-200%); }
+          100% { transform: translateX(400%); }
+        }
+        /* decorative circle */
+        .exp-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .exp-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .exp-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .exp-title-block { flex: 1; }
+        .exp-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .exp-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .exp-badge {
+          background: rgba(255,255,255,0.15);
+          color: #fff; font-size: 10px; font-weight: 700;
+          padding: 2px 9px; border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.25);
+          letter-spacing: 0.05em;
+        }
+        /* divider */
+        .exp-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        /* pill buttons row */
+        .exp-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .exp-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .exp-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .exp-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .exp-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .exp-pill:active { transform: translateY(0); }
+        .exp-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .exp-pill-local   { background: linear-gradient(135deg, #29B6F6, #0277BD); }
+        .exp-pill-transit { background: linear-gradient(135deg, #26C6DA, #00838F); }
+        .exp-pill-trc     { background: linear-gradient(135deg, #7986CB, #3949AB); }
+        .exp-pill-arrow {
+          margin-left: 4px; font-size: 10px;
+          opacity: 0.7;
+        }
+      </style>
+      <div id="exports-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(21,101,192,0.22);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(21,101,192,0.32)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(21,101,192,0.22)';this.style.transform='translateY(0)'">
+        <div class="exp-banner">
+          <div class="exp-top-row">
+            <div class="exp-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="hullG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E3F2FD"/><stop offset="100%" stop-color="#64B5F6"/></linearGradient>
+                  <linearGradient id="cabinG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#BBDEFB"/></linearGradient>
+                  <linearGradient id="funnelG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF7043"/><stop offset="100%" stop-color="#BF360C"/></linearGradient>
+                  <linearGradient id="waterG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1565C0" stop-opacity="0.7"/><stop offset="50%" stop-color="#29B6F6" stop-opacity="0.9"/><stop offset="100%" stop-color="#1565C0" stop-opacity="0.7"/></linearGradient>
+                  <radialGradient id="skyG" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#E1F5FE" stop-opacity="0.3"/><stop offset="100%" stop-color="#0D47A1" stop-opacity="0.15"/></radialGradient>
+                </defs>
+                <!-- Sky wash -->
+                <rect x="0" y="0" width="80" height="80" rx="14" fill="url(#skyG)"/>
+                <!-- Sun -->
+                <circle cx="62" cy="14" r="6" fill="#FFD54F" opacity="0.9"/>
+                <circle cx="62" cy="14" r="9" fill="#FFD54F" opacity="0.2"/>
+                <!-- Sun rays -->
+                <line x1="62" y1="3" x2="62" y2="1" stroke="#FFD54F" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+                <line x1="62" y1="25" x2="62" y2="27" stroke="#FFD54F" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+                <line x1="51" y1="14" x2="49" y2="14" stroke="#FFD54F" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+                <line x1="73" y1="14" x2="75" y2="14" stroke="#FFD54F" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+                <line x1="54" y1="6" x2="53" y2="5" stroke="#FFD54F" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+                <line x1="70" y1="22" x2="71" y2="23" stroke="#FFD54F" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+                <!-- Water body -->
+                <ellipse cx="40" cy="62" rx="34" ry="8" fill="url(#waterG)" opacity="0.85"/>
+                <!-- Wave lines -->
+                <path d="M8 60 Q20 56 32 60 Q44 64 56 60 Q66 56 72 60" stroke="#29B6F6" stroke-width="1.4" fill="none" opacity="0.6" stroke-linecap="round"/>
+                <path d="M14 65 Q26 62 38 65 Q50 68 62 65" stroke="#4FC3F7" stroke-width="1" fill="none" opacity="0.4" stroke-linecap="round"/>
+                <!-- Hull -->
+                <path d="M10 56 Q40 67 70 56 L64 43 H16 Z" fill="url(#hullG)" stroke="#90CAF9" stroke-width="0.8"/>
+                <!-- Hull accent stripe -->
+                <path d="M13 52 Q40 61 67 52" stroke="#1976D2" stroke-width="1.5" fill="none" opacity="0.35" stroke-linecap="round"/>
+                <!-- Cabin lower -->
+                <rect x="22" y="30" width="30" height="15" rx="3" fill="url(#cabinG)" stroke="#90CAF9" stroke-width="0.6"/>
+                <!-- Cabin upper / bridge -->
+                <rect x="26" y="24" width="22" height="8" rx="2.5" fill="#FFFFFF" opacity="0.95" stroke="#BBDEFB" stroke-width="0.5"/>
+                <!-- Portholes / windows -->
+                <rect x="25" y="34" width="6" height="5" rx="1.5" fill="#1976D2" opacity="0.9"/>
+                <rect x="34" y="34" width="6" height="5" rx="1.5" fill="#1976D2" opacity="0.9"/>
+                <rect x="43" y="34" width="6" height="5" rx="1.5" fill="#1976D2" opacity="0.9"/>
+                <!-- Window shine -->
+                <rect x="26" y="35" width="2.5" height="1.5" rx="0.5" fill="white" opacity="0.65"/>
+                <rect x="35" y="35" width="2.5" height="1.5" rx="0.5" fill="white" opacity="0.65"/>
+                <rect x="44" y="35" width="2.5" height="1.5" rx="0.5" fill="white" opacity="0.65"/>
+                <!-- Bridge windows -->
+                <rect x="29" y="27" width="5" height="3.5" rx="1" fill="#29B6F6" opacity="0.7"/>
+                <rect x="37" y="27" width="5" height="3.5" rx="1" fill="#29B6F6" opacity="0.7"/>
+                <!-- Funnel -->
+                <rect x="31" y="14" width="9" height="13" rx="3" fill="url(#funnelG)" stroke="#E64A19" stroke-width="0.5"/>
+                <!-- Funnel yellow band -->
+                <rect x="31" y="20" width="9" height="3.5" fill="#FFF176" opacity="0.9"/>
+                <!-- Smoke puffs (static, layered) -->
+                <circle cx="35" cy="11" r="4" fill="#ECEFF1" opacity="0.55"/>
+                <circle cx="40" cy="8"  r="3"  fill="#ECEFF1" opacity="0.38"/>
+                <circle cx="44" cy="6"  r="2"  fill="#ECEFF1" opacity="0.22"/>
+                <!-- Mast -->
+                <line x1="55" y1="30" x2="55" y2="13" stroke="#B0BEC5" stroke-width="2" stroke-linecap="round"/>
+                <!-- Flag (red with white stripe) -->
+                <polygon points="55,13 67,17 55,21" fill="#EF5350"/>
+                <polygon points="55,13 64,17 55,21" fill="#FF8A80" opacity="0.6"/>
+                <line x1="55" y1="14" x2="55" y2="20" stroke="white" stroke-width="0.8" opacity="0.5"/>
+                <!-- Anchor icon on hull -->
+                <circle cx="40" cy="51" r="3" fill="#1565C0" opacity="0.25"/>
+                <text x="40" y="53.5" text-anchor="middle" font-size="5" fill="#1565C0" opacity="0.5" font-family="serif">⚓</text>
+              </svg>
+            </div>
+            <div class="exp-title-block">
+              <div class="exp-title">Exports</div>
+              <div class="exp-subtitle">Cargo &amp; Consignment Management</div>
+            </div>
+          </div>
+
+          <div class="exp-divider"></div>
+
+          <div class="exp-pills">
+            <div class="exp-pill exp-pill-local" onclick="openPage('E02')">
+              <div class="exp-pill-icon">🏭</div>
+              Local
+              <span class="exp-pill-arrow">›</span>
+            </div>
+            <div class="exp-pill exp-pill-transit" onclick="openPage('E06')">
+              <div class="exp-pill-icon">🚢</div>
+              Transit
+              <span class="exp-pill-arrow">›</span>
+            </div>
+            <div class="exp-pill exp-pill-trc" onclick="openPage('E09')">
+              <div class="exp-pill-icon">↩</div>
+              TRC
+              <span class="exp-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── STATUTORY ── -->
+      <style>
+        .sta-banner {
+          background: linear-gradient(120deg, #00838F 0%, #006064 55%, #004D54 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: visible;
+        }
+        .sta-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+          border-radius: 10px;
+          pointer-events: none;
+        }
+        .sta-banner::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 10px;
+          pointer-events: none;
+        }
+        .sta-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .sta-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.08);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.14);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .sta-title-block { flex: 1; }
+        .sta-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .sta-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.5);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .sta-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.1);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .sta-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .sta-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 600;
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.15);
+          box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.03em;
+          position: relative;
+          overflow: hidden;
+        }
+        .sta-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .sta-pill:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.28); filter: brightness(1.1); }
+        .sta-pill:hover::after { background: rgba(255,255,255,0.07); }
+        .sta-pill:active { transform: translateY(0); }
+        .sta-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.15);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .sta-pill-licenses  { background: linear-gradient(135deg, #26C6DA, #00838F); }
+        .sta-pill-bond      { background: linear-gradient(135deg, #4DB6AC, #00796B); }
+        .sta-pill-vehicles  { background: linear-gradient(135deg, #4DD0E1, #0097A7); }
+        .sta-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.5; }
+      </style>
+      <div id="statutory-panel" style="border-radius:10px;overflow:visible;box-shadow:0 4px 18px rgba(0,131,143,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(0,131,143,0.4)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(0,131,143,0.28)';this.style.transform='translateY(0)'">
+        <div class="sta-banner">
+          <div class="sta-top-row">
+            <div class="sta-icon-wrap">
+              <!-- Scales of Justice + Gavel SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="poleG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#C8E6C9"/></linearGradient>
+                  <linearGradient id="scaleL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD54F"/><stop offset="100%" stop-color="#F9A825"/></linearGradient>
+                  <linearGradient id="scaleR" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A5D6A7"/><stop offset="100%" stop-color="#43A047"/></linearGradient>
+                  <linearGradient id="gavelG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFECB3"/><stop offset="100%" stop-color="#FF8F00"/></linearGradient>
+                  <filter id="glow"><feGaussianBlur stdDeviation="1.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+
+                <!-- Glow ring behind icon -->
+                <circle cx="40" cy="40" r="34" fill="rgba(255,255,255,0.05)"/>
+
+                <!-- Central pole -->
+                <rect x="38.5" y="16" width="3" height="46" rx="1.5" fill="url(#poleG)" opacity="0.9"/>
+
+                <!-- Base platform -->
+                <rect x="27" y="60" width="26" height="4" rx="2" fill="url(#poleG)" opacity="0.85"/>
+                <rect x="31" y="64" width="18" height="3" rx="1.5" fill="rgba(255,255,255,0.5)"/>
+
+                <!-- Crown / top ornament -->
+                <circle cx="40" cy="16" r="4" fill="#FFD54F" opacity="0.95" filter="url(#glow)"/>
+                <circle cx="40" cy="16" r="2" fill="white" opacity="0.7"/>
+
+                <!-- Balance beam -->
+                <rect x="14" y="26" width="52" height="2.5" rx="1.25" fill="url(#poleG)" opacity="0.9"/>
+
+                <!-- Left chain -->
+                <line x1="20" y1="28.5" x2="18" y2="37" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-dasharray="2 1.5" stroke-linecap="round"/>
+                <!-- Left pan -->
+                <path d="M10 38 Q18 44 26 38" stroke="url(#scaleL)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M10 38 Q18 42 26 38" fill="#FFD54F" opacity="0.5"/>
+                <!-- Left pan shine -->
+                <line x1="13" y1="39" x2="23" y2="39" stroke="white" stroke-width="0.8" opacity="0.5" stroke-linecap="round"/>
+
+                <!-- Right chain -->
+                <line x1="60" y1="28.5" x2="62" y2="40" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-dasharray="2 1.5" stroke-linecap="round"/>
+                <!-- Right pan (slightly lower — tilted effect) -->
+                <path d="M52 41 Q60 47 68 41" stroke="url(#scaleR)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M52 41 Q60 45 68 41" fill="#A5D6A7" opacity="0.5"/>
+                <!-- Right pan shine -->
+                <line x1="55" y1="42" x2="65" y2="42" stroke="white" stroke-width="0.8" opacity="0.5" stroke-linecap="round"/>
+
+                <!-- Gavel handle -->
+                <rect x="52" y="54" width="18" height="4" rx="2" fill="url(#gavelG)" transform="rotate(-40 52 54)" stroke="#E65100" stroke-width="0.5"/>
+                <!-- Gavel head -->
+                <rect x="56" y="48" width="13" height="7" rx="2.5" fill="url(#gavelG)" transform="rotate(-40 56 48)" stroke="#E65100" stroke-width="0.6"/>
+                <!-- Gavel head shine -->
+                <rect x="57" y="49" width="9" height="2.5" rx="1" fill="white" opacity="0.35" transform="rotate(-40 57 49)"/>
+
+                <!-- Sparkle dots -->
+                <circle cx="8"  cy="22" r="1.5" fill="#FFD54F" opacity="0.7"/>
+                <circle cx="72" cy="18" r="1.2" fill="#A5D6A7" opacity="0.7"/>
+                <circle cx="70" cy="55" r="1"   fill="#FFD54F" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="sta-title-block">
+              <div class="sta-title">Statutory</div>
+              <div class="sta-subtitle">Compliance &amp; Licensing Management</div>
+            </div>
+          </div>
+
+          <div class="sta-divider"></div>
+
+          <div class="sta-pills">
+            <div class="sta-pill sta-pill-bond" onclick="window.location.href='bond-dashboard.html'">
+              <div class="sta-pill-icon">🔒</div>
+              Bond
+              <span class="sta-pill-arrow">›</span>
+            </div>
+
+            <!-- Licenses pill with popover -->
+            <div style="position:relative;" id="lic-wrap">
+              <div class="sta-pill sta-pill-licenses" onclick="toggleLicensePopover(event)" id="lic-pill">
+                <div class="sta-pill-icon">📜</div>
+                Licenses
+                <span class="sta-pill-arrow" id="lic-arrow">›</span>
+              </div>
+
+              <!-- Popover -->
+              <div id="lic-popover" style="
+                display:none;
+                position:absolute;
+                bottom: calc(100% + 10px);
+                left: 50%;
+                transform: translateX(-50%);
+                background:#fff;
+                border-radius:10px;
+                box-shadow:0 8px 30px rgba(0,96,100,0.22), 0 2px 8px rgba(0,0,0,0.1);
+                border:1px solid rgba(0,131,143,0.18);
+                z-index:9999;
+                width:200px;
+                padding:6px;
+              ">
+                <!-- Arrow pointer -->
+                <div style="
+                  position:absolute;
+                  bottom:-7px; left:50%;
+                  transform:translateX(-50%);
+                  width:14px; height:7px;
+                  overflow:hidden;
+                ">
+                  <div style="
+                    width:10px; height:10px;
+                    background:#fff;
+                    border-right:1px solid rgba(0,131,143,0.18);
+                    border-bottom:1px solid rgba(0,131,143,0.18);
+                    transform:rotate(45deg) translate(-3px,-3px);
+                    margin:0 auto;
+                    box-shadow:2px 2px 4px rgba(0,0,0,0.06);
+                  "></div>
+                </div>
+
+                <!-- Header -->
+                <div style="padding:8px 10px 6px;font-size:10px;font-weight:700;color:#00838F;letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid #E0F7FA;margin-bottom:4px;">
+                  Select License Type
+                </div>
+
+                <!-- Option 1 -->
+                <div onclick="window.location.href='vehicle-license.html'" style="
+                  display:flex; align-items:center; gap:10px;
+                  padding:9px 10px; border-radius:7px; cursor:pointer;
+                  transition:background 0.12s;
+                " onmouseover="this.style.background='#E0F7FA'" onmouseout="this.style.background='transparent'">
+                  <div style="width:30px;height:30px;background:linear-gradient(135deg,#26C6DA,#00838F);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🚗</div>
+                  <div>
+                    <div style="font-size:12px;font-weight:700;color:#004D54;">Vehicle License</div>
+                    <div style="font-size:10px;color:#80CBC4;margin-top:1px;">Fleet &amp; transport docs</div>
+                  </div>
+                </div>
+
+                <!-- Option 2 -->
+                <div onclick="window.location.href='license-index.html'" style="
+                  display:flex; align-items:center; gap:10px;
+                  padding:9px 10px; border-radius:7px; cursor:pointer;
+                  transition:background 0.12s;
+                " onmouseover="this.style.background='#E0F7FA'" onmouseout="this.style.background='transparent'">
+                  <div style="width:30px;height:30px;background:linear-gradient(135deg,#4DB6AC,#00796B);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📋</div>
+                  <div>
+                    <div style="font-size:12px;font-weight:700;color:#004D54;">Other License</div>
+                    <div style="font-size:10px;color:#80CBC4;margin-top:1px;">Trade &amp; customs permits</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sta-pill sta-pill-vehicles" onclick="window.location.href='vehicles_list.html'">
+              <div class="sta-pill-icon">🚛</div>
+              Vehicles
+              <span class="sta-pill-arrow">›</span>
+            </div>
+          </div>
+
+          <script>
+            function toggleLicensePopover(e) {
+              e.stopPropagation();
+              const pop = document.getElementById('lic-popover');
+              const open = pop.style.display === 'block';
+              pop.style.display = open ? 'none' : 'block';
+              document.getElementById('lic-pill').style.filter = open ? '' : 'brightness(1.12)';
+            }
+            document.addEventListener('click', function() {
+              const pop = document.getElementById('lic-popover');
+              if (pop) {
+                pop.style.display = 'none';
+                const pill = document.getElementById('lic-pill');
+                if (pill) pill.style.filter = '';
+              }
+            });
+          </script>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 3: Vehicle Clearance & Fuel Management -->
+  <div style="margin-top:16px;">
+    <div class="two-col">
+
+      <!-- ── VEHICLE CLEARANCE ── -->
+      <style>
+        .vc-banner {
+          background: linear-gradient(120deg, #6A1B9A 0%, #4A148C 50%, #38006b 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .vc-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .vc-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .vc-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .vc-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .vc-title-block { flex: 1; }
+        .vc-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .vc-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .vc-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .vc-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .vc-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .vc-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .vc-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .vc-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .vc-pill:active { transform: translateY(0); }
+        .vc-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .vc-pill-clearance { background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+        .vc-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="vehicle-clearance-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(106,27,154,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(106,27,154,0.42)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(106,27,154,0.28)';this.style.transform='translateY(0)'">
+        <div class="vc-banner">
+          <div class="vc-top-row">
+            <div class="vc-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="vcBodyG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E1BEE7"/><stop offset="100%" stop-color="#CE93D8"/></linearGradient>
+                  <linearGradient id="vcCabG"  x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F3E5F5"/><stop offset="100%" stop-color="#BA68C8"/></linearGradient>
+                  <linearGradient id="vcRoadG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(255,255,255,0.0)"/><stop offset="50%" stop-color="rgba(255,255,255,0.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0.0)"/></linearGradient>
+                </defs>
+                <!-- Road -->
+                <rect x="4" y="57" width="72" height="8" rx="4" fill="url(#vcRoadG)"/>
+                <line x1="10" y1="61" x2="22" y2="61" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="32" y1="61" x2="48" y2="61" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="58" y1="61" x2="70" y2="61" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <!-- Cargo body -->
+                <rect x="8" y="33" width="38" height="24" rx="3" fill="url(#vcBodyG)" opacity="0.95"/>
+                <!-- Cargo door line -->
+                <line x1="8" y1="45" x2="46" y2="45" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+                <!-- Cab -->
+                <path d="M46 39 L46 57 L68 57 L68 47 L61 33 L46 33 Z" fill="url(#vcCabG)" opacity="0.95"/>
+                <!-- Cab window -->
+                <path d="M49 37 L49 46 L65 46 L65 43 L60 35 Z" fill="rgba(255,255,255,0.5)"/>
+                <!-- Headlight -->
+                <rect x="64" y="48" width="5" height="4" rx="1.5" fill="#FFD54F" opacity="0.9"/>
+                <!-- Exhaust stack -->
+                <rect x="10" y="24" width="4" height="12" rx="2" fill="rgba(255,255,255,0.3)"/>
+                <ellipse cx="12" cy="24" rx="3" ry="1.5" fill="rgba(255,255,255,0.2)"/>
+                <!-- Wheels -->
+                <circle cx="22" cy="58" r="7" fill="#38006b" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="22" cy="58" r="3.5" fill="#CE93D8" opacity="0.8"/>
+                <circle cx="56" cy="58" r="7" fill="#38006b" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="56" cy="58" r="3.5" fill="#CE93D8" opacity="0.8"/>
+                <!-- Customs clearance badge -->
+                <circle cx="62" cy="22" r="10" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>
+                <path d="M57 22 L60.5 26 L67 18" stroke="#FFD54F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="vc-title-block">
+              <div class="vc-title">Vehicle Clearance</div>
+              <div class="vc-subtitle">Vehicle Customs &amp; Port Clearance</div>
+            </div>
+          </div>
+
+          <div class="vc-divider"></div>
+
+          <div class="vc-pills">
+            <div class="vc-pill vc-pill-clearance" onclick="window.location.href='dashboard-vehicle-clearance.html'">
+              <div class="vc-pill-icon">🚗</div>
+              Vehicle Clearance
+              <span class="vc-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FUEL MANAGEMENT ── -->
+      <style>
+        .fm-banner {
+          background: linear-gradient(120deg, #E65100 0%, #BF360C 50%, #960000 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .fm-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .fm-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .fm-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .fm-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .fm-title-block { flex: 1; }
+        .fm-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .fm-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .fm-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .fm-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .fm-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .fm-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .fm-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .fm-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .fm-pill:active { transform: translateY(0); }
+        .fm-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .fm-pill-fuel { background: linear-gradient(135deg, #FF7043, #BF360C); }
+        .fm-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="fuel-management-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(230,81,0,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(230,81,0,0.42)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(230,81,0,0.28)';this.style.transform='translateY(0)'">
+        <div class="fm-banner">
+          <div class="fm-top-row">
+            <div class="fm-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="fmTankG"   x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFCCBC"/><stop offset="100%" stop-color="#FF8A65"/></linearGradient>
+                  <linearGradient id="fmFlameG"  x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FFD54F"/><stop offset="60%" stop-color="#FF7043"/><stop offset="100%" stop-color="#BF360C"/></linearGradient>
+                  <linearGradient id="fmNozzleG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFCCBC"/><stop offset="100%" stop-color="#FF7043"/></linearGradient>
+                </defs>
+                <!-- Fuel tank / barrel body -->
+                <rect x="18" y="28" width="30" height="36" rx="6" fill="url(#fmTankG)" opacity="0.95"/>
+                <!-- Tank top cap -->
+                <rect x="22" y="24" width="22" height="7" rx="3.5" fill="#FFAB91" opacity="0.9"/>
+                <!-- Tank highlight -->
+                <rect x="22" y="31" width="6" height="22" rx="3" fill="rgba(255,255,255,0.25)"/>
+                <!-- Fuel level indicator lines -->
+                <line x1="24" y1="42" x2="42" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-linecap="round"/>
+                <line x1="24" y1="48" x2="42" y2="48" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-linecap="round"/>
+                <line x1="24" y1="54" x2="42" y2="54" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"/>
+                <!-- Nozzle pipe -->
+                <rect x="48" y="38" width="12" height="5" rx="2.5" fill="url(#fmNozzleG)" opacity="0.95"/>
+                <rect x="56" y="35" width="5" height="10" rx="2" fill="#FF8A65" opacity="0.9"/>
+                <rect x="58" y="44" width="8" height="4" rx="2" fill="#FF7043" opacity="0.9"/>
+                <!-- Nozzle tip -->
+                <circle cx="66" cy="46" r="3" fill="#FFD54F" opacity="0.85"/>
+                <!-- Flame above tank -->
+                <path d="M33 24 Q30 16 34 10 Q35 18 38 14 Q40 20 36 24 Z" fill="url(#fmFlameG)" opacity="0.9"/>
+                <!-- Droplets -->
+                <circle cx="60" cy="30" r="2.5" fill="#FFD54F" opacity="0.7"/>
+                <circle cx="65" cy="24" r="1.8" fill="#FF7043" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="fm-title-block">
+              <div class="fm-title">Fuel Management</div>
+              <div class="fm-subtitle">Fuel Distribution &amp; Reporting</div>
+            </div>
+          </div>
+
+          <div class="fm-divider"></div>
+
+          <div class="fm-pills">
+            <div class="fm-pill fm-pill-fuel" onclick="openPage('R02')">
+              <div class="fm-pill-icon">⛽</div>
+              Distribution Fuel
+              <span class="fm-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 4: Transit -->
+  <div style="margin-top:16px;">
+    <div class="two-col">
+
+      <!-- ── TRANSIT ── -->
+      <style>
+        .trn-banner {
+          background: linear-gradient(120deg, #00695C 0%, #004D40 50%, #003D36 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .trn-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .trn-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .trn-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .trn-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .trn-title-block { flex: 1; }
+        .trn-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .trn-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .trn-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .trn-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .trn-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .trn-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .trn-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .trn-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .trn-pill:active { transform: translateY(0); }
+        .trn-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .trn-pill-clearance { background: linear-gradient(135deg, #26A69A, #00695C); }
+        .trn-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="transit-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(0,105,92,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(0,105,92,0.42)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(0,105,92,0.28)';this.style.transform='translateY(0)'">
+        <div class="trn-banner">
+          <div class="trn-top-row">
+            <div class="trn-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="truckBodyG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#B2DFDB"/><stop offset="100%" stop-color="#4DB6AC"/></linearGradient>
+                  <linearGradient id="truckCabG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0F2F1"/><stop offset="100%" stop-color="#80CBC4"/></linearGradient>
+                  <linearGradient id="roadG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(255,255,255,0.0)"/><stop offset="50%" stop-color="rgba(255,255,255,0.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0.0)"/></linearGradient>
+                </defs>
+                <!-- Road -->
+                <rect x="4" y="56" width="72" height="8" rx="4" fill="url(#roadG)"/>
+                <line x1="10" y1="60" x2="22" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="32" y1="60" x2="48" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="58" y1="60" x2="70" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <!-- Truck body (cargo) -->
+                <rect x="14" y="34" width="36" height="22" rx="3" fill="url(#truckBodyG)" opacity="0.95"/>
+                <!-- Truck cab -->
+                <path d="M50 40 L50 56 L66 56 L66 46 L60 34 L50 34 Z" fill="url(#truckCabG)" opacity="0.95"/>
+                <!-- Cab window -->
+                <path d="M53 38 L53 46 L63 46 L63 43 L58 36 Z" fill="rgba(255,255,255,0.55)" rx="2"/>
+                <!-- Cargo door line -->
+                <line x1="14" y1="45" x2="50" y2="45" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+                <!-- Wheels -->
+                <circle cx="26" cy="57" r="6" fill="#004D40" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="26" cy="57" r="3" fill="#80CBC4" opacity="0.7"/>
+                <circle cx="57" cy="57" r="6" fill="#004D40" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="57" cy="57" r="3" fill="#80CBC4" opacity="0.7"/>
+                <!-- Motion lines -->
+                <line x1="4"  y1="40" x2="12" y2="40" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="4"  y1="44" x2="10" y2="44" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="4"  y1="48" x2="13" y2="48" stroke="rgba(255,255,255,0.2)"  stroke-width="1"   stroke-linecap="round"/>
+                <!-- Border crossing flag -->
+                <line x1="68" y1="28" x2="68" y2="56" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M68 28 L76 32 L68 36 Z" fill="#FFD54F" opacity="0.85"/>
+              </svg>
+            </div>
+            <div class="trn-title-block">
+              <div class="trn-title">Transit</div>
+              <div class="trn-subtitle">Cross-Border Transit Management</div>
+            </div>
+          </div>
+
+          <div class="trn-divider"></div>
+
+          <div class="trn-pills">
+            <div class="trn-pill trn-pill-clearance" onclick="window.location.href='transit_clearance_dashboard.html'">
+              <div class="trn-pill-icon">🛃</div>
+              Transit Clearance
+              <span class="trn-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TRANSIT RETURN ── -->
+      <style>
+        .trt-banner {
+          background: linear-gradient(120deg, #4A148C 0%, #38006b 50%, #2D0057 100%);
+          border-radius: 10px;
+          padding: 20px 24px 18px;
+          position: relative;
+          overflow: hidden;
+        }
+        .trt-banner::before {
+          content: '';
+          position: absolute;
+          top: -60%; left: 0;
+          width: 60%; height: 220%;
+          background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 60%);
+          animation: expShimmer 3.5s infinite;
+        }
+        .trt-banner::after {
+          content: '';
+          position: absolute;
+          right: -28px; top: -28px;
+          width: 110px; height: 110px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.06);
+          pointer-events: none;
+        }
+        .trt-top-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+        .trt-icon-wrap {
+          flex-shrink: 0;
+          width: 68px; height: 68px;
+          background: rgba(255,255,255,0.12);
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          border: 1.5px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .trt-title-block { flex: 1; }
+        .trt-title {
+          font-size: 20px; font-weight: 800; color: #fff;
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+          line-height: 1;
+        }
+        .trt-subtitle {
+          font-size: 11px; color: rgba(255,255,255,0.65);
+          margin-top: 3px; font-weight: 400; letter-spacing: 0.03em;
+        }
+        .trt-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.12);
+          margin: 14px 0 12px;
+          position: relative; z-index: 1;
+        }
+        .trt-pills {
+          display: flex; gap: 10px; flex-wrap: wrap;
+          position: relative; z-index: 1;
+        }
+        .trt-pill {
+          display: flex; align-items: center; gap: 7px;
+          padding: 7px 18px 7px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px; font-weight: 700;
+          color: #fff;
+          border: 1.5px solid rgba(255,255,255,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+          user-select: none;
+          letter-spacing: 0.04em;
+          position: relative;
+          overflow: hidden;
+        }
+        .trt-pill::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: rgba(255,255,255,0);
+          transition: background 0.15s;
+        }
+        .trt-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); filter: brightness(1.08); }
+        .trt-pill:hover::after { background: rgba(255,255,255,0.08); }
+        .trt-pill:active { transform: translateY(0); }
+        .trt-pill-icon {
+          width: 22px; height: 22px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 12px; flex-shrink: 0;
+        }
+        .trt-pill-return { background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+        .trt-pill-arrow { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+      </style>
+      <div id="transit-return-panel" style="border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(74,20,140,0.28);transition:box-shadow 0.2s,transform 0.2s;border:none;background:transparent;" onmouseover="this.style.boxShadow='0 8px 28px rgba(74,20,140,0.42)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 4px 18px rgba(74,20,140,0.28)';this.style.transform='translateY(0)'">
+        <div class="trt-banner">
+          <div class="trt-top-row">
+            <div class="trt-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 80 80" fill="none">
+                <defs>
+                  <linearGradient id="trtBodyG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E1BEE7"/><stop offset="100%" stop-color="#CE93D8"/></linearGradient>
+                  <linearGradient id="trtCabG"  x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F3E5F5"/><stop offset="100%" stop-color="#BA68C8"/></linearGradient>
+                  <linearGradient id="trtRoadG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(255,255,255,0.0)"/><stop offset="50%" stop-color="rgba(255,255,255,0.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0.0)"/></linearGradient>
+                </defs>
+                <!-- Road -->
+                <rect x="4" y="56" width="72" height="8" rx="4" fill="url(#trtRoadG)"/>
+                <line x1="10" y1="60" x2="22" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="32" y1="60" x2="48" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <line x1="58" y1="60" x2="70" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+                <!-- Truck body (mirrored — cab on left, cargo on right) -->
+                <path d="M30 40 L30 56 L14 56 L14 46 L20 34 L30 34 Z" fill="url(#trtCabG)" opacity="0.95"/>
+                <!-- Cab window -->
+                <path d="M27 38 L27 46 L17 46 L17 43 L22 36 Z" fill="rgba(255,255,255,0.55)"/>
+                <!-- Cargo body -->
+                <rect x="30" y="34" width="36" height="22" rx="3" fill="url(#trtBodyG)" opacity="0.95"/>
+                <!-- Cargo door line -->
+                <line x1="30" y1="45" x2="66" y2="45" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+                <!-- Wheels -->
+                <circle cx="23" cy="57" r="6" fill="#2D0057" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="23" cy="57" r="3" fill="#CE93D8" opacity="0.7"/>
+                <circle cx="54" cy="57" r="6" fill="#2D0057" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+                <circle cx="54" cy="57" r="3" fill="#CE93D8" opacity="0.7"/>
+                <!-- Return motion lines (right side) -->
+                <line x1="68" y1="40" x2="76" y2="40" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="70" y1="44" x2="76" y2="44" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="67" y1="48" x2="76" y2="48" stroke="rgba(255,255,255,0.2)"  stroke-width="1"   stroke-linecap="round"/>
+                <!-- Return arrow arc -->
+                <path d="M36 22 Q40 14 44 22" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <polyline points="36,18 36,23 41,23" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="trt-title-block">
+              <div class="trt-title">Transit Return</div>
+              <div class="trt-subtitle">Return Transit Management</div>
+            </div>
+          </div>
+
+          <div class="trt-divider"></div>
+
+          <div class="trt-pills">
+            <div class="trt-pill trt-pill-return" onclick="window.location.href='dashboard.html'">
+              <div class="trt-pill-icon">↩</div>
+              Transit Return
+              <span class="trt-pill-arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- ════════════ END PAGES TAB ════════════ -->
+
+<!-- ════════════════ MASTERS TAB ════════════════ -->
+<div id="tab-masters" class="content-area">
+  <div class="page-header">Masters</div>
+
+  <!-- TREE VIEW for Masters -->
+  <div class="tree-view-wrap" id="mastersTree">
+    <div class="tree-columns">
+
+      <!-- 1. C&F Agent -->
+      <div class="tree-col">
+        <div class="tree-col-header blue">C&amp;F Agent</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Counter Part Agent</span><span class="tree-flat-code">M19</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Destination Agents</span><span class="tree-flat-code">M16</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Port Agent</span><span class="tree-flat-code">M17</span></div>
+      </div>
+
+      <!-- 2. C&F Master Configuration -->
+      <div class="tree-col">
+        <div class="tree-col-header indigo">C&amp;F Master Configuration</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Bond Master</span><span class="tree-flat-code">C01</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Assessment Types</span><span class="tree-flat-code">M30</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Commodities Master</span><span class="tree-flat-code">M20</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Container Size</span><span class="tree-flat-code">M21</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Division Categories</span><span class="tree-flat-code">M26</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Remarks Master</span><span class="tree-flat-code">M28</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Transit Remarks</span><span class="tree-flat-code">M29</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">UIN Master</span><span class="tree-flat-code">M27</span></div>
+      </div>
+
+      <!-- 3. Geographic & Network -->
+      <div class="tree-col">
+        <div class="tree-col-header cyan">Geographic &amp; Network</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Border Master</span><span class="tree-flat-code">M12</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Destination Master</span><span class="tree-flat-code">M15</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Empty Offload Location</span><span class="tree-flat-code">M22</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">ICD Master</span><span class="tree-flat-code">M13</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Loading Points</span><span class="tree-flat-code">M14</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">POD Master</span><span class="tree-flat-code">M11</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">POL Master</span><span class="tree-flat-code">M10</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Return Locations</span><span class="tree-flat-code">M23</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Sales Offices</span><span class="tree-flat-code">M24</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Shipping Lines</span><span class="tree-flat-code">M09</span></div>
+      </div>
+
+      <!-- 4. Party & Carrier -->
+      <div class="tree-col">
+        <div class="tree-col-header teal">Party &amp; Carrier</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Clients Master</span><span class="tree-flat-code">M02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Consignee Master</span><span class="tree-flat-code">M03</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Customer Master</span><span class="tree-flat-code">M01</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Declarant Master</span><span class="tree-flat-code">M18</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Source of Business</span><span class="tree-flat-code">M05</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Supplier Master</span><span class="tree-flat-code">M04</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Transporter Master</span><span class="tree-flat-code">M06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Vessels Master</span><span class="tree-flat-code">M07</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">≡</span><span class="tree-flat-label">Voyage Master</span><span class="tree-flat-code">M08</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+
+    <!-- Row 1: C&F Agent + C&F Master Configuration -->
+    <div class="two-col" style="margin-bottom:16px;">
+
+      <!-- ── 1. C&F AGENT ── -->
+      <div class="module-panel">
+        <div class="module-header blue" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          C&amp;F Agent
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-indigo">📄</div>
+              <div class="item-info">
+                <div class="item-name">Counter Part Agent</div>
+                <div class="item-code">M19</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-indigo">📄</div>
+              <div class="item-info">
+                <div class="item-name">Destination Agents</div>
+                <div class="item-code">M16</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-indigo">📄</div>
+              <div class="item-info">
+                <div class="item-name">Port Agent</div>
+                <div class="item-code">M17</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 2. C&F MASTER CONFIGURATION ── -->
+      <div class="module-panel">
+        <div class="module-header indigo" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          C&amp;F Master Configuration
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Bond Master</div>
+                <div class="item-code">C01</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-indigo">📄</div>
+              <div class="item-info">
+                <div class="item-name">Assessment Types</div>
+                <div class="item-code">M30</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-light-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Commodities Master</div>
+                <div class="item-code">M20</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-amber">📄</div>
+              <div class="item-info">
+                <div class="item-name">Container Size</div>
+                <div class="item-code">M21</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-amber">📄</div>
+              <div class="item-info">
+                <div class="item-name">Division Categories</div>
+                <div class="item-code">M26</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-purple">📄</div>
+              <div class="item-info">
+                <div class="item-name">Remarks Master</div>
+                <div class="item-code">M28</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-red">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transit Remarks</div>
+                <div class="item-code">M29</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">UIN Master</div>
+                <div class="item-code">M27</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Geographic & Network + Party & Carrier -->
+    <div class="two-col" style="margin-bottom:16px;">
+
+      <!-- ── 3. GEOGRAPHIC & NETWORK ── -->
+      <div class="module-panel">
+        <div class="module-header cyan" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          Geographic &amp; Network
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-red">📄</div>
+              <div class="item-info">
+                <div class="item-name">Border Master</div>
+                <div class="item-code">M12</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-cyan">📄</div>
+              <div class="item-info">
+                <div class="item-name">Destination Master</div>
+                <div class="item-code">M15</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-gray">📄</div>
+              <div class="item-info">
+                <div class="item-name">Empty Offload Location</div>
+                <div class="item-code">M22</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-red">📄</div>
+              <div class="item-info">
+                <div class="item-name">ICD Master</div>
+                <div class="item-code">M13</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-cyan">📄</div>
+              <div class="item-info">
+                <div class="item-name">Loading Points</div>
+                <div class="item-code">M14</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-purple">📄</div>
+              <div class="item-info">
+                <div class="item-name">POD Master</div>
+                <div class="item-code">M11</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-purple">📄</div>
+              <div class="item-info">
+                <div class="item-name">POL Master</div>
+                <div class="item-code">M10</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-gray">📄</div>
+              <div class="item-info">
+                <div class="item-name">Return Locations</div>
+                <div class="item-code">M23</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Sales Offices</div>
+                <div class="item-code">M24</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-cyan">📄</div>
+              <div class="item-info">
+                <div class="item-name">Shipping Lines</div>
+                <div class="item-code">M09</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 4. PARTY & CARRIER ── -->
+      <div class="module-panel">
+        <div class="module-header teal" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          Party &amp; Carrier
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Clients Master</div>
+                <div class="item-code">M02</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Consignee Master</div>
+                <div class="item-code">M03</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Customer Master</div>
+                <div class="item-code">M01</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-gray">📄</div>
+              <div class="item-info">
+                <div class="item-name">Declarant Master</div>
+                <div class="item-code">M18</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-green">📄</div>
+              <div class="item-info">
+                <div class="item-name">Source of Business</div>
+                <div class="item-code">M05</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Supplier Master</div>
+                <div class="item-code">M04</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-amber">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transporter Master</div>
+                <div class="item-code">M06</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Vessels Master</div>
+                <div class="item-code">M07</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Voyage Master</div>
+                <div class="item-code">M08</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- ════════════ END MASTERS TAB ════════════ -->
+
+
+
+<!-- ════════════════ REPORTS TAB ════════════════ -->
+<div id="tab-reports" class="content-area">
+  <div class="page-header">Reports</div>
+
+  <!-- TREE VIEW for Reports (hidden by default) -->
+  <div class="tree-view-wrap" id="reportsTree">
+    <div class="tree-columns">
+      <div class="tree-col">
+        <div class="tree-col-header teal">📁 Cargo Position Reports</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Local Clearance Cargo Position</span><span class="tree-flat-code">R05</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Vehicles Clearance Cargo Position</span><span class="tree-flat-code">R06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Transit Clearance Consignment</span><span class="tree-flat-code">R07</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Transit Clearance Cargo (Round Trip)</span><span class="tree-flat-code">T11</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Transit Return Cargo Clearance</span><span class="tree-flat-code">TR06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Transit Return Cargo (Coffee)</span><span class="tree-flat-code">TR07</span></div>
+      </div>
+      <div class="tree-col">
+        <div class="tree-col-header amber">📁 Compliance &amp; Bond Reports</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Bond Utilization</span><span class="tree-flat-code">R01</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Statutory</span><span class="tree-flat-code">R08</span></div>
+      </div>
+      <div class="tree-col">
+        <div class="tree-col-header indigo">📁 Fuel Management Reports</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Distribution Fuel Report</span><span class="tree-flat-code">R02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Distribution Fuel Report (Detail)</span><span class="tree-flat-code">R03</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Add Distribution Fuel Management</span><span class="tree-flat-code">R04</span></div>
+      </div>
+      <div class="tree-col">
+        <div class="tree-col-header cyan">📁 Export Reports</div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Exports Local (Report View)</span><span class="tree-flat-code">E02</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Exports Transit (Report View)</span><span class="tree-flat-code">E06</span></div>
+        <div class="tree-flat"><span class="tree-leaf-icon">⊞</span><span class="tree-flat-label">Return Transit Export</span><span class="tree-flat-code">E09</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <div class="two-col">
+
+      <!-- ── CARGO POSITION REPORTS ── -->
+      <div class="module-panel">
+        <div class="module-header teal" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          Cargo Position Reports
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Local Clearance Cargo Position</div>
+                <div class="item-code">R05</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Vehicles Clearance Cargo Position</div>
+                <div class="item-code">R06</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-green">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transit Clearance Consignment</div>
+                <div class="item-code">R07</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-amber">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transit Clearance Cargo (Round Trip)</div>
+                <div class="item-code">T11</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-purple">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transit Return Cargo Clearance</div>
+                <div class="item-code">TR06</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-red">📄</div>
+              <div class="item-info">
+                <div class="item-name">Transit Return Cargo (Coffee)</div>
+                <div class="item-code">TR07</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COMPLIANCE & BOND REPORTS ── -->
+      <div class="module-panel">
+        <div class="module-header amber" onclick="togglePanel(this)">
+          <div class="toggle-icon">▼</div>
+          Compliance &amp; Bond Reports
+        </div>
+        <div class="panel-body">
+          <div class="items-grid">
+
+            <div class="menu-item">
+              <div class="item-icon icon-blue">📄</div>
+              <div class="item-info">
+                <div class="item-name">Bond Utilization</div>
+                <div class="item-code">R01</div>
+              </div>
+            </div>
+
+            <div class="menu-item">
+              <div class="item-icon icon-teal">📄</div>
+              <div class="item-info">
+                <div class="item-name">Statutory</div>
+                <div class="item-code">R08</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="two-col">
+
+        <!-- ── FUEL MANAGEMENT REPORTS ── -->
+        <div class="module-panel">
+          <div class="module-header indigo" onclick="togglePanel(this)">
+            <div class="toggle-icon">▼</div>
+            Fuel Management Reports
+          </div>
+          <div class="panel-body">
+            <div class="items-grid">
+
+              <div class="menu-item">
+                <div class="item-icon icon-blue">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Distribution Fuel Report</div>
+                  <div class="item-code">R02</div>
+                </div>
+              </div>
+
+              <div class="menu-item">
+                <div class="item-icon icon-teal">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Distribution Fuel Report (Detail)</div>
+                  <div class="item-code">R03</div>
+                </div>
+              </div>
+
+              <div class="menu-item">
+                <div class="item-icon icon-green">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Add Distribution Fuel Management</div>
+                  <div class="item-code">R04</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── EXPORT REPORTS ── -->
+        <div class="module-panel">
+          <div class="module-header cyan" onclick="togglePanel(this)">
+            <div class="toggle-icon">▼</div>
+            Export Reports
+          </div>
+          <div class="panel-body">
+            <div class="items-grid">
+
+              <div class="menu-item">
+                <div class="item-icon icon-blue">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Exports Local (Report View)</div>
+                  <div class="item-code">E02</div>
+                </div>
+              </div>
+
+              <div class="menu-item">
+                <div class="item-icon icon-teal">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Exports Transit (Report View)</div>
+                  <div class="item-code">E06</div>
+                </div>
+              </div>
+
+              <div class="menu-item">
+                <div class="item-icon icon-green">📄</div>
+                <div class="item-info">
+                  <div class="item-name">Return Transit Export</div>
+                  <div class="item-code">E09</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ════════════ END REPORTS TAB ════════════ -->
+
+
+<script>
+  function showTab(tabName, el) {
+    document.querySelectorAll('.content-area').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    el.classList.add('active');
+    document.querySelectorAll('.tree-view-wrap').forEach(t => t.classList.remove('visible'));
+    document.getElementById('globalTreeBtn').classList.remove('tree-active');
+    if (tabName === 'dashboard') initDashboard();
+  }
+
+  function togglePanel(headerEl) {
+    const body = headerEl.nextElementSibling;
+    const icon = headerEl.querySelector('.toggle-icon');
+    if (body.classList.contains('collapsed')) {
+      body.classList.remove('collapsed');
+      icon.textContent = '▼';
+    } else {
+      body.classList.add('collapsed');
+      icon.textContent = '▶';
+    }
+  }
+
+  function toggleTreeView() {
+    const btn = document.getElementById('globalTreeBtn');
+    const isActive = btn.classList.contains('tree-active');
+    document.querySelectorAll('.tree-view-wrap').forEach(t => {
+      t.classList.toggle('visible', !isActive);
+    });
+    btn.classList.toggle('tree-active', !isActive);
+  }
+
+  /* ── DASHBOARD LOGIC ──────────────────────────── */
+  let dashInited = false;
+
+  function initDashboard() {
+    if (dashInited) return;
+    dashInited = true;
+
+    // Date
+    document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+    // Animated counters
+    const counters = [
+      {id:'kv1', target:24, suffix:''},
+      {id:'kv2', target:17, suffix:''},
+      {id:'kv3', target:8,  suffix:''},
+      {id:'kv4', target:73, suffix:'%'},
+      {id:'kv5', target:12, suffix:''},
+      {id:'kv6', target:31, suffix:''},
+      {id:'kv7', target:3,  suffix:''},
+      {id:'kv8', target:9,  suffix:''},
+    ];
+    counters.forEach(c => animateCounter(c.id, c.target, c.suffix));
+
+    // Sparklines
+    const sparkData = [
+      [14,18,20,15,22,19,24],
+      [10,13,11,15,14,16,17],
+      [5,7,9,6,8,10,8],
+      [60,65,68,70,71,72,73],
+      [8,10,9,11,10,13,12],
+      [20,22,25,27,26,29,31],
+      [1,2,2,2,3,3,3],
+      [4,5,6,7,8,8,9],
+    ];
+    const sparkColors = ['#1565C0','#00897B','#F57C00','#C62828','#2E7D32','#6A1B9A','#00838F','#283593'];
+    for (let i=1;i<=8;i++) drawSparkline('spark'+i, sparkData[i-1], sparkColors[i-1]);
+
+    // Donut
+    drawDonut([24,17,12,8], ['#1565C0','#00897B','#6A1B9A','#F57C00']);
+
+    // Bars animate in
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(b => {
+        b.style.width = b.dataset.w + '%';
+      });
+    }, 300);
+  }
+
+  function animateCounter(id, target, suffix) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let start = 0;
+    const duration = 900;
+    const step = 16;
+    const increment = target / (duration / step);
+    const timer = setInterval(() => {
+      start = Math.min(start + increment, target);
+      el.textContent = Math.round(start) + suffix;
+      if (start >= target) clearInterval(timer);
+    }, step);
+  }
+
+  function drawSparkline(id, data, color) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.offsetWidth || 160;
+    canvas.width = w;
+    const h = 32;
+    const min = Math.min(...data), max = Math.max(...data);
+    const range = max - min || 1;
+    const pts = data.map((v,i) => [i*(w/(data.length-1)), h - ((v-min)/range)*(h-4) - 2]);
+    ctx.clearRect(0,0,w,h);
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], h);
+    pts.forEach(p => ctx.lineTo(p[0],p[1]));
+    ctx.lineTo(pts[pts.length-1][0], h);
+    ctx.closePath();
+    ctx.fillStyle = color + '22';
+    ctx.fill();
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0],pts[0][1]);
+    pts.forEach(p => ctx.lineTo(p[0],p[1]));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Last dot
+    const lp = pts[pts.length-1];
+    ctx.beginPath();
+    ctx.arc(lp[0],lp[1],3,0,Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  function drawDonut(data, colors) {
+    const canvas = document.getElementById('donutChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = 65, cy = 65, r = 52, ir = 32;
+    const total = data.reduce((a,b)=>a+b,0);
+    let angle = -Math.PI/2;
+    ctx.clearRect(0,0,130,130);
+    data.forEach((v,i) => {
+      const sweep = (v/total)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,angle,angle+sweep);
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      angle += sweep;
+    });
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(cx,cy,ir,0,Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    // Center text
+    ctx.fillStyle = '#1a237e';
+    ctx.font = 'bold 16px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(total, cx, cy-6);
+    ctx.font = '10px Segoe UI';
+    ctx.fillStyle = '#888';
+    ctx.fillText('Total', cx, cy+10);
+  }
+
+  const donutSets = {
+    today: { vals:[24,17,12,8], labels:['24','17','12','8'] },
+    week:  { vals:[148,103,67,42], labels:['148','103','67','42'] },
+    month: { vals:[612,430,280,195], labels:['612','430','280','195'] },
+  };
+  function updateDonut(period) {
+    const d = donutSets[period];
+    drawDonut(d.vals, ['#1565C0','#00897B','#6A1B9A','#F57C00']);
+    ['dl1','dl2','dl3','dl4'].forEach((id,i) => {
+      document.getElementById(id).textContent = d.labels[i];
+    });
+  }
+
+  function filterTable(type, btn) {
+    document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const rows = document.querySelectorAll('#actTableBody tr');
+    rows.forEach(row => {
+      const t = row.dataset.type || '';
+      const s = row.dataset.status || '';
+      const show = type==='all' || t===type || s===type;
+      row.style.display = show ? '' : 'none';
+    });
+  }
+
+  // Init dashboard on load since it's not the default active tab
+  // (will auto-init when user clicks Dashboard)
+  // But also run if dashboard happens to be active
+  // ── TITLE BAR CLOCK ───────────────────────────────────
+  function updateTitleClock() {
+    const now = new Date();
+    const timeEl = document.getElementById('titleClock');
+    const dateEl = document.getElementById('titleDate');
+    if (timeEl) {
+      timeEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    if (dateEl) {
+      dateEl.textContent = now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  }
+  updateTitleClock();
+  setInterval(updateTitleClock, 1000);
+
+  // ── PAGE MODAL ─────────────────────────────────────────
+  const PAGE_MAP = {
+    // C&F Agent
+    'M19': { title: 'Counter Part Agent',  file: 'counter-part-agent.html'   },
+    'M16': { title: 'Destination Agents',  file: 'destination-agent.html'    },
+    'M17': { title: 'Port Agent',          file: 'port-agent.html'           },
+    // Party & Carrier
+    'M01': { title: 'Customer Master',    file: 'customer_master.html'        },
+    'M02': { title: 'Clients Master',     file: 'clients_master.html'         },
+    'M03': { title: 'Consignee Master',   file: 'consignee_master.html'       },
+    'M04': { title: 'Supplier Master',    file: 'suppliers_master.html'       },
+    'M05': { title: 'Source of Business', file: 'source_of_business.html'     },
+    'M06': { title: 'Transporter Master', file: 'transporters_master.html'    },
+    'M07': { title: 'Vessels Master',     file: 'vessels_master.html'         },
+    'M08': { title: 'Voyage Master',      file: 'voyage_master.html'          },
+    'M18': { title: 'Declarant Master',   file: 'declarant_master.html'       },
+    // C&F Master Configuration
+    'C01': { title: 'Bond Master',        file: 'bond_master.html'            },
+    'M30': { title: 'Assessment Types',   file: 'assessment-types.html'       },
+    'M20': { title: 'Commodities Master', file: 'commodity_master.html'       },
+    'M21': { title: 'Container Size',     file: 'size_master.html'            },
+    'M26': { title: 'Division Categories',file: 'category_master.html'        },
+    'M27': { title: 'UIN Master',         file: 'uin_master.html'             },
+    'M28': { title: 'Remarks Master',     file: 'remarks_master.html'         },
+    'M29': { title: 'Transit Remarks',    file: 'transit_remarks_master.html' },
+    // Geographic & Network
+    'M09': { title: 'Shipping Lines',     file: 'Shipping_Lines.html'         },
+    'M10': { title: 'POL Master',         file: 'POL.html'                    },
+    'M11': { title: 'POD Master',         file: 'POD.html'                    },
+    'M12': { title: 'Border Master',      file: 'Border.html'                 },
+    'M13': { title: 'ICD Master',         file: 'ICD.html'                    },
+    'M14': { title: 'Loading Points',     file: 'Loading_Points.html'         },
+    'M15': { title: 'Destination Master', file: 'Destination.html'            },
+    'M22': { title: 'Empty Offload Location', file: 'Empty_Offload_Location.html' },
+    'M23': { title: 'Return Locations',   file: 'Return_Locations.html'       },
+    'M24': { title: 'Sales Offices',      file: 'Sales_Offices.html'          },
+    // Fuel Management
+    'R02': { title: 'Distribution Fuel Report',          file: 'distribution-fuel-report.html' },
+    'R03': { title: 'Distribution Fuel Report (Detail)', file: 'distribution-fuel-report.html' },
+    'R04': { title: 'Add Distribution Fuel Management',  file: 'add-distribution-fuel.html'    },
+    // Exports
+    'E02': { title: 'Exports Local',          file: '1-Export_Local.html'          },
+    'E06': { title: 'Exports Transit',        file: 'transit-exports-list.html'    },
+    'E09': { title: 'Return Transit Export',  file: 'return-transit-exports.html'  },
+    // Clearance
+    'L01': { title: 'Local Clearance',        file: 'cargo-position.html'          },
+  };
+
+  function openPage(code) {
+    const page = PAGE_MAP[code];
+    if (!page) return;
+    window.location.href = page.file;
+  }
+
+  // Auto-wire onclick to all menu-items and tree entries that have a known code
+  document.addEventListener('DOMContentLoaded', () => {
+    // Menu items: find item-code inside menu-item
+    document.querySelectorAll('.menu-item').forEach(el => {
+      const codeEl = el.querySelector('.item-code');
+      if (codeEl && PAGE_MAP[codeEl.textContent.trim()]) {
+        const code = codeEl.textContent.trim();
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => openPage(code));
+      }
+    });
+    // Tree flat & leaf items: read code from tree-flat-code / tree-leaf-code span
+    document.querySelectorAll('.tree-flat, .tree-leaf').forEach(el => {
+      const codeEl = el.querySelector('.tree-flat-code, .tree-leaf-code');
+      if (codeEl && PAGE_MAP[codeEl.textContent.trim()]) {
+        const code = codeEl.textContent.trim();
+        el.addEventListener('click', () => openPage(code));
+      }
+    });
+
+    if (document.getElementById('tab-dashboard').classList.contains('active')) initDashboard();
+  });
+</script>
+</body>
+</html>

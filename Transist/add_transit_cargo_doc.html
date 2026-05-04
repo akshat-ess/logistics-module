@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Transit Cargo Consignment</title>
+<style>
+  :root {
+    --primary: #3c8dbc;
+    --primary-dark: #2e6d96;
+    --primary-light: #d9edf7;
+    --success: #00a65a;
+    --warning: #f39c12;
+    --danger: #dd4b39;
+    --info: #00c0ef;
+    --bg: #ecf0f5;
+    --white: #ffffff;
+    --border: #d2d6de;
+    --text: #333333;
+    --text-muted: #777777;
+    --row-header: #e8e8e8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.12);
+    --radius: 3px;
+    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 13px; }
+
+  /* NAVBAR */
+  .navbar {
+    background: var(--primary); color: #fff; height: 50px;
+    display: flex; align-items: center; padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
+  }
+  .navbar-brand { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .navbar-nav { margin-left: auto; display: flex; gap: 5px; align-items: center; }
+  .navbar-nav a { color: rgba(255,255,255,0.85); text-decoration: none; padding: 6px 12px; border-radius: var(--radius); font-size: 13px; transition: background 0.2s; }
+  .navbar-nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* BREADCRUMB */
+  .breadcrumb-bar {
+    background: #fff; padding: 8px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-muted);
+  }
+  .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+
+  /* MAIN */
+  .main-content { padding: 16px 20px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+
+  /* VIEW CONSIGNMENTS BUTTON */
+  .view-btn {
+    padding: 8px 18px; background: var(--primary); color: #fff;
+    border: none; border-radius: var(--radius); cursor: pointer;
+    font-size: 14px; font-weight: 600; font-family: var(--font);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .view-btn:hover { background: var(--primary-dark); }
+
+  /* CARD */
+  .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px; overflow: hidden; }
+  .card-header-bar {
+    background: #f4f4f4; padding: 7px 12px; border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* TOP CONTROLS ROW (Declarant / Port Agent) */
+  .top-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: #fff; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 8px;
+  }
+  .top-control-group { display: flex; align-items: center; gap: 8px; }
+  .top-control-group label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+  .top-control-group select {
+    padding: 5px 8px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; font-family: var(--font); min-width: 160px; background: #fff;
+  }
+
+  /* TABS */
+  .tabs-bar { display: flex; background: #fff; border-bottom: none; padding: 0 0 0 0; }
+  .tab-btn {
+    padding: 7px 20px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; font-family: var(--font);
+    background: #ccc; color: #fff;
+    transition: background 0.15s;
+    border-radius: 3px 3px 0 0;
+    margin-right: 2px;
+  }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+  .tab-btn:hover:not(.active) { background: #aaa; }
+
+  /* TAB CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ============================================================
+     ERP FORM GRID  —  exactly like screenshots
+     Each "row" = a header bar + a field-input bar
+  ============================================================ */
+  .form-section-wrap {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+  }
+  .form-grid-table {
+    width: 100%; border-collapse: collapse;
+    table-layout: fixed; min-width: 800px;
+  }
+
+  /* HEADER ROWS (grey label rows) */
+  .form-grid-table .hdr-row td {
+    background: var(--row-header);
+    padding: 5px 10px;
+    font-size: 11px; font-weight: 600; text-align: center;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    text-transform: none;
+  }
+
+  /* INPUT ROWS */
+  .form-grid-table .inp-row td {
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    background: #fff;
+    vertical-align: middle;
+  }
+  .form-grid-table .inp-row td input,
+  .form-grid-table .inp-row td select {
+    width: 100%;
+    padding: 5px 7px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: var(--font);
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-grid-table .inp-row td input:focus,
+  .form-grid-table .inp-row td select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(60,141,188,0.15);
+  }
+  .form-grid-table .inp-row td input.error { border-color: var(--danger) !important; }
+
+  /* Checkbox cell */
+  .checkbox-cell { text-align: center !important; }
+  .checkbox-cell input[type="checkbox"] {
+    width: 22px !important; height: 22px !important;
+    cursor: pointer;
+  }
+
+  /* Scroll indicator arrows */
+  .scroll-indicator {
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 4px 8px; border-top: 1px solid var(--border);
+    background: #fafafa; font-size: 16px; color: var(--text-muted); gap: 8px;
+  }
+  .scroll-indicator .side-arrow {
+    display: flex; justify-content: space-between;
+    padding: 0; font-size: 14px; color: var(--text-muted); width: 100%;
+  }
+
+  /* FORM ACTIONS */
+  .form-actions {
+    display: flex; gap: 8px; padding: 12px 14px;
+    background: #f9f9f9; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 7px 16px; border: none; border-radius: var(--radius);
+    cursor: pointer; font-size: 13px; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 5px;
+    font-weight: 500; transition: filter 0.15s, transform 0.1s;
+    color: #fff;
+  }
+  .btn:hover  { filter: brightness(0.9); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary { background: var(--primary); }
+  .btn-success { background: var(--success); }
+  .btn-warning { background: var(--warning); }
+  .btn-danger  { background: var(--danger);  }
+  .btn-default { background: #f4f4f4; color: var(--text); border: 1px solid var(--border); }
+
+  /* VALIDATION MESSAGES */
+  .error-msg {
+    color: var(--danger); font-size: 11px; margin-top: 3px; display: none;
+  }
+
+  /* SPINNER */
+  .spinner-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOOLTIP */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%); background: #333; color: #fff;
+    padding: 3px 8px; border-radius: 3px; font-size: 11px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 200;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* ALERT BANNER */
+  .alert { padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 13px; display: none; }
+  .alert-success { background: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+  .alert-danger  { background: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+</style>
+</head>
+<body>
+
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">🛣️ TransitERP — Logistics Management System</div>
+  <div class="navbar-nav">
+    <a href="transit_clearance_dashboard.html">Dashboard</a>
+    <a href="transit_clearance_consignment.html">Consignments</a>
+    <a href="add_transit_cargo_doc.html" style="background:rgba(255,255,255,0.2);">New Entry</a>
+    <a href="#">👤 Admin</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="transit_clearance_dashboard.html">🏠 Home</a>
+  <span>›</span>
+  <a href="transit_clearance_consignment.html">Transit Clearance</a>
+  <span>›</span>
+  <span>Add Transit Cargo Consignment</span>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">Add Transit Cargo Consignment</h1>
+    <a href="transit_clearance_consignment.html" class="view-btn" data-tooltip="Go back to consignment listing">📋 View Consignments</a>
+  </div>
+
+  <!-- ALERT -->
+  <div class="alert alert-success" id="successAlert">✅ Consignment saved successfully!</div>
+  <div class="alert alert-danger"  id="errorAlert">❌ Please fill in all required fields.</div>
+
+  <!-- FORM CARD -->
+  <div class="card">
+    <div class="card-header-bar">
+      📦 Cargo details
+      <button onclick="refreshForm()" style="background:none;border:none;cursor:pointer;font-size:15px;" data-tooltip="Reset form">🔄</button>
+    </div>
+
+    <!-- TOP CONTROLS -->
+    <div class="top-controls">
+      <div class="top-control-group">
+        <label>DECLARANT</label>
+        <select id="declarant" required>
+          <option value="">select...</option>
+          <option>Customs Broker A</option>
+          <option>Customs Broker B</option>
+          <option>ABC Clearing Ltd</option>
+          <option>FastClear Agents</option>
+        </select>
+      </div>
+      <div class="top-control-group">
+        <label>PORT AGENT</label>
+        <select id="portAgent">
+          <option value="">select...</option>
+          <option>Dar Port Agency</option>
+          <option>Mombasa Agents</option>
+          <option>Beira Port Co</option>
+          <option>Walvis Bay Ltd</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar" style="padding:6px 8px 0 8px; background:#fff; border-bottom:2px solid var(--border);">
+      <button class="tab-btn active" id="tab-doc" onclick="switchTab('doc')">DOC</button>
+      <button class="tab-btn"        id="tab-sl"  onclick="switchTab('sl')">SL</button>
+      <button class="tab-btn"        id="tab-ops" onclick="switchTab('ops')">OPS</button>
+    </div>
+
+    <!-- ===================== DOC TAB ===================== -->
+    <div class="tab-content active" id="content-doc">
+      <div class="form-section-wrap">
+        <table class="form-grid-table">
+
+          <!-- ROW 1: Category | Source of Business | Billing Customer | Consignee | Refer. Number -->
+          <tr class="hdr-row">
+            <td>Category</td>
+            <td>Source of Business</td>
+            <td>Billing Customer</td>
+            <td>Consignee</td>
+            <td>Refer. Number</td>
+          </tr>
+          <tr class="inp-row">
+            <td>
+              <select id="category">
+                <option value="">select...</option>
+                <option>Import</option>
+                <option>Export</option>
+                <option>Transit</option>
+                <option>Transhipment</option>
+              </select>
+            </td>
+            <td>
+              <select id="sourceOfBusiness">
+                <option value="">select...</option>
+                <option>Direct Client</option>
+                <option>Agent Referral</option>
+                <option>Tender</option>
+                <option>Repeat Business</option>
+              </select>
+            </td>
+            <td>
+              <select id="billingCustomer">
+                <option value="">select...</option>
+                <option>ACME Logistics</option>
+                <option>GlobalTrade Ltd</option>
+                <option>East Africa Cargo</option>
+                <option>Northern Freight</option>
+              </select>
+            </td>
+            <td>
+              <select id="consignee" required>
+                <option value="">select...</option>
+                <option>ACME Logistics</option>
+                <option>GlobalTrade Ltd</option>
+                <option>East Africa Cargo</option>
+                <option>Northern Freight</option>
+                <option>Congo Trade Co</option>
+              </select>
+            </td>
+            <td><input type="text" id="referNumber" placeholder="Refer. Number"></td>
+          </tr>
+
+          <!-- ROW 2: Tansad No | Supplier | Material Descr. | POL/Country | B/L Number -->
+          <tr class="hdr-row">
+            <td>Tansad No.</td>
+            <td>Supplier</td>
+            <td>Material Descr.</td>
+            <td>POL/Country</td>
+            <td>B/L Number</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="text" id="tansadNo" placeholder="Tansad Number"></td>
+            <td>
+              <select id="supplier">
+                <option value="">select...</option>
+                <option>China Supplier A</option>
+                <option>India Supplier B</option>
+                <option>Europe Supplier C</option>
+                <option>Local Supplier D</option>
+              </select>
+            </td>
+            <td><input type="text" id="materialDescr" placeholder="Material Description"></td>
+            <td>
+              <select id="polCountry">
+                <option value="">select...</option>
+                <option>China (CN)</option>
+                <option>India (IN)</option>
+                <option>Germany (DE)</option>
+                <option>South Africa (ZA)</option>
+                <option>United Kingdom (GB)</option>
+              </select>
+            </td>
+            <td><input type="text" id="blNumber" placeholder="B/L Number"></td>
+          </tr>
+
+          <!-- ROW 3: S/Line | Vessel | Voyage | ETA | ETB -->
+          <tr class="hdr-row">
+            <td>S/Line</td>
+            <td>Vessel</td>
+            <td>Voyage</td>
+            <td>ETA</td>
+            <td>ETB</td>
+          </tr>
+          <tr class="inp-row">
+            <td>
+              <select id="sLine">
+                <option value="">select...</option>
+                <option>MSC</option>
+                <option>Maersk</option>
+                <option>CMA CGM</option>
+                <option>Hapag-Lloyd</option>
+                <option>Evergreen</option>
+              </select>
+            </td>
+            <td><input type="text" id="vessel" placeholder="Vessel Name"></td>
+            <td><input type="text" id="voyage" placeholder="Voyage Number"></td>
+            <td><input type="date" id="eta"></td>
+            <td><input type="date" id="etb"></td>
+          </tr>
+
+          <!-- ROW 4: Carry In Date | Copy Docs Recd Date | Org Doc Recd Date | Doc. Lodged Date | Assmt Valu. Date -->
+          <tr class="hdr-row">
+            <td>Carry In Date</td>
+            <td>Copy Docs Recd Date</td>
+            <td>Org Doc Recd Date</td>
+            <td>Doc. Lodged Date</td>
+            <td>Assmt Valu. Date</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="date" id="carryInDate"></td>
+            <td><input type="date" id="copyDocDate"></td>
+            <td><input type="date" id="orgDocDate"></td>
+            <td><input type="date" id="docLodgedDate"></td>
+            <td><input type="date" id="assmtValuDate"></td>
+          </tr>
+
+          <!-- ROW 5: Transf. Manifest Date | Discharge Date | Special Instructions | Entry Date | Sales Office -->
+          <tr class="hdr-row">
+            <td>Transf. Manifest Date</td>
+            <td>Discharge Date</td>
+            <td>Special Instructions</td>
+            <td>Entry Date</td>
+            <td>Sales Office</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="date" id="transfManifestDate"></td>
+            <td><input type="date" id="dischargeDate"></td>
+            <td><input type="text" id="specialInstructions" placeholder="Special Instructions"></td>
+            <td><input type="date" id="entryDate"></td>
+            <td>
+              <select id="salesOffice">
+                <option value="">select...</option>
+                <option>Dar es Salaam</option>
+                <option>Mombasa</option>
+                <option>Lusaka</option>
+                <option>Nairobi</option>
+              </select>
+            </td>
+          </tr>
+
+          <!-- ROW 6: Num of 20 Conts | Num of 40 Conts | Loose Cargo | Client | Actual Arrival Date -->
+          <tr class="hdr-row">
+            <td>Num of 20 Conts</td>
+            <td>Num of 40 Conts</td>
+            <td>Loose Cargo</td>
+            <td>Client</td>
+            <td>Actual Arrival Date</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="number" id="num20Conts" min="0" placeholder="0"></td>
+            <td><input type="number" id="num40Conts" min="0" placeholder="0"></td>
+            <td><input type="text"   id="looseCargo" placeholder="Loose Cargo Details"></td>
+            <td>
+              <select id="client">
+                <option value="">select...</option>
+                <option>ACME Logistics</option>
+                <option>GlobalTrade Ltd</option>
+                <option>East Africa Cargo</option>
+              </select>
+            </td>
+            <td><input type="date" id="actualArrivalDate"></td>
+          </tr>
+
+          <!-- ROW 7: Actual Arrival Time | Actual Unloading Date | Actual Unloading Time | Is From Network? | UIN -->
+          <tr class="hdr-row">
+            <td>Actual Arrival Time</td>
+            <td>Actual Unloading Date</td>
+            <td>Actual Unloading Time</td>
+            <td>Is From Network?</td>
+            <td>UIN</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="time" id="actualArrivalTime"></td>
+            <td><input type="date" id="actualUnloadingDate"></td>
+            <td><input type="time" id="actualUnloadingTime"></td>
+            <td>
+              <select id="isFromNetwork">
+                <option value="">select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </td>
+            <td>
+              <select id="uin">
+                <option value="">select...</option>
+                <option>UIN-2024-0001</option>
+                <option>UIN-2024-0002</option>
+                <option>UIN-2024-0003</option>
+              </select>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+      <!-- scroll indicator -->
+      <div class="scroll-indicator">
+        <div class="side-arrow">
+          <span>◀</span>
+          <span>▲</span>
+          <span>▶</span>
+        </div>
+      </div>
+    </div><!-- /#content-doc -->
+
+    <!-- ===================== OPS TAB ===================== -->
+    <div class="tab-content" id="content-ops">
+      <div class="form-section-wrap">
+        <table class="form-grid-table">
+
+          <!-- ROW 1: ICD | Country | Border | Wharfage Pay Date | RO Recd Date -->
+          <tr class="hdr-row">
+            <td>ICD</td>
+            <td>Country</td>
+            <td>Border</td>
+            <td>Wharfage Pay Date</td>
+            <td>RO Recd Date</td>
+          </tr>
+          <tr class="inp-row">
+            <td>
+              <select id="icd">
+                <option value="">select...</option>
+                <option>Dar ICD</option>
+                <option>Mombasa ICD</option>
+                <option>Lusaka ICD</option>
+                <option>Beira ICD</option>
+              </select>
+            </td>
+            <td>
+              <select id="opsCountry">
+                <option value="">select...</option>
+                <option>Zambia</option>
+                <option>DRC</option>
+                <option>Malawi</option>
+                <option>Rwanda</option>
+                <option>Burundi</option>
+                <option>Uganda</option>
+              </select>
+            </td>
+            <td>
+              <select id="border">
+                <option value="">select...</option>
+                <option>Nakonde</option>
+                <option>Tunduma</option>
+                <option>Kasumbalesa</option>
+                <option>Mchinji</option>
+                <option>Rusumo</option>
+              </select>
+            </td>
+            <td><input type="date" id="wharfagePayDate"></td>
+            <td><input type="date" id="roRecdDate"></td>
+          </tr>
+
+          <!-- ROW 2: Port Charge Pay Date | ICD Charge Pay Date | Destination | Agent Consignee | Delivery Date -->
+          <tr class="hdr-row">
+            <td>Port Charge Pay Date</td>
+            <td>ICD Charge Pay Date</td>
+            <td>Destination</td>
+            <td>Agent Consignee</td>
+            <td>Delivery Date</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="date" id="portChargePayDate"></td>
+            <td><input type="date" id="icdChargePayDate"></td>
+            <td>
+              <select id="destination">
+                <option value="">select...</option>
+                <option>Lusaka, ZM</option>
+                <option>Kinshasa, DRC</option>
+                <option>Lilongwe, MAL</option>
+                <option>Kigali, RW</option>
+                <option>Bujumbura, BUR</option>
+                <option>Kampala, UG</option>
+              </select>
+            </td>
+            <td><input type="text" id="agentConsignee" placeholder="Agent Consignee Name"></td>
+            <td><input type="date" id="deliveryDate"></td>
+          </tr>
+
+        </table>
+      </div>
+      <div class="scroll-indicator">
+        <div class="side-arrow"><span>◀</span><span>▲</span><span>▶</span></div>
+      </div>
+    </div><!-- /#content-ops -->
+
+    <!-- ===================== SL TAB ===================== -->
+    <div class="tab-content" id="content-sl">
+      <div class="form-section-wrap">
+        <table class="form-grid-table">
+
+          <!-- ROW 1: S/L DO Date | DO Valid Till | SO Valid Date | Empty Offload Location | BL TYPE -->
+          <tr class="hdr-row">
+            <td>S/L DO Date</td>
+            <td>DO Valid Till</td>
+            <td>SO Valid Date</td>
+            <td>Empty Offload Location</td>
+            <td>BL TYPE</td>
+          </tr>
+          <tr class="inp-row">
+            <td><input type="date" id="slDoDate"></td>
+            <td><input type="date" id="doValidTill"></td>
+            <td><input type="date" id="soValidDate"></td>
+            <td><input type="text" id="emptyOffloadLocation" placeholder="Empty Offload Location"></td>
+            <td>
+              <select id="blType">
+                <option value="">select...</option>
+                <option>Original</option>
+                <option>Telex Release</option>
+                <option>Sea Waybill</option>
+                <option>Express Release</option>
+              </select>
+            </td>
+          </tr>
+
+          <!-- ROW 2: DG Cargo? | Transportation | S/L Invoice Date | S/L Invoice Received Date | S/L Paydate -->
+          <tr class="hdr-row">
+            <td>DG Cargo?</td>
+            <td>Transportation</td>
+            <td>S/L Invoice Date</td>
+            <td>S/L Invoice Received Date</td>
+            <td>S/L Paydate</td>
+          </tr>
+          <tr class="inp-row">
+            <td class="checkbox-cell">
+              <input type="checkbox" id="dgCargo">
+            </td>
+            <td>
+              <select id="transportation">
+                <option value="with_transport">With Transport</option>
+                <option value="without_transport">Without Transport</option>
+                <option value="self_transport">Self Transport</option>
+                <option value="rail">Rail</option>
+              </select>
+            </td>
+            <td><input type="date" id="slInvoiceDate"></td>
+            <td><input type="date" id="slInvoiceReceivedDate"></td>
+            <td><input type="date" id="slPaydate"></td>
+          </tr>
+
+        </table>
+      </div>
+      <div class="scroll-indicator">
+        <div class="side-arrow"><span>◀</span><span>▲</span><span>▶</span></div>
+      </div>
+    </div><!-- /#content-sl -->
+
+    <!-- FORM ACTIONS -->
+    <div class="form-actions">
+      <button class="btn btn-success" onclick="saveForm()" data-tooltip="Save the consignment record">💾 Save</button>
+      <button class="btn btn-primary" onclick="saveAndNew()" data-tooltip="Save and create another">💾➕ Save & New</button>
+      <button class="btn btn-warning" onclick="validateForm()" data-tooltip="Validate form fields">✔ Validate</button>
+      <button class="btn btn-danger"  onclick="resetForm()"   data-tooltip="Clear all fields">🗑 Clear</button>
+      <a href="transit_clearance_consignment.html" class="btn btn-default" data-tooltip="Cancel and return">✖ Cancel</a>
+    </div>
+
+  </div><!-- /.card -->
+
+</div><!-- /.main-content -->
+
+<script>
+  // === SPINNER + HASH TAB ===
+  window.addEventListener('load', () => {
+    setTimeout(() => { document.getElementById('spinner').style.display = 'none'; }, 600);
+    // Auto-switch tab based on URL hash (#ops or #sl)
+    const hash = window.location.hash.replace('#','');
+    if (hash === 'ops' || hash === 'sl' || hash === 'doc') {
+      switchTab(hash);
+    }
+  });
+
+  // === TAB SWITCHING ===
+  function switchTab(name) {
+    ['doc','ops','sl'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('active', t === name);
+      document.getElementById('content-' + t).classList.toggle('active', t === name);
+    });
+  }
+
+  // === FORM VALIDATION ===
+  const requiredFields = ['declarant', 'consignee'];
+
+  function validateForm() {
+    let valid = true;
+    requiredFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('error');
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        valid = false;
+      }
+    });
+    // Date validation: ETA must be after today
+    const eta = document.getElementById('eta').value;
+    if (eta) {
+      const etaDate = new Date(eta);
+      const today   = new Date();
+      today.setHours(0,0,0,0);
+      if (etaDate < today) {
+        document.getElementById('eta').classList.add('error');
+        valid = false;
+      }
+    }
+    // ETB should be before ETA
+    const etb = document.getElementById('etb').value;
+    if (eta && etb && new Date(etb) > new Date(eta)) {
+      document.getElementById('etb').classList.add('error');
+      valid = false;
+    }
+    showAlert(valid ? 'success' : 'error');
+    return valid;
+  }
+
+  function showAlert(type) {
+    const s = document.getElementById('successAlert');
+    const e = document.getElementById('errorAlert');
+    s.style.display = 'none';
+    e.style.display = 'none';
+    if (type === 'success') { s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 3500); }
+    else                    { e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 3500); }
+  }
+
+  function saveForm() {
+    if (validateForm()) {
+      document.getElementById('spinner').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('spinner').style.display = 'none';
+        showAlert('success');
+        setTimeout(() => window.location.href = 'transit_clearance_consignment.html', 1500);
+      }, 900);
+    }
+  }
+
+  function saveAndNew() {
+    if (validateForm()) {
+      document.getElementById('spinner').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('spinner').style.display = 'none';
+        showAlert('success');
+        setTimeout(() => resetForm(), 800);
+      }, 700);
+    }
+  }
+
+  function resetForm() {
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.type === 'checkbox') el.checked = false;
+      else el.value = '';
+      el.classList.remove('error');
+    });
+  }
+
+  function refreshForm() {
+    if (confirm('Reset all form fields?')) resetForm();
+  }
+</script>
+</body>
+</html>

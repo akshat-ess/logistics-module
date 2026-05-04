@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Return Transit Exports Consignment | ERP Logistics</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    /* ========================================================
+       ERP GLOBAL VARIABLES & RESET
+    ======================================================== */
+    :root {
+      --erp-bg:           #f0f2f5;
+      --erp-panel-bg:     #ffffff;
+      --erp-border:       #d1d5db;
+      --erp-section-hdr:  #e8eaed;
+      --erp-thead-bg:     #dee2e6;
+      --erp-text:         #212529;
+      --erp-muted:        #6c757d;
+      --erp-blue:         #1a6fc4;
+      --erp-blue-hover:   #155a9e;
+      --erp-teal:         #0d9488;
+      --erp-teal-hover:   #0a7a70;
+      --erp-danger:       #dc3545;
+      --erp-label:        #495057;
+      --erp-input-focus:  rgba(26,111,196,0.18);
+      --font-main:        'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--erp-bg);
+      color: var(--erp-text);
+      font-size: 13.5px;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ========================================================
+       TOP NAV BAR
+    ======================================================== */
+    .erp-topbar {
+      background: #1e3a5f;
+      color: #fff;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      border-bottom: 2px solid #0d2a4a;
+    }
+    .erp-topbar .module-name {
+      font-size: 11px;
+      font-weight: 400;
+      color: #a0b4cc;
+      margin-left: 12px;
+      padding-left: 12px;
+      border-left: 1px solid #3a5a7a;
+    }
+    .erp-topbar .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: #a0b4cc;
+    }
+    .erp-topbar .topbar-right i { font-size: 14px; }
+
+    /* ========================================================
+       BREADCRUMB
+    ======================================================== */
+    .erp-breadcrumb {
+      background: #e4e8ef;
+      border-bottom: 1px solid #c8cdd6;
+      padding: 5px 20px;
+      font-size: 11.5px;
+      color: var(--erp-muted);
+    }
+    .erp-breadcrumb a {
+      color: var(--erp-blue);
+      text-decoration: none;
+    }
+    .erp-breadcrumb a:hover { text-decoration: underline; }
+    .erp-breadcrumb .sep { margin: 0 5px; color: #aaa; }
+
+    /* ========================================================
+       MAIN CONTENT WRAPPER
+    ======================================================== */
+    .erp-main {
+      padding: 18px 20px 50px;
+    }
+
+    /* ========================================================
+       PAGE HEADER CARD
+    ======================================================== */
+    .erp-page-header {
+      background: var(--erp-panel-bg);
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .erp-page-header .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    /* ========================================================
+       BUTTONS
+    ======================================================== */
+    .btn-erp-primary {
+      background-color: var(--erp-blue);
+      border: 1px solid var(--erp-blue-hover);
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-erp-primary:hover { background-color: var(--erp-blue-hover); color: #fff; }
+
+    .btn-erp-success {
+      background-color: #198754;
+      border: 1px solid #157347;
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 18px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-erp-success:hover { background-color: #157347; color: #fff; }
+
+    .btn-erp-reset {
+      background-color: #fff;
+      border: 1px solid var(--erp-border);
+      color: var(--erp-text);
+      font-size: 12.5px;
+      padding: 5px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-erp-reset:hover { background-color: #e9ecef; }
+
+    .btn-erp-secondary {
+      background-color: #6c757d;
+      border: 1px solid #5a6268;
+      color: #fff;
+      font-size: 12.5px;
+      padding: 5px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-erp-secondary:hover { background-color: #5a6268; color: #fff; }
+
+    /* ========================================================
+       FORM PANEL CARD
+    ======================================================== */
+    .erp-form-panel {
+      background: var(--erp-panel-bg);
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    /* ========================================================
+       SECTION HEADER (inside form)
+    ======================================================== */
+    .erp-section-header {
+      background: var(--erp-section-hdr);
+      border-bottom: 1px solid var(--erp-border);
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1e3a5f;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .erp-section-header .section-refresh {
+      cursor: pointer;
+      color: var(--erp-blue);
+      font-size: 13px;
+      transition: transform 0.4s;
+    }
+    .erp-section-header .section-refresh:hover {
+      transform: rotate(180deg);
+    }
+
+    /* ========================================================
+       FORM GRID CONTAINER
+    ======================================================== */
+    .erp-form-body {
+      padding: 0;
+    }
+
+    /* ========================================================
+       FORM ROW STRIPE (alternating section headers)
+    ======================================================== */
+    .erp-field-row {
+      display: grid;
+      border-bottom: 1px solid #ebebeb;
+    }
+    .erp-field-row:last-child { border-bottom: none; }
+
+    /* 5-column row */
+    .erp-field-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+    /* 4-column row */
+    .erp-field-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    /* 3-column row */
+    .erp-field-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    /* Label row (grey header strip) */
+    .erp-label-row {
+      background: #f3f4f6;
+      border-bottom: 1px solid var(--erp-border);
+    }
+    .erp-label-row .field-label-cell {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      border-right: 1px solid var(--erp-border);
+      display: flex;
+      align-items: center;
+    }
+    .erp-label-row .field-label-cell:last-child { border-right: none; }
+    .erp-label-row .field-label-cell .req-star {
+      color: var(--erp-danger);
+      margin-left: 3px;
+      font-size: 11px;
+    }
+
+    /* Input row */
+    .erp-input-row {
+      background: #fff;
+    }
+    .erp-input-row .field-input-cell {
+      padding: 8px 10px;
+      border-right: 1px solid #ebebeb;
+    }
+    .erp-input-row .field-input-cell:last-child { border-right: none; }
+
+    /* ========================================================
+       FORM CONTROLS (ERP flat style)
+    ======================================================== */
+    .erp-input,
+    .erp-select,
+    .erp-date {
+      width: 100%;
+      padding: 5px 8px;
+      font-size: 12.5px;
+      font-family: var(--font-main);
+      border: 1px solid var(--erp-border);
+      border-radius: 2px;
+      background: #fff;
+      color: var(--erp-text);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      height: 30px;
+    }
+    .erp-input:focus,
+    .erp-select:focus,
+    .erp-date:focus {
+      border-color: var(--erp-blue);
+      box-shadow: 0 0 0 2px var(--erp-input-focus);
+    }
+    .erp-input.is-invalid,
+    .erp-select.is-invalid,
+    .erp-date.is-invalid {
+      border-color: var(--erp-danger);
+      box-shadow: 0 0 0 2px rgba(220,53,69,0.15);
+    }
+    .erp-select { appearance: auto; cursor: pointer; }
+    .erp-date   { cursor: pointer; }
+
+    .field-error {
+      font-size: 11px;
+      color: var(--erp-danger);
+      margin-top: 3px;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
+    /* ========================================================
+       FORM ACTION BUTTONS ROW
+    ======================================================== */
+    .erp-form-actions {
+      background: var(--erp-panel-bg);
+      border: 1px solid var(--erp-border);
+      border-radius: 3px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .erp-form-actions .action-sep {
+      flex: 1;
+    }
+
+    /* ========================================================
+       TOAST NOTIFICATION
+    ======================================================== */
+    .erp-toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .erp-toast {
+      background: #1e3a5f;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.25s ease;
+      min-width: 280px;
+    }
+    .erp-toast.success { border-left: 4px solid #0d9488; }
+    .erp-toast.info    { border-left: 4px solid #1a6fc4; }
+    .erp-toast.error   { border-left: 4px solid #dc3545; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ========================================================
+       VERTICAL SCROLL INDICATOR
+    ======================================================== */
+    .erp-form-panel .scroll-hint {
+      border-top: 1px solid var(--erp-border);
+      background: #f8f9fa;
+      text-align: center;
+      padding: 4px;
+      font-size: 11px;
+      color: var(--erp-muted);
+    }
+
+    /* ========================================================
+       RESPONSIVE OVERFLOW FOR NARROW SCREENS
+    ======================================================== */
+    .erp-form-body {
+      overflow-x: auto;
+    }
+    .erp-label-row,
+    .erp-input-row {
+      min-width: 800px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================
+       TOP NAV BAR
+  ======================================================= -->
+  <!-- <div class="erp-topbar">
+    <i class="bi bi-box-seam"></i>
+    <span style="margin-left:8px;">LogiERP</span>
+    <span class="module-name">Logistics &amp; Transit Management</span>
+    <div class="topbar-right">
+      <span><i class="bi bi-bell"></i></span>
+      <span><i class="bi bi-person-circle"></i> Admin User</span>
+      <span><i class="bi bi-box-arrow-right"></i></span>
+    </div>
+  </div> -->
+
+  <!-- ======================================================
+       BREADCRUMB
+  ======================================================= -->
+  <!-- <div class="erp-breadcrumb">
+    <a href="#">Home</a>
+    <span class="sep">›</span>
+    <a href="#">Logistics</a>
+    <span class="sep">›</span>
+    <a href="return-transit-exports.html">Return Transit Exports</a>
+    <span class="sep">›</span>
+    <span>Add Consignment</span>
+  </div> -->
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ======================================================= -->
+  <div class="erp-main">
+
+    <!-- PAGE HEADER -->
+    <div class="erp-page-header">
+      <h1 class="page-title">
+        <i class="bi bi-file-earmark-plus" style="color:#1a6fc4;margin-right:8px;font-size:15px;"></i>
+        Add Return Transit Exports Consignment
+      </h1>
+      <div>
+        <button class="btn-erp-primary" onclick="window.location.href='return-transit-exports.html'">
+          <i class="bi bi-table" style="margin-right:4px;"></i>View Consignments
+        </button>
+      </div>
+    </div>
+
+    <!-- ================================================
+         FORM PANEL: Cargo Details
+    ================================================= -->
+    <form id="consignmentForm" novalidate>
+      <div class="erp-form-panel">
+
+        <!-- Section Header -->
+        <div class="erp-section-header">
+          <i class="bi bi-box2-fill" style="color:#1a6fc4;"></i>
+          Cargo Details
+          <i class="bi bi-arrow-clockwise section-refresh" title="Refresh" onclick="refreshSection()"></i>
+        </div>
+
+        <div class="erp-form-body">
+
+          <!-- ==================== ROW 1: Labels ==================== -->
+          <div class="erp-field-row erp-label-row cols-5">
+            <div class="field-label-cell">File No <span class="req-star">*</span></div>
+            <div class="field-label-cell">UIN <span class="req-star">*</span></div>
+            <div class="field-label-cell">LPO Number</div>
+            <div class="field-label-cell">Shipper</div>
+            <div class="field-label-cell">Consignee <span class="req-star">*</span></div>
+          </div>
+          <!-- ROW 1: Inputs -->
+          <div class="erp-field-row erp-input-row cols-5">
+            <div class="field-input-cell">
+              <input type="text" id="fileNo" name="fileNo" class="erp-input" placeholder="e.g. FN-10231" maxlength="50" />
+              <div class="field-error" id="err-fileNo">File No is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <select id="uin" name="uin" class="erp-select">
+                <option value="">select...</option>
+                <option value="UIN-2024-001">UIN-2024-001</option>
+                <option value="UIN-2024-002">UIN-2024-002</option>
+                <option value="UIN-2024-003">UIN-2024-003</option>
+                <option value="UIN-2024-004">UIN-2024-004</option>
+                <option value="UIN-2024-005">UIN-2024-005</option>
+                <option value="NEW">-- New UIN --</option>
+              </select>
+              <div class="field-error" id="err-uin">UIN is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="lpoNumber" name="lpoNumber" class="erp-input" placeholder="LPO Number" maxlength="50" />
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="shipper" name="shipper" class="erp-input" placeholder="Shipper name" maxlength="100" />
+            </div>
+            <div class="field-input-cell">
+              <select id="consignee" name="consignee" class="erp-select">
+                <option value="">select...</option>
+                <option value="Alpha Traders Ltd">Alpha Traders Ltd</option>
+                <option value="Beta Logistics Co.">Beta Logistics Co.</option>
+                <option value="Gamma Imports Ltd">Gamma Imports Ltd</option>
+                <option value="Delta Supplies Inc.">Delta Supplies Inc.</option>
+                <option value="Epsilon Global Ltd">Epsilon Global Ltd</option>
+                <option value="Zeta Freight Co.">Zeta Freight Co.</option>
+              </select>
+              <div class="field-error" id="err-consignee">Consignee is required.</div>
+            </div>
+          </div>
+
+          <!-- ==================== ROW 2: Labels ==================== -->
+          <div class="erp-field-row erp-label-row cols-5">
+            <div class="field-label-cell">POL</div>
+            <div class="field-label-cell">POD</div>
+            <div class="field-label-cell">Truck_Trailer <span class="req-star">*</span></div>
+            <div class="field-label-cell">Container No. <span class="req-star">*</span></div>
+            <div class="field-label-cell">Packages</div>
+          </div>
+          <!-- ROW 2: Inputs -->
+          <div class="erp-field-row erp-input-row cols-5">
+            <div class="field-input-cell">
+              <input type="text" id="pol" name="pol" class="erp-input" placeholder="Port of Loading" maxlength="80" />
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="pod" name="pod" class="erp-input" placeholder="Port of Destination" maxlength="80" />
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="truckTrailer" name="truckTrailer" class="erp-input" placeholder="e.g. KCA 123A" maxlength="30" />
+              <div class="field-error" id="err-truckTrailer">Truck/Trailer is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="containerNo" name="containerNo" class="erp-input" placeholder="e.g. TCKU3456789" maxlength="20" />
+              <div class="field-error" id="err-containerNo">Container No. is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="number" id="packages" name="packages" class="erp-input" placeholder="0" min="0" />
+            </div>
+          </div>
+
+          <!-- ==================== ROW 3: Labels ==================== -->
+          <div class="erp-field-row erp-label-row cols-5">
+            <div class="field-label-cell">Weight (kg)</div>
+            <div class="field-label-cell">Container Size <span class="req-star">*</span></div>
+            <div class="field-label-cell">Loading Date <span class="req-star">*</span></div>
+            <div class="field-label-cell">Delivery Date <span class="req-star">*</span></div>
+            <div class="field-label-cell">Commodity <span class="req-star">*</span></div>
+          </div>
+          <!-- ROW 3: Inputs -->
+          <div class="erp-field-row erp-input-row cols-5">
+            <div class="field-input-cell">
+              <input type="number" id="weight" name="weight" class="erp-input" placeholder="0.00" min="0" step="0.01" />
+            </div>
+            <div class="field-input-cell">
+              <select id="containerSize" name="containerSize" class="erp-select">
+                <option value="">Select...</option>
+                <option value="20ft">20 ft Standard</option>
+                <option value="40ft">40 ft Standard</option>
+                <option value="40hc">40 ft High Cube</option>
+                <option value="45hc">45 ft High Cube</option>
+                <option value="20ot">20 ft Open Top</option>
+                <option value="40ot">40 ft Open Top</option>
+                <option value="20rf">20 ft Reefer</option>
+                <option value="40rf">40 ft Reefer</option>
+              </select>
+              <div class="field-error" id="err-containerSize">Container Size is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="date" id="loadingDate" name="loadingDate" class="erp-date" />
+              <div class="field-error" id="err-loadingDate">Loading Date is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="date" id="deliveryDate" name="deliveryDate" class="erp-date" />
+              <div class="field-error" id="err-deliveryDate">Delivery Date is required.</div>
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="commodity" name="commodity" class="erp-input" placeholder="e.g. Electronics" maxlength="100" />
+              <div class="field-error" id="err-commodity">Commodity is required.</div>
+            </div>
+          </div>
+
+          <!-- ==================== ROW 4: Labels ==================== -->
+          <div class="erp-field-row erp-label-row cols-3">
+            <div class="field-label-cell">Transporter Name</div>
+            <div class="field-label-cell">Transporter TIN</div>
+            <div class="field-label-cell">Rate Agreed</div>
+          </div>
+          <!-- ROW 4: Inputs -->
+          <div class="erp-field-row erp-input-row cols-3" style="min-width:800px;">
+            <div class="field-input-cell">
+              <input type="text" id="transporterName" name="transporterName" class="erp-input" placeholder="Transporter full name" maxlength="100" />
+            </div>
+            <div class="field-input-cell">
+              <input type="text" id="transporterTIN" name="transporterTIN" class="erp-input" placeholder="Tax Identification Number" maxlength="30" />
+            </div>
+            <div class="field-input-cell">
+              <input type="number" id="rateAgreed" name="rateAgreed" class="erp-input" placeholder="0.00" min="0" step="0.01" />
+            </div>
+          </div>
+
+        </div><!-- /erp-form-body -->
+
+        <!-- Scroll hint -->
+        <div class="scroll-hint" id="scrollHint" style="display:none;">
+          <i class="bi bi-arrow-left-right"></i> Scroll horizontally to see all fields
+        </div>
+
+      </div><!-- /erp-form-panel -->
+
+      <!-- ================================================
+           FORM ACTION BUTTONS
+      ================================================= -->
+      <div class="erp-form-actions">
+        <button type="button" class="btn-erp-success" onclick="submitForm()">
+          <i class="bi bi-save2-fill" style="margin-right:5px;"></i>Save Consignment
+        </button>
+        <button type="button" class="btn-erp-secondary" onclick="saveDraft()">
+          <i class="bi bi-file-earmark-text" style="margin-right:5px;"></i>Save as Draft
+        </button>
+        <button type="button" class="btn-erp-reset" onclick="resetForm()">
+          <i class="bi bi-x-circle" style="margin-right:5px;"></i>Reset Form
+        </button>
+        <div class="action-sep"></div>
+        <button type="button" class="btn-erp-reset" onclick="window.location.href='return-transit-exports.html'">
+          <i class="bi bi-arrow-left" style="margin-right:5px;"></i>Cancel
+        </button>
+        <small style="color:#6c757d;font-size:11.5px;">
+          <span style="color:#dc3545;">*</span> Required fields
+        </small>
+      </div>
+
+    </form>
+
+  </div><!-- /erp-main -->
+
+  <!-- ======================================================
+       TOAST CONTAINER
+  ======================================================= -->
+  <div class="erp-toast-container" id="toastContainer"></div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ============================================================
+       REQUIRED FIELDS VALIDATION MAP
+    ============================================================ */
+    const requiredFields = [
+      { id: "fileNo",        errId: "err-fileNo",        label: "File No"        },
+      { id: "uin",           errId: "err-uin",           label: "UIN"            },
+      { id: "consignee",     errId: "err-consignee",     label: "Consignee"      },
+      { id: "truckTrailer",  errId: "err-truckTrailer",  label: "Truck/Trailer"  },
+      { id: "containerNo",   errId: "err-containerNo",   label: "Container No."  },
+      { id: "containerSize", errId: "err-containerSize", label: "Container Size" },
+      { id: "loadingDate",   errId: "err-loadingDate",   label: "Loading Date"   },
+      { id: "deliveryDate",  errId: "err-deliveryDate",  label: "Delivery Date"  },
+      { id: "commodity",     errId: "err-commodity",     label: "Commodity"      },
+    ];
+
+    /* ============================================================
+       VALIDATE FORM
+    ============================================================ */
+    function validateForm() {
+      let valid = true;
+      const errors = [];
+
+      // Clear previous errors
+      requiredFields.forEach(f => {
+        const el  = document.getElementById(f.id);
+        const err = document.getElementById(f.errId);
+        el.classList.remove("is-invalid");
+        err.classList.remove("visible");
+      });
+
+      // Check each required field
+      requiredFields.forEach(f => {
+        const el    = document.getElementById(f.id);
+        const err   = document.getElementById(f.errId);
+        const value = el.value.trim();
+        if (!value) {
+          valid = false;
+          el.classList.add("is-invalid");
+          err.classList.add("visible");
+          errors.push(f.label);
+        }
+      });
+
+      // Cross-validate: delivery date must be >= loading date
+      const loadingDateEl  = document.getElementById("loadingDate");
+      const deliveryDateEl = document.getElementById("deliveryDate");
+      if (loadingDateEl.value && deliveryDateEl.value) {
+        if (deliveryDateEl.value < loadingDateEl.value) {
+          valid = false;
+          deliveryDateEl.classList.add("is-invalid");
+          document.getElementById("err-deliveryDate").textContent = "Delivery Date must be on or after Loading Date.";
+          document.getElementById("err-deliveryDate").classList.add("visible");
+          errors.push("Delivery Date (must be ≥ Loading Date)");
+        }
+      }
+
+      return { valid, errors };
+    }
+
+    /* ============================================================
+       COLLECT FORM DATA
+    ============================================================ */
+    function collectFormData() {
+      return {
+        fileNo:          document.getElementById("fileNo").value.trim(),
+        uin:             document.getElementById("uin").value,
+        lpoNumber:       document.getElementById("lpoNumber").value.trim(),
+        shipper:         document.getElementById("shipper").value.trim(),
+        consignee:       document.getElementById("consignee").value,
+        pol:             document.getElementById("pol").value.trim(),
+        pod:             document.getElementById("pod").value.trim(),
+        truckTrailer:    document.getElementById("truckTrailer").value.trim(),
+        containerNo:     document.getElementById("containerNo").value.trim(),
+        packages:        document.getElementById("packages").value,
+        weight:          document.getElementById("weight").value,
+        containerSize:   document.getElementById("containerSize").value,
+        loadingDate:     document.getElementById("loadingDate").value,
+        deliveryDate:    document.getElementById("deliveryDate").value,
+        commodity:       document.getElementById("commodity").value.trim(),
+        transporterName: document.getElementById("transporterName").value.trim(),
+        transporterTIN:  document.getElementById("transporterTIN").value.trim(),
+        rateAgreed:      document.getElementById("rateAgreed").value,
+        status:          "transit",
+        createdAt:       new Date().toISOString(),
+      };
+    }
+
+    /* ============================================================
+       SUBMIT FORM
+    ============================================================ */
+    function submitForm() {
+      const { valid, errors } = validateForm();
+      if (!valid) {
+        showToast(`Please fill in required fields: ${errors.join(", ")}.`, "error");
+        // Scroll to first error
+        const firstInvalid = document.querySelector(".is-invalid");
+        if (firstInvalid) firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      const data = collectFormData();
+      console.log("Submitting consignment:", data);
+
+      // Simulate API call
+      showToast("Saving consignment, please wait…", "info");
+      setTimeout(() => {
+        showToast("Consignment saved successfully! UIN: " + data.uin, "success");
+        setTimeout(() => {
+          if (confirm("Consignment saved. Go back to the consignments list?")) {
+            window.location.href = "return-transit-exports.html";
+          }
+        }, 1200);
+      }, 800);
+    }
+
+    /* ============================================================
+       SAVE AS DRAFT
+    ============================================================ */
+    function saveDraft() {
+      const data = collectFormData();
+      data.status = "draft";
+      try {
+        const drafts = JSON.parse(localStorage.getItem("erteDrafts") || "[]");
+        drafts.push(data);
+        localStorage.setItem("erteDrafts", JSON.stringify(drafts));
+        showToast("Draft saved locally (localStorage).", "info");
+      } catch(e) {
+        showToast("Draft saved (session only).", "info");
+      }
+    }
+
+    /* ============================================================
+       RESET FORM
+    ============================================================ */
+    function resetForm() {
+      if (confirm("Reset the form? All entered data will be cleared.")) {
+        document.getElementById("consignmentForm").reset();
+        // Clear all validation states
+        document.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
+        document.querySelectorAll(".field-error").forEach(el => el.classList.remove("visible"));
+        showToast("Form has been reset.", "info");
+      }
+    }
+
+    /* ============================================================
+       REFRESH SECTION
+    ============================================================ */
+    function refreshSection() {
+      showToast("Cargo details section refreshed.", "info");
+    }
+
+    /* ============================================================
+       REAL-TIME VALIDATION (clear error on input)
+    ============================================================ */
+    requiredFields.forEach(f => {
+      const el  = document.getElementById(f.id);
+      const err = document.getElementById(f.errId);
+      const eventType = el.tagName === "SELECT" ? "change" : "input";
+      el.addEventListener(eventType, () => {
+        if (el.value.trim()) {
+          el.classList.remove("is-invalid");
+          err.classList.remove("visible");
+        }
+      });
+    });
+
+    /* ============================================================
+       SCROLL HINT FOR NARROW SCREENS
+    ============================================================ */
+    function checkScrollHint() {
+      const panel = document.querySelector(".erp-form-body");
+      if (panel && panel.scrollWidth > panel.clientWidth) {
+        document.getElementById("scrollHint").style.display = "block";
+      }
+    }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const iconMap = {
+        success: "bi-check-circle-fill",
+        info:    "bi-info-circle-fill",
+        error:   "bi-exclamation-octagon-fill",
+        warning: "bi-exclamation-triangle-fill"
+      };
+      const toast = document.createElement("div");
+      toast.className = `erp-toast ${type}`;
+      toast.innerHTML = `<i class="bi ${iconMap[type] || iconMap.info}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.3s";
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    /* ============================================================
+       SET DEFAULT LOADING DATE TO TODAY
+    ============================================================ */
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("loadingDate").value  = today;
+      document.getElementById("deliveryDate").min   = today;
+      document.getElementById("loadingDate").addEventListener("change", function() {
+        document.getElementById("deliveryDate").min = this.value;
+        if (document.getElementById("deliveryDate").value < this.value) {
+          document.getElementById("deliveryDate").value = this.value;
+        }
+      });
+      checkScrollHint();
+      window.addEventListener("resize", checkScrollHint);
+    });
+  </script>
+</body>
+</html>

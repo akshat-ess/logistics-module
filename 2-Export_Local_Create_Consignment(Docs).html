@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Export Consignment – DOCS | ERP Logistics</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* TOP NAV */
+  .erp-topbar {
+    background: #1a5276;
+    color: #fff;
+    padding: 0 18px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    gap: 20px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+  }
+  .erp-topbar .brand { font-weight: 700; font-size: 13px; letter-spacing: .5px; }
+  .erp-topbar nav a { color: #cce5ff; text-decoration: none; padding: 0 8px; font-size: 12px; }
+  .erp-topbar nav a:hover { color: #fff; }
+  .erp-topbar .user-info { margin-left: auto; font-size: 12px; }
+
+  .erp-main { 
+    /* margin-top: 36px;  */
+    padding: 14px 18px; }
+
+  /* PAGE TITLE BAR */
+  .page-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .page-title-bar h1 { font-size: 20px; font-weight: 700; color: #1a3a5c; margin: 0; }
+
+  /* BUTTONS */
+  .btn-erp {
+    font-size: 12px; padding: 5px 12px; border-radius: 3px;
+    font-weight: 500; display: inline-flex; align-items: center;
+    gap: 4px; cursor: pointer; border: 1px solid transparent;
+    text-decoration: none;
+  }
+  .btn-erp-primary   { background:#2980b9; color:#fff; border-color:#2471a3; }
+  .btn-erp-primary:hover { background:#1f6fa1; color:#fff; }
+  .btn-erp-success   { background:#27ae60; color:#fff; border-color:#1e8449; }
+  .btn-erp-success:hover { background:#1e8449; color:#fff; }
+  .btn-erp-danger    { background:#e74c3c; color:#fff; border-color:#cb4335; }
+
+  /* CARD */
+  .erp-card {
+    background: #fff;
+    border: 1px solid #d0d6dc;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .erp-card-header {
+    background: #eaeff4;
+    border-bottom: 1px solid #d0d6dc;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a3a5c;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 3px 3px 0 0;
+  }
+  .erp-card-body { padding: 14px; }
+
+  /* TABS */
+  .erp-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: 2px solid #2980b9;
+  }
+  .erp-tab {
+    padding: 6px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #d0d6dc;
+    border-bottom: none;
+    background: #eaeff4;
+    color: #555;
+    border-radius: 3px 3px 0 0;
+    margin-right: 2px;
+    user-select: none;
+  }
+  .erp-tab.active { background: #2980b9; color: #fff; border-color: #2980b9; }
+  .erp-tab:hover:not(.active) { background: #d0dce8; }
+  .tab-pane { display: none; }
+  .tab-pane.show { display: block; }
+
+  /* FORM GRID – ERP STYLE */
+  .form-section {
+    border: 1px solid #d5dde5;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+  .form-row-header {
+    display: grid;
+    background: #e8ecf0;
+    border-bottom: 1px solid #d0d6dc;
+  }
+  .form-row-header span {
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c3e50;
+    border-right: 1px solid #d0d6dc;
+  }
+  .form-row-header span:last-child { border-right: none; }
+  .form-row-inputs {
+    display: grid;
+    background: #fff;
+  }
+  .form-row-inputs .field-cell {
+    padding: 6px 10px;
+    border-right: 1px solid #e8ecef;
+  }
+  .form-row-inputs .field-cell:last-child { border-right: none; }
+  .form-row-inputs .form-control,
+  .form-row-inputs .form-select {
+    font-size: 12px;
+    height: 28px;
+    padding: 3px 8px;
+    border: 1px solid #bdc3c7;
+    border-radius: 2px;
+    width: 100%;
+  }
+  .form-row-inputs .form-control:focus,
+  .form-row-inputs .form-select:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 2px rgba(41,128,185,.12);
+    outline: none;
+  }
+  .form-row-inputs textarea.form-control {
+    height: 60px;
+    resize: vertical;
+  }
+
+  /* DECLARANT SECTION */
+  .declarant-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+    padding: 0 2px;
+  }
+  .declarant-select { font-size: 12px; height: 30px; border: 1px solid #bdc3c7; border-radius: 2px; width: 100%; padding: 3px 8px; }
+  .declarant-select:focus { border-color: #2980b9; box-shadow: 0 0 0 2px rgba(41,128,185,.12); outline: none; }
+
+  /* VALIDATION */
+  .field-required { border-left: 3px solid #e74c3c !important; }
+  .error-msg { font-size: 10px; color: #e74c3c; margin-top: 2px; display: none; }
+  .is-invalid + .error-msg, .show-error { display: block; }
+
+  /* BOTTOM ACTION BAR */
+  .action-bar {
+    background: #eaeff4;
+    border-top: 1px solid #d0d6dc;
+    padding: 10px 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* SCROLLABLE horizontal hint */
+  .scroll-hint {
+    color: #888; font-size: 11px;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 4px 12px;
+    border-top: 1px solid #e8ecef;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<!-- <div class="erp-topbar">
+  <span class="brand">🚢 LogiERP</span>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#">Imports</a>
+    <a href="1-Export_Local.html" style="color:#fff;font-weight:600;border-bottom:2px solid #5dade2;">Exports</a>
+    <a href="#">Vessels</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+  <span class="user-info"><i class="bi bi-person-circle"></i> ADMIN &nbsp;|&nbsp; <i class="bi bi-building"></i> HQ Branch</span>
+</div> -->
+
+<div class="erp-main">
+
+  <!-- TITLE BAR -->
+  <div class="page-title-bar">
+    <h1>Add Exports Consignment</h1>
+    <button class="btn-erp btn-erp-primary" onclick="window.location='1-Export_Local.html'">
+      <i class="bi bi-list-ul"></i> View Consignments
+    </button>
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="erp-card">
+    <div class="erp-card-header">
+      Cargo details &nbsp;<i class="bi bi-arrow-clockwise" style="cursor:pointer;color:#2980b9;" title="Refresh"></i>
+    </div>
+    <div class="erp-card-body">
+
+      <!-- DECLARANT -->
+      <div class="mb-3">
+        <div class="declarant-label">Declarant</div>
+        <select class="declarant-select" id="declarant" required>
+          <option value="">select...</option>
+          <option>CUSTOMS AGENT – JOHN DOE</option>
+          <option>CUSTOMS AGENT – JANE SMITH</option>
+          <option>CUSTOMS AGENT – PETER JONES</option>
+          <option>CUSTOMS AGENT – MARIA ALI</option>
+        </select>
+        <div class="error-msg" id="err-declarant">Declarant is required</div>
+      </div>
+
+      <!-- TABS -->
+      <div class="erp-tabs" id="tabBar">
+        <div class="erp-tab active" onclick="switchTab('docs')">DOC</div>
+        <div class="erp-tab" onclick="switchTab('ops')">OPS</div>
+        <!-- Dummy save button in tab bar area -->
+        <div style="margin-left:auto;display:flex;align-items:flex-end;padding-bottom:2px;gap:6px;">
+          <button class="btn-erp btn-erp-success" onclick="saveForm()"><i class="bi bi-floppy"></i> Save</button>
+          <button class="btn-erp btn-erp-danger" onclick="window.location='1-Export_Local.html'"><i class="bi bi-x-circle"></i> Cancel</button>
+        </div>
+      </div>
+
+      <!-- DOCS TAB -->
+      <div class="tab-pane show" id="tab-docs">
+
+        <!-- ROW 1: UIN / Billing Customer / Mode / Refer Number / Tansad No / Lodge Date -->
+        <div class="form-section mt-2">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;">
+            <span>UIN</span>
+            <span>Billing Customer</span>
+            <span>Mode</span>
+            <span>Refer. Number</span>
+            <span>Tansad No.</span>
+            <span>Lodge Date</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;">
+            <div class="field-cell">
+              <select class="form-select" id="uin">
+                <option value="">select...</option>
+                <option>EXP/YASMIN/AIR/2026/0015</option>
+                <option>EXP/ALLIANCE/2026/0016</option>
+                <option>EXP/PANAFRICA/2026/0017</option>
+              </select>
+            </div>
+            <div class="field-cell">
+              <select class="form-select" id="billingCustomer">
+                <option value="">select...</option>
+                <option>CUSTOMER A</option>
+                <option>CUSTOMER B</option>
+                <option>CUSTOMER C</option>
+              </select>
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="mode" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="referNumber" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="tansadNo" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="date" class="form-control" id="lodgeDate">
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: Invoice No / Shipper / Consignee / Shipping Order BL / POD/Country -->
+        <div class="form-section">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+            <span>Invoice No.</span>
+            <span>Shipper</span>
+            <span>Consignee</span>
+            <span>Shipping Order BL</span>
+            <span>POD/Country</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+            <div class="field-cell">
+              <input type="text" class="form-control" id="invoiceNo" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="shipper" placeholder="">
+            </div>
+            <div class="field-cell">
+              <select class="form-select" id="consignee">
+                <option value="">select...</option>
+                <option>YASMIN PEERMOHAMMAD</option>
+                <option>ALLIANCE ONE TOBACCO TANZANIA LIMITED</option>
+                <option>PAN AFRICA ENTERPRISES LIMITED</option>
+                <option>EAST AFRICA TRADING CO.</option>
+              </select>
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="shippingOrderBL" placeholder="">
+            </div>
+            <div class="field-cell">
+              <select class="form-select" id="podCountry">
+                <option value="">select...</option>
+                <option>KENYA – MOMBASA</option>
+                <option>UAE – DUBAI</option>
+                <option>CHINA – SHANGHAI</option>
+                <option>INDIA – NHAVA SHEVA</option>
+                <option>UK – FELIXSTOWE</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: Material Descr / Size 20 / Size 40 / S/Line / Terminal -->
+        <div class="form-section">
+          <div class="form-row-header" style="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;">
+            <span>Material Descr.</span>
+            <span>Size 20</span>
+            <span>Size 40</span>
+            <span>S/Line</span>
+            <span>Terminal</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;">
+            <div class="field-cell">
+              <input type="text" class="form-control" id="materialDescr" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="number" class="form-control" id="size20" placeholder="" min="0">
+            </div>
+            <div class="field-cell">
+              <input type="number" class="form-control" id="size40" placeholder="" min="0">
+            </div>
+            <div class="field-cell">
+              <select class="form-select" id="sLine">
+                <option value="">select...</option>
+                <option>MAERSK LINE</option>
+                <option>MSC</option>
+                <option>CMA CGM</option>
+                <option>EVERGREEN</option>
+                <option>HAPAG-LLOYD</option>
+              </select>
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="terminal" placeholder="">
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 4: Vessel / Voyage / CFS / Cargo at CFS / Empty Placement -->
+        <div class="form-section">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+            <span>Vessel</span>
+            <span>Voyage</span>
+            <span>CFS</span>
+            <span>Cargo at CFS</span>
+            <span>Empty Placement</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+            <div class="field-cell">
+              <input type="text" class="form-control" id="vessel" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="voyage" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="cfs" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="cargoAtCFS" placeholder="">
+            </div>
+            <div class="field-cell">
+              <input type="text" class="form-control" id="emptyPlacement" placeholder="">
+            </div>
+          </div>
+        </div>
+
+        <!-- Original Document Received -->
+        <div class="form-section">
+          <div class="form-row-header" style="grid-template-columns:1fr;">
+            <span>Original Document Received</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr;">
+            <div class="field-cell">
+              <textarea class="form-control" id="originalDocument" rows="3" style="height:60px;resize:vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-docs -->
+
+      <!-- OPS TAB (inline for tab switching) -->
+      <div class="tab-pane" id="tab-ops">
+
+        <!-- Left/Right scroll nav -->
+        <div class="scroll-hint mt-2">
+          <i class="bi bi-caret-left-fill" style="color:#aaa;cursor:pointer;font-size:14px;"></i>
+          <i class="bi bi-caret-right-fill" style="color:#aaa;cursor:pointer;font-size:14px;"></i>
+        </div>
+
+        <!-- ROW 1: ETA / ETB / Release Order / Loading Permit -->
+        <div class="form-section mt-2">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <span>ETA</span>
+            <span>ETB</span>
+            <span>Release Order</span>
+            <span>Loading Permit</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <div class="field-cell"><input type="date" class="form-control" id="eta"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="etb"></div>
+            <div class="field-cell"><input type="text" class="form-control" id="releaseOrder"></div>
+            <div class="field-cell"><input type="text" class="form-control" id="loadingPermit"></div>
+          </div>
+        </div>
+
+        <!-- ROW 2: Stuffing Date / Delivery to Port / SOB / File Closed On / Remarks -->
+        <div class="form-section">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr 1fr 1.5fr;">
+            <span>Stuffing Date</span>
+            <span>Delivery To Port</span>
+            <span>SOB</span>
+            <span>File closed on</span>
+            <span>Remarks</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr 1fr 1.5fr;">
+            <div class="field-cell"><input type="date" class="form-control" id="stuffingDate"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="deliveryToPort"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="sob"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="fileClosed"></div>
+            <div class="field-cell"><input type="text" class="form-control" id="opsRemarks"></div>
+          </div>
+        </div>
+
+        <!-- Bottom scroll nav -->
+        <div class="scroll-hint">
+          <i class="bi bi-caret-left-fill" style="color:#aaa;cursor:pointer;font-size:14px;"></i>
+          <i class="bi bi-caret-right-fill" style="color:#aaa;cursor:pointer;font-size:14px;"></i>
+        </div>
+
+        <!-- ROW 3: Vessel Arrived / Customs Cleared / Gate Out Date -->
+        <div class="form-section mt-2">
+          <div class="form-row-header" style="grid-template-columns:1fr 1fr 1fr;">
+            <span>Vessel Arrived</span>
+            <span>Customs Cleared</span>
+            <span>Gate Out Date</span>
+          </div>
+          <div class="form-row-inputs" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="field-cell"><input type="date" class="form-control" id="vesselArrived"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="customsCleared"></div>
+            <div class="field-cell"><input type="date" class="form-control" id="gateOut"></div>
+          </div>
+        </div>
+
+        <!-- CONTAINER STATUS TABLE -->
+        <div style="margin-top:10px;">
+          <div style="font-size:12px;font-weight:600;color:#1a3a5c;margin-bottom:6px;padding:5px 10px;background:#eaeff4;border:1px solid #d0d6dc;border-radius:2px 2px 0 0;">
+            <i class="bi bi-box-seam"></i> Container Status
+          </div>
+          <div style="overflow-x:auto;border:1px solid #d0d6dc;border-top:none;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;" id="containerStatusTable">
+              <thead>
+                <tr style="background:#dce3ea;">
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">#</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Container No.</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Size</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Seal No.</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Status</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Loaded Date</th>
+                  <th style="padding:6px 10px;border:1px solid #c5cdd5;font-weight:600;color:#2c3e50;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="containerRows">
+                <tr>
+                  <td style="padding:6px 10px;border:1px solid #e0e5ea;text-align:center;color:#888;" colspan="7">No containers added. Use the containers section.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /tab-ops -->
+
+    </div><!-- /erp-card-body -->
+
+    <!-- BOTTOM ACTION BAR -->
+    <div class="action-bar">
+      <button class="btn-erp btn-erp-success" onclick="saveForm()"><i class="bi bi-floppy"></i> Save</button>
+      <button class="btn-erp btn-erp-primary" onclick="window.location='1-Export_Local.html'"><i class="bi bi-list-ul"></i> View Consignments</button>
+      <button class="btn-erp" style="background:#7f8c8d;color:#fff;" onclick="resetForm()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+      <button class="btn-erp btn-erp-danger" onclick="window.location='1-Export_Local.html'"><i class="bi bi-x-circle"></i> Cancel</button>
+    </div>
+  </div><!-- /erp-card -->
+
+</div>
+
+<!-- SUCCESS TOAST -->
+<div id="successToast" style="
+  display:none;position:fixed;bottom:30px;right:30px;
+  background:#27ae60;color:#fff;padding:12px 22px;
+  border-radius:4px;font-size:13px;font-weight:600;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;">
+  <i class="bi bi-check-circle"></i> Record saved successfully!
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ===== TAB SWITCHING ===== */
+function switchTab(tab) {
+  document.querySelectorAll('.erp-tab').forEach((t,i) => {
+    t.classList.toggle('active', (i === (tab === 'docs' ? 0 : 1)));
+  });
+  document.getElementById('tab-docs').classList.toggle('show', tab === 'docs');
+  document.getElementById('tab-ops').classList.toggle('show', tab === 'ops');
+}
+
+/* ===== VALIDATION ===== */
+function saveForm() {
+  let valid = true;
+
+  const declarant = document.getElementById('declarant');
+  const errD = document.getElementById('err-declarant');
+  if (!declarant.value) {
+    declarant.style.borderColor = '#e74c3c';
+    errD.style.display = 'block';
+    valid = false;
+  } else {
+    declarant.style.borderColor = '#bdc3c7';
+    errD.style.display = 'none';
+  }
+
+  if (valid) {
+    // Show success toast
+    const toast = document.getElementById('successToast');
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+  }
+}
+
+function resetForm() {
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+    el.style.borderColor = '';
+  });
+  document.getElementById('err-declarant').style.display = 'none';
+}
+</script>
+</body>
+</html>

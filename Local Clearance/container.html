@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Local Clearance Container for BL NO</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --erp-blue: #2a7ab5;
+    --erp-border: #dee2e6;
+    --erp-label-bg: #e8e8e8;
+  }
+  body { background: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+
+  .top-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--erp-border);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .top-navbar .user-info { color: var(--erp-blue); font-size: 13px; cursor: pointer; }
+
+  .main-content { padding: 16px 20px; }
+
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 22px; font-weight: 600; color: #222; margin: 0; }
+  .view-btn {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 4px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .view-btn:hover { background: #1a6aa0; }
+
+  /* Outer card */
+  .erp-card {
+    background: #fff;
+    border: 1px solid var(--erp-border);
+    border-radius: 4px;
+    overflow: visible;
+  }
+
+  /* CARGO tab header (like reference image – blue bar) */
+  .cargo-tab-header {
+    background: var(--erp-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 16px;
+    display: inline-block;
+    border-radius: 3px 3px 0 0;
+    margin: 0;
+    letter-spacing: 1px;
+    border: 1px solid #1a6aa0;
+    border-bottom: none;
+  }
+  .cargo-tab-wrap {
+    padding: 0 0 0 0;
+    border-bottom: none;
+    display: flex;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--erp-blue);
+  }
+
+  /* Form grid – matches reference exactly */
+  .form-grid { border-left: 1px solid #ccc; border-top: 1px solid #ccc; }
+  .form-grid-row { display: flex; border-bottom: 1px solid #ccc; flex-wrap: nowrap; }
+  .form-grid-cell {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  /* Size overrides for narrow cells */
+  .form-grid-cell.narrow   { flex: 0 0 90px; max-width: 90px; }
+  .form-grid-cell.narrow2  { flex: 0 0 80px; max-width: 80px; }
+  .form-grid-cell.wide     { flex: 2; }
+  .form-grid-cell.wide3    { flex: 3; }
+
+  .fgc-label {
+    background: var(--erp-label-bg);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .fgc-input {
+    padding: 4px 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+  }
+  .fgc-input input[type="text"],
+  .fgc-input input[type="date"],
+  .fgc-input input[type="number"],
+  .fgc-input select,
+  .fgc-input textarea {
+    width: 100%;
+    font-size: 11px;
+    height: 26px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 2px 6px;
+    background: #fff;
+  }
+  .fgc-input input[type="checkbox"] {
+    width: 18px; height: 18px;
+    cursor: pointer;
+    accent-color: var(--erp-blue);
+  }
+  .checkbox-cell .fgc-input { justify-content: center; }
+
+  /* Saved containers table */
+  .containers-table-wrap {
+    margin-top: 0;
+    border-top: 2px solid #e0e0e0;
+  }
+  .containers-table-wrap .section-title {
+    background: #f0f4f8;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2a7ab5;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .containers-table-wrap table { font-size: 11px; margin: 0; }
+  .containers-table-wrap thead th {
+    background: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    color: #444;
+    padding: 5px 8px;
+    border-bottom: 2px solid #ccc;
+    border-right: 1px solid #eee;
+    white-space: nowrap;
+  }
+  .containers-table-wrap tbody td {
+    padding: 4px 8px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  .containers-table-wrap tbody tr:hover { background: #f0f7ff; }
+  .containers-table-wrap tbody tr:nth-child(even) { background: #fafafa; }
+  .no-records { text-align: center; color: #aaa; padding: 16px; font-style: italic; }
+
+  /* Action buttons in table */
+  .btn-del { background: #dc3545; color: #fff; border: none; font-size: 10px; padding: 2px 7px; border-radius: 3px; cursor: pointer; }
+  .btn-del:hover { background: #c82333; }
+  .btn-edit2 { background: var(--erp-blue); color: #fff; border: none; font-size: 10px; padding: 2px 7px; border-radius: 3px; cursor: pointer; }
+
+  /* Save bar */
+  .save-bar {
+    padding: 12px 14px;
+    border-top: 1px solid var(--erp-border);
+    background: #f8f9fa;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .btn-save {
+    background: #28a745; color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-save:hover { background: #218838; }
+  .btn-cancel {
+    background: #6c757d; color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; cursor: pointer;
+  }
+  .btn-cancel:hover { background: #5a6268; }
+  .btn-add-more {
+    background: var(--erp-blue); color: #fff; border: none;
+    border-radius: 3px; padding: 6px 20px; font-size: 13px; cursor: pointer;
+  }
+  .btn-add-more:hover { background: #1a6aa0; }
+
+  /* BL number in heading */
+  .bl-ref { color: var(--erp-blue); font-weight: 700; }
+
+  /* Scroll indicator */
+  .scroll-up-btn {
+    position: absolute; right: 0; top: 0;
+    background: #e0e0e0; border: 1px solid #ccc;
+    width: 14px; cursor: pointer; text-align: center;
+    color: #888; font-size: 10px; line-height: 16px;
+    height: 20px;
+  }
+  .scroll-down-btn {
+    position: absolute; right: 0; bottom: 0;
+    background: #e0e0e0; border: 1px solid #ccc;
+    width: 14px; cursor: pointer; text-align: center;
+    color: #888; font-size: 10px; line-height: 16px;
+    height: 20px;
+  }
+
+  /* Validation error highlight */
+  .field-error input, .field-error select {
+    border-color: #dc3545 !important;
+    background: #fff5f5 !important;
+  }
+  .err-msg { color: #dc3545; font-size: 10px; margin-top: 2px; display: none; }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<!-- <div class="top-navbar">
+  <span class="user-info"><i class="fa fa-user-circle"></i> temp user <i class="fa fa-caret-down"></i></span>
+</div> -->
+
+<div class="main-content">
+
+  <div class="page-heading">
+    <h1>Add Local Clearance Container for BL NO: <span class="bl-ref" id="blDisplay"></span></h1>
+    <button class="view-btn" onclick="location.href='cargo-position.html'">View Consignments</button>
+  </div>
+
+  <div class="erp-card">
+
+    <!-- CARGO tab -->
+    <div class="cargo-tab-wrap">
+      <div class="cargo-tab-header">CARGO</div>
+      <!-- extended blue bar -->
+      <div style="flex:1; height:2px; background:var(--erp-blue); align-self:flex-end;"></div>
+    </div>
+
+    <!-- Container Entry Form Grid -->
+    <div class="form-grid" id="entryForm">
+
+      <!-- Row 1: Container No. | Size20 | Size40 | Container Type | LCL -->
+      <div class="form-grid-row">
+        <div class="form-grid-cell wide" id="containerNoCell">
+          <div class="fgc-label">Container No.</div>
+          <div class="fgc-input">
+            <input type="text" id="containerNo" placeholder="e.g. MSCU1234567" maxlength="11"
+              oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;">
+          </div>
+        </div>
+        <div class="form-grid-cell narrow">
+          <div class="fgc-label">Size20</div>
+          <div class="fgc-input">
+            <input type="number" id="size20" min="0" max="1" value="0"
+              onchange="syncSize(this,'size40')">
+          </div>
+        </div>
+        <div class="form-grid-cell narrow">
+          <div class="fgc-label">Size40</div>
+          <div class="fgc-input">
+            <input type="number" id="size40" min="0" max="1" value="0"
+              onchange="syncSize(this,'size20')">
+          </div>
+        </div>
+        <div class="form-grid-cell wide">
+          <div class="fgc-label">Container Type</div>
+          <div class="fgc-input">
+            <select id="containerType">
+              <option value="">select...</option>
+              <option>DRY (GP)</option>
+              <option>HIGH CUBE (HC)</option>
+              <option>REEFER (RF)</option>
+              <option>OPEN TOP (OT)</option>
+              <option>FLAT RACK (FR)</option>
+              <option>TANK (TK)</option>
+              <option>BULK (BK)</option>
+              <option>VENTILATED (VH)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-cell narrow checkbox-cell">
+          <div class="fgc-label">LCL</div>
+          <div class="fgc-input">
+            <input type="checkbox" id="lclChk">
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: UNITS | Gross Weight (KGS) | Transporter | Truck Details | Remarks -->
+      <div class="form-grid-row">
+        <div class="form-grid-cell narrow2">
+          <div class="fgc-label">UNITS</div>
+          <div class="fgc-input">
+            <input type="number" id="units" min="0" placeholder="">
+          </div>
+        </div>
+        <div class="form-grid-cell">
+          <div class="fgc-label">Gross Weight (KGS)</div>
+          <div class="fgc-input">
+            <input type="number" id="grossWeight" step="0.001" min="0" placeholder="">
+          </div>
+        </div>
+        <div class="form-grid-cell wide">
+          <div class="fgc-label">Transporter</div>
+          <div class="fgc-input">
+            <select id="transporter">
+              <option value="">select...</option>
+              <option>SWIFT TRANSPORT LTD</option>
+              <option>COAST HAULIERS</option>
+              <option>SERENGETI LOGISTICS</option>
+              <option>EAST AFRICA FREIGHT</option>
+              <option>KILIMANJARO TRANSPORT</option>
+              <option>ZANZIBAR CARGO MOVERS</option>
+              <option>MARA EXPRESS LTD</option>
+              <option>ARUSHA HAULAGE CO</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-cell wide">
+          <div class="fgc-label">Truck Details</div>
+          <div class="fgc-input">
+            <input type="text" id="truckDetails" placeholder="e.g. T 123 ABC / Driver Name">
+          </div>
+        </div>
+        <div class="form-grid-cell wide">
+          <div class="fgc-label">Remarks</div>
+          <div class="fgc-input">
+            <input type="text" id="remarks" placeholder="">
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Loading Date | Destination Date | Offload Date | Empty Gate In Date/Interchange -->
+      <div class="form-grid-row">
+        <div class="form-grid-cell">
+          <div class="fgc-label">Loading Date</div>
+          <div class="fgc-input"><input type="date" id="loadingDate"></div>
+        </div>
+        <div class="form-grid-cell">
+          <div class="fgc-label">Destination Date</div>
+          <div class="fgc-input"><input type="date" id="destDate"></div>
+        </div>
+        <div class="form-grid-cell">
+          <div class="fgc-label">Offload Date</div>
+          <div class="fgc-input"><input type="date" id="offloadDate"></div>
+        </div>
+        <div class="form-grid-cell wide3">
+          <div class="fgc-label">Empty Gate In Date / Interchange</div>
+          <div class="fgc-input">
+            <input type="date" id="emptyGateDate" style="width:48%; margin-right:4px;">
+            <input type="text" id="interchange" placeholder="Interchange Ref." style="width:48%;">
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-grid -->
+
+    <!-- Saved Containers Table -->
+    <div class="containers-table-wrap">
+      <div class="section-title">
+        <span><i class="fa fa-boxes me-1"></i> Added Containers (<span id="containerCount">0</span>)</span>
+        <span style="font-size:11px; color:#888;">Records saved in this session</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table" style="font-size:11px; margin:0;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Container No.</th>
+              <th>Size20</th>
+              <th>Size40</th>
+              <th>Type</th>
+              <th>LCL</th>
+              <th>Units</th>
+              <th>Gross Wt (KGS)</th>
+              <th>Transporter</th>
+              <th>Truck Details</th>
+              <th>Remarks</th>
+              <th>Loading Date</th>
+              <th>Dest. Date</th>
+              <th>Offload Date</th>
+              <th>Empty Gate In</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="savedContainers">
+            <tr><td colspan="16" class="no-records">No containers added yet. Use the form above to add containers.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Save Bar -->
+    <div class="save-bar">
+      <button class="btn-cancel" onclick="location.href='cargo-position.html'">Back to List</button>
+      <button class="btn-add-more" onclick="addAnotherContainer()">
+        <i class="fa fa-plus me-1"></i> Add Another
+      </button>
+      <button class="btn-save" onclick="saveContainer()">
+        <i class="fa fa-save me-1"></i> Save Container
+      </button>
+    </div>
+
+  </div><!-- /erp-card -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ----- BL Number from URL or default -----
+const urlParams = new URLSearchParams(window.location.search);
+const blNo = urlParams.get('bl') || '';
+document.getElementById('blDisplay').textContent = blNo;
+
+// ----- Saved containers data -----
+let savedContainers = [];
+let editIndex = -1;
+
+// ----- Sync size20/size40 so total ≤ 1 (or both 0) -----
+function syncSize(changed, other) {
+  const c = parseInt(changed.value) || 0;
+  if (c > 1) { changed.value = 1; }
+  // Can't have both size20 and size40 set (unless multiple containers)
+  // For a single container record: set size
+}
+
+// ----- Validate -----
+function validateForm() {
+  let valid = true;
+  const contNo = document.getElementById('containerNo').value.trim();
+  const cell = document.getElementById('containerNoCell');
+
+  if (!contNo) {
+    cell.classList.add('field-error');
+    valid = false;
+  } else if (!/^[A-Z]{4}\d{7}$/.test(contNo) && contNo !== '') {
+    // Relaxed validation for demo
+    cell.classList.remove('field-error');
+  } else {
+    cell.classList.remove('field-error');
+  }
+
+  // Check duplicate container number
+  if (contNo && editIndex === -1) {
+    const dup = savedContainers.find(c => c.containerNo === contNo);
+    if (dup) {
+      alert(`Container No. "${contNo}" has already been added.`);
+      return false;
+    }
+  }
+  return valid;
+}
+
+// ----- Collect form data -----
+function collectFormData() {
+  return {
+    containerNo:   document.getElementById('containerNo').value.trim().toUpperCase(),
+    size20:        document.getElementById('size20').value,
+    size40:        document.getElementById('size40').value,
+    containerType: document.getElementById('containerType').value,
+    lcl:           document.getElementById('lclChk').checked,
+    units:         document.getElementById('units').value,
+    grossWeight:   document.getElementById('grossWeight').value,
+    transporter:   document.getElementById('transporter').value,
+    truckDetails:  document.getElementById('truckDetails').value,
+    remarks:       document.getElementById('remarks').value,
+    loadingDate:   document.getElementById('loadingDate').value,
+    destDate:      document.getElementById('destDate').value,
+    offloadDate:   document.getElementById('offloadDate').value,
+    emptyGateDate: document.getElementById('emptyGateDate').value,
+    interchange:   document.getElementById('interchange').value
+  };
+}
+
+// ----- Clear form -----
+function clearForm() {
+  document.getElementById('containerNo').value = '';
+  document.getElementById('size20').value = '0';
+  document.getElementById('size40').value = '0';
+  document.getElementById('containerType').value = '';
+  document.getElementById('lclChk').checked = false;
+  document.getElementById('units').value = '';
+  document.getElementById('grossWeight').value = '';
+  document.getElementById('transporter').value = '';
+  document.getElementById('truckDetails').value = '';
+  document.getElementById('remarks').value = '';
+  document.getElementById('loadingDate').value = '';
+  document.getElementById('destDate').value = '';
+  document.getElementById('offloadDate').value = '';
+  document.getElementById('emptyGateDate').value = '';
+  document.getElementById('interchange').value = '';
+  document.getElementById('containerNoCell').classList.remove('field-error');
+  editIndex = -1;
+  document.querySelector('.btn-save').textContent = '💾 Save Container';
+}
+
+// ----- Save container -----
+function saveContainer() {
+  if (!validateForm()) return;
+  const data = collectFormData();
+  if (!data.containerNo) {
+    alert('Container Number is required.');
+    return;
+  }
+  if (editIndex >= 0) {
+    savedContainers[editIndex] = data;
+    editIndex = -1;
+  } else {
+    savedContainers.push(data);
+  }
+  renderTable();
+  clearForm();
+}
+
+// ----- Add another (save + clear) -----
+function addAnotherContainer() {
+  if (!validateForm()) return;
+  const data = collectFormData();
+  if (!data.containerNo) {
+    alert('Please fill in Container Number before adding another.');
+    return;
+  }
+  savedContainers.push(data);
+  renderTable();
+  clearForm();
+  document.getElementById('containerNo').focus();
+}
+
+// ----- Render saved table -----
+function renderTable() {
+  const tbody = document.getElementById('savedContainers');
+  document.getElementById('containerCount').textContent = savedContainers.length;
+
+  if (savedContainers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="16" class="no-records">No containers added yet. Use the form above to add containers.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = savedContainers.map((c, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${c.containerNo}</strong></td>
+      <td class="text-center">${c.size20}</td>
+      <td class="text-center">${c.size40}</td>
+      <td>${c.containerType}</td>
+      <td class="text-center">${c.lcl ? '<span style="color:#28a745;font-weight:700;">✓</span>' : ''}</td>
+      <td class="text-center">${c.units}</td>
+      <td class="text-right">${c.grossWeight ? Number(c.grossWeight).toLocaleString() : ''}</td>
+      <td>${c.transporter}</td>
+      <td>${c.truckDetails}</td>
+      <td>${c.remarks}</td>
+      <td>${formatDate(c.loadingDate)}</td>
+      <td>${formatDate(c.destDate)}</td>
+      <td>${formatDate(c.offloadDate)}</td>
+      <td>${formatDate(c.emptyGateDate)} ${c.interchange ? '<br><small style="color:#888;">' + c.interchange + '</small>' : ''}</td>
+      <td>
+        <button class="btn-edit2" onclick="editContainer(${i})" title="Edit"><i class="fa fa-edit"></i></button>
+        <button class="btn-del" onclick="deleteContainer(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return `${day}-${m}-${y}`;
+}
+
+function deleteContainer(idx) {
+  if (confirm(`Delete container "${savedContainers[idx].containerNo}"?`)) {
+    savedContainers.splice(idx, 1);
+    renderTable();
+  }
+}
+
+function editContainer(idx) {
+  const c = savedContainers[idx];
+  document.getElementById('containerNo').value    = c.containerNo;
+  document.getElementById('size20').value          = c.size20;
+  document.getElementById('size40').value          = c.size40;
+  document.getElementById('containerType').value   = c.containerType;
+  document.getElementById('lclChk').checked        = c.lcl;
+  document.getElementById('units').value           = c.units;
+  document.getElementById('grossWeight').value     = c.grossWeight;
+  document.getElementById('transporter').value     = c.transporter;
+  document.getElementById('truckDetails').value    = c.truckDetails;
+  document.getElementById('remarks').value         = c.remarks;
+  document.getElementById('loadingDate').value     = c.loadingDate;
+  document.getElementById('destDate').value        = c.destDate;
+  document.getElementById('offloadDate').value     = c.offloadDate;
+  document.getElementById('emptyGateDate').value   = c.emptyGateDate;
+  document.getElementById('interchange').value     = c.interchange;
+  editIndex = idx;
+  document.querySelector('.btn-save').innerHTML = '<i class="fa fa-save me-1"></i> Update Container';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Container No format hint
+document.getElementById('containerNo').addEventListener('blur', function() {
+  const v = this.value.trim().toUpperCase();
+  this.value = v;
+  if (v && !/^[A-Z]{4}\d{7}$/.test(v)) {
+    this.style.borderColor = '#fd7e14';
+    this.title = 'Standard format: 4 letters + 7 digits (e.g. MSCU1234567)';
+  } else {
+    this.style.borderColor = '#ddd';
+    this.title = '';
+  }
+});
+</script>
+</body>
+</html>

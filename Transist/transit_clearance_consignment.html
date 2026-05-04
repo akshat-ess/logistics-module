@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit Clearance Consignment</title>
+<style>
+  :root {
+    --primary: #3c8dbc;
+    --primary-dark: #2e6d96;
+    --primary-light: #d9edf7;
+    --success: #00a65a;
+    --warning: #f39c12;
+    --danger: #dd4b39;
+    --info: #00c0ef;
+    --purple: #605ca8;
+    --teal: #39cccc;
+    --bg: #ecf0f5;
+    --white: #ffffff;
+    --border: #d2d6de;
+    --text: #333333;
+    --text-muted: #777777;
+    --shadow: 0 1px 3px rgba(0,0,0,0.12);
+    --radius: 3px;
+    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 13px; }
+
+  /* NAVBAR */
+  .navbar {
+    background: var(--primary); color: #fff; height: 50px;
+    display: flex; align-items: center; padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
+  }
+  .navbar-brand { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .navbar-nav { margin-left: auto; display: flex; gap: 5px; align-items: center; }
+  .navbar-nav a {
+    color: rgba(255,255,255,0.8); text-decoration: none; padding: 6px 12px;
+    border-radius: var(--radius); font-size: 13px; transition: background 0.2s;
+  }
+  .navbar-nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* BREADCRUMB */
+  .breadcrumb-bar {
+    background: #fff; padding: 8px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-muted);
+  }
+  .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+
+  /* MAIN */
+  .main-content { padding: 20px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+  }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+
+  /* CARD */
+  .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
+  .card-header {
+    background: #f4f4f4; padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+  }
+  .card-body { padding: 12px; }
+
+  /* ACTION BUTTONS ROW */
+  .action-buttons { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .action-btn {
+    padding: 5px 10px; border: none; border-radius: var(--radius);
+    cursor: pointer; font-size: 12px; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 4px;
+    color: #fff; font-weight: 500; transition: filter 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .action-btn:hover { filter: brightness(0.88); transform: translateY(-1px); }
+  .action-btn.blue   { background: var(--primary); }
+  .action-btn.green  { background: var(--success); }
+  .action-btn.orange { background: var(--warning); }
+  .action-btn.red    { background: var(--danger); }
+  .action-btn.teal   { background: var(--teal); color: #fff; }
+  .action-btn.purple { background: var(--purple); }
+  .action-btn.dark   { background: #555; }
+  .action-btn.info   { background: var(--info); }
+
+  /* SEARCH FILTERS */
+  .filter-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 4px; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-select-wrap { display: flex; gap: 5px; align-items: center; }
+  .filter-select-wrap select {
+    flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; font-family: var(--font); background: #fff;
+  }
+  .btn-search {
+    padding: 5px 14px; background: var(--primary); color: #fff;
+    border: none; border-radius: var(--radius); cursor: pointer;
+    font-size: 13px; font-family: var(--font);
+    transition: background 0.15s;
+  }
+  .btn-search:hover { background: var(--primary-dark); }
+
+  /* TOTALS BAR */
+  .totals-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; background: #f9f9f9; border-bottom: 1px solid #eee;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .totals-bar strong { color: var(--text); }
+
+  /* TABLE CONTROLS */
+  .table-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; border-bottom: 1px solid #eee; background: #fff;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .records-per-page { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .records-per-page input {
+    width: 50px; padding: 3px 6px; border: 1px solid var(--border);
+    border-radius: var(--radius); font-size: 13px; text-align: center;
+  }
+  .table-search { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .table-search input {
+    padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; width: 200px;
+  }
+
+  /* DATA TABLE */
+  .table-wrap { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 900px; }
+  .data-table thead tr { background: var(--primary); color: #fff; }
+  .data-table thead th {
+    padding: 8px 8px; text-align: left; font-weight: 600; white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.15); cursor: pointer; font-size: 11px;
+    user-select: none;
+  }
+  .data-table thead th .sort-icons { display: inline-block; margin-left: 4px; opacity: 0.6; font-size: 10px; }
+  .data-table thead th:hover { background: var(--primary-dark); }
+  .data-table tbody tr { border-bottom: 1px solid #f0f0f0; }
+  .data-table tbody tr:hover { background: var(--primary-light); }
+  .data-table tbody tr:nth-child(even) { background: #fafafa; }
+  .data-table tbody tr:nth-child(even):hover { background: var(--primary-light); }
+  .data-table tbody td { padding: 7px 8px; vertical-align: middle; white-space: nowrap; }
+  .data-table .no-data { text-align: center; padding: 20px; color: var(--text-muted); }
+
+  /* ACTION ICONS IN TABLE */
+  .tbl-action-btn {
+    padding: 3px 8px; border: none; border-radius: 2px; cursor: pointer;
+    font-size: 11px; color: #fff; margin-right: 2px; transition: filter 0.15s;
+  }
+  .tbl-action-btn:hover { filter: brightness(0.85); }
+  .tbl-btn-view  { background: var(--primary); }
+  .tbl-btn-edit  { background: var(--warning); }
+  .tbl-btn-del   { background: var(--danger); }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-top: 1px solid #eee; background: #fff;
+    flex-wrap: wrap; gap: 8px; font-size: 12px;
+  }
+  .pagination-info { color: var(--text-muted); }
+  .pagination-btns { display: flex; gap: 4px; }
+  .page-btn {
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: #fff; cursor: pointer; font-size: 12px; font-family: var(--font);
+    transition: background 0.15s;
+  }
+  .page-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+  .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-success { background: #dff0d8; color: #3c763d; }
+  .badge-warning { background: #fcf8e3; color: #8a6d3b; }
+  .badge-danger  { background: #f2dede; color: #a94442; }
+  .badge-info    { background: #d9edf7; color: #31708f; }
+  .badge-primary { background: #dbeeff; color: #2e6d96; }
+
+  /* SPINNER */
+  .spinner-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOOLTIP */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%); background: #333; color: #fff;
+    padding: 3px 8px; border-radius: 3px; font-size: 11px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 200;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* EXPORT BUTTONS */
+  .export-btns { display: flex; gap: 6px; }
+  .btn { padding: 6px 12px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-family: var(--font); display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: filter 0.15s; color: #fff; }
+  .btn-primary { background: var(--primary); }
+  .btn-success { background: var(--success); }
+  .btn-warning { background: var(--warning); }
+  .btn-danger  { background: var(--danger); }
+  .btn:hover   { filter: brightness(0.9); }
+  .create-btn {
+    padding: 8px 18px; background: var(--primary); color: #fff; border: none;
+    border-radius: var(--radius); cursor: pointer; font-size: 14px; font-weight: 600;
+    font-family: var(--font); transition: background 0.15s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .create-btn:hover { background: var(--primary-dark); }
+
+  @media (max-width: 768px) { .filter-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .filter-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">🛣️ TransitERP — Logistics Management System</div>
+  <div class="navbar-nav">
+    <a href="transit_clearance_dashboard.html">Dashboard</a>
+    <a href="transit_clearance_consignment.html" style="background:rgba(255,255,255,0.2);">Consignments</a>
+    <a href="add_transit_cargo_doc.html">New Entry</a>
+    <a href="#">👤 Admin</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="transit_clearance_dashboard.html">🏠 Home</a>
+  <span>›</span>
+  <a href="transit_clearance_dashboard.html">Transit Clearance</a>
+  <span>›</span>
+  <span>Consignment Listing</span>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">Transit Clearance Consignment</h1>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <div class="export-btns">
+        <button class="btn btn-success" onclick="exportCSV()" data-tooltip="Export to Excel/CSV">📥 Excel</button>
+        <button class="btn btn-danger"  onclick="exportPDF()" data-tooltip="Export to PDF / Print">🖨️ PDF</button>
+      </div>
+      <a href="add_transit_cargo_doc.html" class="create-btn" data-tooltip="Create a new consignment">➕ Create Consignment</a>
+    </div>
+  </div>
+
+  <!-- ACTION BUTTONS ROW 1 -->
+  <div class="card">
+    <div class="card-body" style="padding:10px;">
+      <div class="action-buttons">
+        <button class="action-btn blue"   onclick="doAction('Print Containers')"   data-tooltip="Print all container labels">🖨️ Print (Containers)</button>
+        <button class="action-btn red"    onclick="doAction('Special Instructions')" data-tooltip="View special instructions">📋 Special Instructions</button>
+        <button class="action-btn blue"   onclick="doAction('Ops Monitoring')"     data-tooltip="Operations monitoring">📡 Op's Monitoring</button>
+        <button class="action-btn blue"   onclick="doAction('Port Agent Monitoring')" data-tooltip="Port agent monitoring">🏗️ Port Agent Monitoring</button>
+        <button class="action-btn red"    onclick="doAction('Border and Offload Delay')" data-tooltip="Border and offload delay report">🚧 Border and Offload Delay</button>
+        <button class="action-btn blue"   onclick="printAll()"                     data-tooltip="Print all records">🖨️ Print All</button>
+        <button class="action-btn teal"   onclick="doAction('Track')"              data-tooltip="Track consignments">📍 Track</button>
+        <button class="action-btn green"  onclick="filterStatus('Active')"         data-tooltip="Show active consignments">✅ Active</button>
+        <button class="action-btn green"  onclick="filterStatus('Delivered')"      data-tooltip="Show delivered consignments">📦 Delivered</button>
+        <button class="action-btn orange" onclick="filterStatus('With Transport')" data-tooltip="With transport consignments">🚛 With Transport</button>
+        <button class="action-btn dark"   onclick="filterStatus('Without Transport')" data-tooltip="Without transport">🚫 Without Transport</button>
+        <button class="action-btn red"    onclick="filterStatus('DO Pending')"     data-tooltip="DO pending consignments">⏳ DO Pending</button>
+        <button class="action-btn blue"   onclick="filterStatus('Await Carry In')" data-tooltip="Awaiting carry in">🕐 Await Carry In</button>
+        <button class="action-btn blue"   onclick="doAction('Transport Planning')" data-tooltip="Transport planning">🗓️ Transport Planning</button>
+        <button class="action-btn green"  onclick="doAction('DropOff Requests')"   data-tooltip="Drop-off requests">📬 DropOff Requests</button>
+      </div>
+      <div class="action-buttons" style="margin-top:4px;">
+        <button class="action-btn red"    onclick="doAction('Southern Corridor')"  data-tooltip="Southern corridor report">🛣️ Southern Corridor</button>
+        <button class="action-btn red"    onclick="doAction('Central Corridor')"   data-tooltip="Central corridor report">🛣️ Central Corridor</button>
+        <button class="action-btn red"    onclick="doAction('TBL')"               data-tooltip="TBL report">🖨️ TBL</button>
+        <button class="action-btn blue"   onclick="doAction('Ageing Search')"      data-tooltip="Ageing search">🔍 Ageing Search</button>
+        <button class="action-btn blue"   onclick="doAction('UIN Container Report – Regional')" data-tooltip="UIN Container Report Regional">🔍 UIN Container Report – Regional</button>
+        <button class="action-btn blue"   onclick="doAction('UIN Container Report – Countries')" data-tooltip="UIN Container Report Countries">🔍 UIN Container Report – Countries</button>
+        <button class="action-btn blue"   onclick="doAction('Goods In Transit Upcountry')" data-tooltip="Goods in transit upcountry">🔍 Goods In Transit Upcountry</button>
+        <button class="action-btn blue"   onclick="doAction('Update Voyage')"      data-tooltip="Update voyage details">👤 Update Voyage</button>
+        <button class="action-btn blue"   onclick="doAction('Border Report')"      data-tooltip="Border report">🔍 Border Report</button>
+      </div>
+      <div class="action-buttons" style="margin-top:4px;">
+        <button class="action-btn blue"   onclick="doAction('Interchange Search')" data-tooltip="Interchange search">🔍 Interchange Search</button>
+        <button class="action-btn blue"   onclick="doAction('Delay Offloading')"   data-tooltip="Delay offloading report">🔍 Delay Offloading Report</button>
+        <button class="action-btn blue"   onclick="doAction('Overweight Report')"  data-tooltip="Overweight report">🔍 Overweight Report</button>
+        <button class="action-btn orange" onclick="doAction('Detention')"          data-tooltip="Detention report">▶️ Detention</button>
+        <button class="action-btn orange" onclick="doAction('Demurrage')"          data-tooltip="Demurrage report">▶️ Demurrage</button>
+        <button class="action-btn teal"   onclick="doAction('Transporter Ageing')" data-tooltip="Transporter ageing">🔍 Transporter Ageing</button>
+        <button class="action-btn red"    onclick="doAction('Breakdowns')"         data-tooltip="Breakdowns">🔍 Breakdowns</button>
+        <button class="action-btn blue"   onclick="doAction('Bulk Update Containers')" data-tooltip="Bulk update containers">👤 Bulk Update Containers</button>
+        <button class="action-btn blue"   onclick="doAction('Container Delay Report')" data-tooltip="Container delay report">🔍 Container Delay Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH FILTERS CARD -->
+  <div class="card">
+    <div class="card-header">🔍 All Consignments <button onclick="refreshTable()" style="background:none;border:none;cursor:pointer;font-size:14px;" data-tooltip="Refresh list">🔄</button></div>
+    <div class="card-body">
+      <div class="filter-row">
+        <div class="filter-group">
+          <div class="filter-select-wrap">
+            <select id="filterConsignee">
+              <option value="">Search Consignee...</option>
+              <option>ACME Logistics</option>
+              <option>GlobalTrade Ltd</option>
+              <option>East Africa Cargo</option>
+              <option>Northern Freight</option>
+              <option>Congo Trade Co</option>
+            </select>
+            <button class="btn-search" onclick="applyFilters()">Search</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-select-wrap">
+            <select id="filterUIN">
+              <option value="">Search UIN...</option>
+              <option>UIN-2024-0001</option>
+              <option>UIN-2024-0002</option>
+              <option>UIN-2024-0003</option>
+            </select>
+            <button class="btn-search" onclick="applyFilters()">Search</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-select-wrap">
+            <select id="filterTransporter">
+              <option value="">Search Transporter...</option>
+              <option>FastHaul Ltd</option>
+              <option>TransAfrica</option>
+              <option>KT Logistics</option>
+            </select>
+            <button class="btn-search" onclick="applyFilters()">Search</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-select-wrap">
+            <select id="filterFileNo">
+              <option value="">Search File No...</option>
+              <option>TC-2024-001</option>
+              <option>TC-2024-002</option>
+              <option>TC-2024-003</option>
+              <option>TC-2024-004</option>
+              <option>TC-2024-005</option>
+            </select>
+            <button class="btn-search" onclick="applyFilters()">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="card">
+    <!-- TOTALS -->
+    <div class="totals-bar">
+      <span>Total items: <strong id="totalItems">8</strong> / Total Containers: <strong id="totalContainers">28</strong></span>
+      <span id="activeFilter" style="color:var(--primary);font-weight:600;"></span>
+    </div>
+    <!-- TABLE CONTROLS -->
+    <div class="table-controls">
+      <div class="records-per-page">
+        <input type="number" id="perPage" value="10" min="1" max="100" onchange="renderTable()">
+        <span>records per page</span>
+      </div>
+      <div class="table-search">
+        <label>Search:</label>
+        <input type="text" id="tableSearch" placeholder="Type to filter..." oninput="renderTable()">
+      </div>
+    </div>
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table class="data-table" id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">File No <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(1)">Refer. Number <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(2)">Tansad No <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(3)">Consignee <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(4)">Destination <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(5)">Containers <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(6)">ETA <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(7)">ETB <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(8)">Vessel <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(9)">B/L Number <span class="sort-icons">⇅</span></th>
+            <th onclick="sortTable(10)">S/L DO/Date <span class="sort-icons">⇅</span></th>
+            <th>DETAILS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <span class="pagination-info" id="pageInfo">Showing 0 to 0 of 0 entries</span>
+      <div class="pagination-btns" id="pageBtns"></div>
+    </div>
+  </div>
+
+</div><!-- /.main-content -->
+
+<script>
+  // === SPINNER ===
+  window.addEventListener('load', () => {
+    setTimeout(() => { document.getElementById('spinner').style.display = 'none'; }, 600);
+  });
+
+  // === DUMMY DATA ===
+  const allData = [
+    { fileNo:'TC-2024-001', refNo:'REF-001', tansadNo:'TSD-9001', consignee:'ACME Logistics',    dest:'Lusaka, ZM',       containers:'3 × 20ft', eta:'2024-03-15', etb:'2024-03-10', vessel:'MSC Miriam',   bl:'BL-ZM-001', slDate:'2024-02-28', status:'Active'      },
+    { fileNo:'TC-2024-002', refNo:'REF-002', tansadNo:'TSD-9002', consignee:'GlobalTrade Ltd',   dest:'Kinshasa, DRC',    containers:'1 × 40ft', eta:'2024-03-18', etb:'2024-03-13', vessel:'Evergreen 72', bl:'BL-DRC-002', slDate:'2024-03-01', status:'In Transit'  },
+    { fileNo:'TC-2024-003', refNo:'REF-003', tansadNo:'TSD-9003', consignee:'East Africa Cargo', dest:'Kigali, RW',       containers:'2 × 20ft', eta:'2024-03-20', etb:'2024-03-15', vessel:'CMA CGM Atlas',bl:'BL-RW-003',  slDate:'2024-03-05', status:'Await DO'    },
+    { fileNo:'TC-2024-004', refNo:'REF-004', tansadNo:'TSD-9004', consignee:'Northern Freight',  dest:'Lilongwe, MAL',   containers:'4 × 40ft', eta:'2024-03-22', etb:'2024-03-17', vessel:'MSC Maria',    bl:'BL-MAL-004', slDate:'2024-03-08', status:'Active'      },
+    { fileNo:'TC-2024-005', refNo:'REF-005', tansadNo:'TSD-9005', consignee:'Congo Trade Co',    dest:'Bujumbura, BUR',   containers:'2 × 20ft', eta:'2024-03-25', etb:'2024-03-20', vessel:'Hapag Lloyd X', bl:'BL-BUR-005', slDate:'2024-03-10', status:'DO Pending'  },
+    { fileNo:'TC-2024-006', refNo:'REF-006', tansadNo:'TSD-9006', consignee:'FastHaul Ltd',      dest:'Lusaka, ZM',       containers:'1 × 20ft', eta:'2024-03-28', etb:'2024-03-22', vessel:'MSC Miriam',   bl:'BL-ZM-006',  slDate:'2024-03-12', status:'With Transport'},
+    { fileNo:'TC-2024-007', refNo:'REF-007', tansadNo:'TSD-9007', consignee:'TransAfrica',       dest:'Dar es Salaam, TZ',containers:'3 × 40ft', eta:'2024-03-30', etb:'2024-03-25', vessel:'Maersk Evora',  bl:'BL-TZ-007',  slDate:'2024-03-15', status:'Delivered'  },
+    { fileNo:'TC-2024-008', refNo:'REF-008', tansadNo:'TSD-9008', consignee:'KT Logistics',      dest:'Nairobi, KE',      containers:'2 × 20ft', eta:'2024-04-02', etb:'2024-03-28', vessel:'CMA CGM Palma', bl:'BL-KE-008',  slDate:'2024-03-18', status:'Active'      },
+  ];
+
+  let filteredData = [...allData];
+  let currentPage = 1;
+  let sortCol = -1, sortAsc = true;
+
+  const statusBadge = {
+    'Active':         '<span class="badge badge-success">Active</span>',
+    'In Transit':     '<span class="badge badge-info">In Transit</span>',
+    'Await DO':       '<span class="badge badge-warning">Await DO</span>',
+    'DO Pending':     '<span class="badge badge-danger">DO Pending</span>',
+    'With Transport': '<span class="badge badge-primary">With Transport</span>',
+    'Delivered':      '<span class="badge badge-success">Delivered</span>',
+  };
+
+  function renderTable() {
+    const perPage = parseInt(document.getElementById('perPage').value) || 10;
+    const search  = document.getElementById('tableSearch').value.toLowerCase();
+    const filtered = filteredData.filter(r =>
+      Object.values(r).some(v => String(v).toLowerCase().includes(search))
+    );
+    const totalPages = Math.ceil(filtered.length / perPage);
+    if (currentPage > totalPages) currentPage = 1;
+    const start = (currentPage - 1) * perPage;
+    const pageRows = filtered.slice(start, start + perPage);
+    const tbody = document.getElementById('tableBody');
+    if (pageRows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="13" class="no-data">No data available in table</td></tr>';
+    } else {
+      tbody.innerHTML = pageRows.map(r => `
+        <tr>
+          <td><strong>${r.fileNo}</strong></td>
+          <td>${r.refNo}</td>
+          <td>${r.tansadNo}</td>
+          <td>${r.consignee}</td>
+          <td>${r.dest}</td>
+          <td>${r.containers}</td>
+          <td>${r.eta}</td>
+          <td>${r.etb}</td>
+          <td>${r.vessel}</td>
+          <td>${r.bl}</td>
+          <td>${r.slDate}</td>
+          <td><button class="tbl-action-btn tbl-btn-view" onclick="viewRecord('${r.fileNo}')">👁 View</button></td>
+          <td>
+            <button class="tbl-action-btn tbl-btn-edit" onclick="editRecord('${r.fileNo}')">✏️ Edit</button>
+            <button class="tbl-action-btn tbl-btn-del"  onclick="deleteRecord('${r.fileNo}')">🗑 Del</button>
+          </td>
+        </tr>`).join('');
+    }
+    document.getElementById('pageInfo').textContent =
+      `Showing ${filtered.length ? start+1 : 0} to ${Math.min(start+perPage, filtered.length)} of ${filtered.length} entries`;
+    document.getElementById('totalItems').textContent = filtered.length;
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(total) {
+    const cont = document.getElementById('pageBtns');
+    if (total <= 1) { cont.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || Math.abs(i - currentPage) <= 1) {
+        html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+      } else if (Math.abs(i - currentPage) === 2) {
+        html += `<span style="padding:4px 6px;">…</span>`;
+      }
+    }
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>Next ›</button>`;
+    cont.innerHTML = html;
+  }
+
+  function goPage(p) { currentPage = p; renderTable(); }
+
+  function sortTable(col) {
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+    const keys = ['fileNo','refNo','tansadNo','consignee','dest','containers','eta','etb','vessel','bl','slDate'];
+    filteredData.sort((a,b) => {
+      const va = a[keys[col]] || '', vb = b[keys[col]] || '';
+      return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+    renderTable();
+  }
+
+  function applyFilters() {
+    const consignee  = document.getElementById('filterConsignee').value;
+    const transporter= document.getElementById('filterTransporter').value;
+    const fileNo     = document.getElementById('filterFileNo').value;
+    filteredData = allData.filter(r => {
+      return (!consignee   || r.consignee.includes(consignee))
+          && (!transporter || r.consignee.includes(transporter))
+          && (!fileNo      || r.fileNo === fileNo);
+    });
+    currentPage = 1;
+    document.getElementById('activeFilter').textContent = '';
+    renderTable();
+  }
+
+  function filterStatus(status) {
+    filteredData = allData.filter(r => r.status === status);
+    currentPage = 1;
+    document.getElementById('activeFilter').textContent = 'Filter: ' + status;
+    renderTable();
+  }
+
+  function refreshTable() {
+    filteredData = [...allData];
+    currentPage = 1;
+    document.getElementById('activeFilter').textContent = '';
+    document.getElementById('filterConsignee').value = '';
+    document.getElementById('filterTransporter').value = '';
+    document.getElementById('filterFileNo').value = '';
+    document.getElementById('tableSearch').value = '';
+    renderTable();
+  }
+
+  function viewRecord(fileNo)   { alert('Viewing: ' + fileNo); }
+  function editRecord(fileNo)   { window.location.href = 'add_transit_cargo_doc.html'; }
+  function deleteRecord(fileNo) { if(confirm('Delete '+fileNo+'?')) { filteredData = filteredData.filter(r=>r.fileNo!==fileNo); renderTable(); } }
+  function doAction(name)       { alert('Action: ' + name); }
+  function printAll()           { window.print(); }
+
+  function exportCSV() {
+    const headers = ['File No','Ref No','Tansad No','Consignee','Destination','Containers','ETA','ETB','Vessel','B/L Number','SL DO Date','Status'];
+    const rows = filteredData.map(r => [r.fileNo,r.refNo,r.tansadNo,r.consignee,r.dest,r.containers,r.eta,r.etb,r.vessel,r.bl,r.slDate,r.status]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv,' + encodeURIComponent(csv);
+    a.download = 'transit_consignments.csv';
+    a.click();
+  }
+
+  function exportPDF() {
+    window.print();
+  }
+
+  // INIT
+  renderTable();
+</script>
+</body>
+</html>

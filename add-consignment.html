@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Transit Cargo Consignment - Round Trip ERP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+.tab-group-wrapper { border-bottom: 2px solid var(--blue-primary); margin-bottom: 0; }
+.form-section { border: 1px solid var(--grey-border); border-top: none; }
+.field-label-row {
+  display: grid;
+  gap: 0;
+  background: var(--grey-header);
+  border-bottom: 1px solid var(--grey-border);
+  border-top: 1px solid var(--grey-border);
+}
+.field-label-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.field-label-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.field-label-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.field-label-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.field-label-cell {
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-right: 1px solid var(--grey-border);
+}
+.field-label-cell:last-child { border-right: none; }
+
+.field-input-row {
+  display: grid;
+  gap: 0;
+}
+.field-input-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.field-input-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.field-input-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.field-input-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+.field-input-cell {
+  padding: 6px 10px;
+  border-right: 1px solid var(--grey-border);
+  border-bottom: 1px solid var(--grey-border);
+}
+.field-input-cell:last-child { border-right: none; }
+.field-input-cell .form-control { height: 26px; font-size: 12px; }
+.field-input-cell select.form-control { height: 26px; }
+
+.checkbox-cell { display: flex; align-items: center; padding: 10px; }
+.checkbox-cell input { width: 18px; height: 18px; }
+
+.save-bar {
+  background: var(--white);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .field-label-row.cols-5,
+  .field-input-row.cols-5 { grid-template-columns: repeat(2, 1fr); }
+  .field-label-row.cols-4,
+  .field-input-row.cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .field-label-row,
+  .field-input-row { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="spinner-overlay"><div class="spinner"></div></div>
+
+<!-- <nav class="erp-topnav">
+  <a href="index.html" class="brand"><i class="fas fa-sync-alt"></i> ROUND TRIP ERP</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="transit-clearance.html" class="active">Going</a>
+    <a href="return-clearance.html">Return</a>
+  </div>
+  <div class="user-info ms-auto"><i class="fas fa-user-circle"></i> Admin User &nbsp;|&nbsp; <i class="fas fa-building"></i> Mombasa</div>
+</nav> -->
+
+<!-- <div class="breadcrumb-bar">
+  <a href="index.html"><i class="fas fa-home"></i></a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="index.html">Round Trip</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <a href="transit-clearance.html">Transit Clearance</a>
+  <span class="sep"><i class="fas fa-chevron-right" style="font-size:9px"></i></span>
+  <span class="current">Add Consignment</span>
+</div> -->
+
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-plus-circle" style="color:var(--blue-primary);font-size:18px;margin-right:8px"></i>Add Transit Cargo Consignment</h1>
+    <div class="header-actions">
+      <a href="transit-clearance.html" class="btn btn-primary"><i class="fas fa-list"></i> View Consignments</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-boxes"></i> Cargo details
+      <button onclick="location.reload()" style="border:none;background:none;cursor:pointer;color:var(--blue-primary);margin-left:4px" title="Reset"><i class="fas fa-sync-alt"></i></button>
+    </div>
+
+    <!-- Declarant Row -->
+    <div class="declarant-row">
+      <div class="declarant-field">
+        <label>DECLARANT</label>
+        <select class="form-control" id="declarant" name="declarant" data-options="declarant" style="width:160px"></select>
+      </div>
+      <div class="declarant-field">
+        <label>PORT AGENT</label>
+        <select class="form-control" id="portAgent" name="portAgent" data-options="portAgent" style="width:160px"></select>
+      </div>
+    </div>
+
+    <!-- Tab Group -->
+    <div class="tab-group-wrapper">
+      <div class="erp-tabs tab-group">
+        <div class="erp-tab active" data-tab="tab-doc">DOC</div>
+        <div class="erp-tab" data-tab="tab-sl">SL</div>
+        <div class="erp-tab" data-tab="tab-ops">OPS</div>
+      </div>
+    </div>
+
+    <!-- ============ TAB: DOC ============ -->
+    <div id="tab-doc" class="tab-content active">
+      <form id="docForm">
+
+        <!-- Row 1: 5 cols -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Category</div>
+          <div class="field-label-cell">Source of Business</div>
+          <div class="field-label-cell">Billing Customer</div>
+          <div class="field-label-cell">Consignee</div>
+          <div class="field-label-cell">Refer. Number</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><select class="form-control" name="category" data-options="category"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="sourceOfBusiness" data-options="sourceOfBusiness"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="billingCustomer" data-options="billingCustomer"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="consignee" data-options="consignee"></select></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="referNumber" placeholder="REF-"></div>
+        </div>
+
+        <!-- Row 2: 5 cols -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Tansad No.</div>
+          <div class="field-label-cell">Supplier</div>
+          <div class="field-label-cell">Material Descr.</div>
+          <div class="field-label-cell">POL/Country</div>
+          <div class="field-label-cell">B/L Number</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="text" class="form-control" name="tansadNo" placeholder="TSD-"></div>
+          <div class="field-input-cell"><select class="form-control" name="supplier" data-options="supplier"></select></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="materialDescr" placeholder="Description..."></div>
+          <div class="field-input-cell"><select class="form-control" name="polCountry" data-options="polCountry"></select></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="blNumber" placeholder="BL-"></div>
+        </div>
+
+        <!-- Row 3: 5 cols -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">S/Line</div>
+          <div class="field-label-cell">Vessel</div>
+          <div class="field-label-cell">Voyage</div>
+          <div class="field-label-cell">ETA</div>
+          <div class="field-label-cell">ETB</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><select class="form-control" name="sline" data-options="sline"></select></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="vessel" placeholder="Vessel name"></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="voyage" placeholder="Voyage No"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="eta"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="etb"></div>
+        </div>
+
+        <!-- Row 4: 5 cols - Dates -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Cargo In Date</div>
+          <div class="field-label-cell">Copy Doc Recd Date</div>
+          <div class="field-label-cell">Orig Doc Recd Date</div>
+          <div class="field-label-cell">Doc. Lodged Date</div>
+          <div class="field-label-cell">Assessmt Valu. Date</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="date" class="form-control" name="cargoInDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="copyDocRecdDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="origDocRecdDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="docLodgedDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="assessmtValuDate"></div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Transit. Manifest Date</div>
+          <div class="field-label-cell">Discharge Date</div>
+          <div class="field-label-cell">Special Instructions</div>
+          <div class="field-label-cell">Entry Date</div>
+          <div class="field-label-cell">Sales Office</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="date" class="form-control" name="transitManifestDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="dischargeDate"></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="specialInstructions" placeholder="Instructions..."></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="entryDate"></div>
+          <div class="field-input-cell"><select class="form-control" name="salesOffice" data-options="salesOffice"></select></div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Num of 20 Conts</div>
+          <div class="field-label-cell">Num of 40 Conts</div>
+          <div class="field-label-cell">Loose Cargo</div>
+          <div class="field-label-cell">Client</div>
+          <div class="field-label-cell">Actual Arrival Date</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="number" class="form-control" name="num20Conts" min="0" placeholder="0"></div>
+          <div class="field-input-cell"><input type="number" class="form-control" name="num40Conts" min="0" placeholder="0"></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="looseCargo" placeholder="Details..."></div>
+          <div class="field-input-cell"><select class="form-control" name="client" data-options="client"></select></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="actualArrivalDate"></div>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Actual Arrival Time</div>
+          <div class="field-label-cell">Actual Unloading Date</div>
+          <div class="field-label-cell">Actual Unloading Time</div>
+          <div class="field-label-cell">Is From Network?</div>
+          <div class="field-label-cell">UIN</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="time" class="form-control" name="actualArrivalTime"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="actualUnloadingDate"></div>
+          <div class="field-input-cell"><input type="time" class="form-control" name="actualUnloadingTime"></div>
+          <div class="field-input-cell"><select class="form-control" name="isFromNetwork" data-options="isFromNetwork"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="uin" data-options="uin"></select></div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ============ TAB: SL ============ -->
+    <div id="tab-sl" class="tab-content">
+      <form id="slForm">
+
+        <!-- Row 1 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">S/L DO Date</div>
+          <div class="field-label-cell">DO Valid Till</div>
+          <div class="field-label-cell">SO Valid Date</div>
+          <div class="field-label-cell">Empty Offload Location</div>
+          <div class="field-label-cell">BL TYPE</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="date" class="form-control" name="slDoDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="doValidTill"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="soValidDate"></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="emptyOffloadLocation" placeholder="Location..."></div>
+          <div class="field-input-cell"><select class="form-control" name="blType" data-options="blType"></select></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">DG Cargo?</div>
+          <div class="field-label-cell">Transportation</div>
+          <div class="field-label-cell">S/L Invoice Date</div>
+          <div class="field-label-cell">S/L Invoice Received Date</div>
+          <div class="field-label-cell">S/L Paydate</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell checkbox-cell">
+            <input type="checkbox" id="dgCargo" name="dgCargo">
+            <label for="dgCargo" style="font-size:12px;cursor:pointer;margin-left:6px">DG Cargo</label>
+          </div>
+          <div class="field-input-cell"><select class="form-control" name="transportation" data-options="transportation"></select></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="slInvoiceDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="slInvoiceReceivedDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="slPaydate"></div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ============ TAB: OPS ============ -->
+    <div id="tab-ops" class="tab-content">
+      <form id="opsForm">
+
+        <!-- Row 1 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">ICD</div>
+          <div class="field-label-cell">Country</div>
+          <div class="field-label-cell">Border</div>
+          <div class="field-label-cell">Wharfage Pay Date</div>
+          <div class="field-label-cell">RO Recd Date</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><select class="form-control" name="icd" data-options="icd"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="country" data-options="country"></select></div>
+          <div class="field-input-cell"><select class="form-control" name="border" data-options="border"></select></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="wharfagePayDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="roRecdDate"></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="field-label-row cols-5">
+          <div class="field-label-cell">Port Charge Pay Date</div>
+          <div class="field-label-cell">ICD Charge Pay Date</div>
+          <div class="field-label-cell">Destination</div>
+          <div class="field-label-cell">Agent Consignee</div>
+          <div class="field-label-cell">Delivery Date</div>
+        </div>
+        <div class="field-input-row cols-5">
+          <div class="field-input-cell"><input type="date" class="form-control" name="portChargePayDate"></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="icdChargePayDate"></div>
+          <div class="field-input-cell"><select class="form-control" name="destination" data-options="destination"></select></div>
+          <div class="field-input-cell"><input type="text" class="form-control" name="agentConsignee" placeholder="Agent name..."></div>
+          <div class="field-input-cell"><input type="date" class="form-control" name="deliveryDate"></div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Scroll Indicators -->
+    <div style="display:flex;justify-content:space-between;padding:2px 6px;color:var(--grey-border);font-size:18px;border-top:1px solid var(--grey-border)">
+      <span>&#9668;</span><span>&#9658;</span>
+    </div>
+  </div>
+
+  <!-- Save Bar -->
+  <div class="save-bar">
+    <button class="btn btn-primary btn-save" id="saveBtn"><i class="fas fa-save"></i> Save</button>
+    <button class="btn btn-outline" onclick="if(confirm('Clear all fields?')) location.reload()"><i class="fas fa-times"></i> Cancel</button>
+  </div>
+</div>
+
+<!-- <footer class="erp-footer">&copy; 2024 Round Trip ERP &bull; Freight Management System &bull; All Rights Reserved</footer> -->
+
+<script src="app.js"></script>
+<script>
+function initPage() {
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    // Collect all form data
+    const allData = {};
+    ['docForm','slForm','opsForm'].forEach(id => {
+      const f = document.getElementById(id);
+      if (f) new FormData(f).forEach((v,k) => allData[k]=v);
+    });
+    allData.declarant = document.getElementById('declarant').value;
+    allData.portAgent = document.getElementById('portAgent').value;
+
+    showSpinner();
+    setTimeout(() => {
+      hideSpinner();
+      console.log('[Transit Cargo Consignment] Saved:', allData);
+      showToast('Transit Cargo Consignment saved successfully!', 'success');
+      setTimeout(() => window.location.href = 'transit-clearance.html', 1500);
+    }, 900);
+  });
+}
+</script>
+</body>
+</html>

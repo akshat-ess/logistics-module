@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round Trip ERP - Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .login-screen { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  .app-brand { color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+  .index-card { width: 380px; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 70px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05); }
+  .index-banner {
+    background: linear-gradient(135deg, #F5A623 0%, #F7BC5A 100%);
+    padding: 30px 34px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .index-banner::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .index-banner .icon-wrap { font-size: 48px; color: var(--white); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); animation: spin-slow 8s linear infinite; }
+  .index-banner .title-block .subtitle { font-size: 11px; color: rgba(255,255,255,0.75); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+  .index-banner .title-block .title { font-size: 34px; font-weight: 700; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .index-actions { background: white; padding: 28px; display: flex; flex-direction: column; gap: 12px; }
+  .index-actions h2 { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .action-btn-large {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: var(--font);
+    transition: all 0.2s;
+    color: white;
+  }
+  .action-btn-large .btn-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .action-btn-large .btn-label { flex: 1; }
+  .action-btn-large .btn-label span { display: block; font-size: 10px; font-weight: 400; opacity: 0.85; margin-top: 1px; }
+  .action-btn-large .btn-arrow { font-size: 14px; opacity: 0.7; }
+  .action-btn-large.going { background: linear-gradient(135deg, #4CAF50, #66BB6A); }
+  .action-btn-large.going:hover { background: linear-gradient(135deg, #388E3C, #4CAF50); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(76,175,80,0.4); }
+  .action-btn-large.return { background: linear-gradient(135deg, #E53935, #EF5350); }
+  .action-btn-large.return:hover { background: linear-gradient(135deg, #B71C1C, #E53935); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(229,57,53,0.4); }
+  .index-footer-card { background: white; border-top: 1px solid var(--grey-border); padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-btn); display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .stats-row { display: flex; gap: 10px; width: 380px; }
+  .stat-card { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; text-align: center; }
+  .stat-card .stat-val { font-size: 22px; font-weight: 700; color: var(--orange-primary); }
+  .stat-card .stat-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<div class="login-screen">
+  <div class="app-brand">Freight ERP System &bull; v2.4.1</div>
+
+  <div class="index-card">
+    <div class="index-banner">
+      <div class="icon-wrap"><i class="fas fa-sync-alt"></i></div>
+      <div class="title-block">
+        <div class="subtitle">Transit Module</div>
+        <div class="title">ROUND TRIP</div>
+      </div>
+    </div>
+    <div class="index-actions">
+      <h2>Select Direction</h2>
+      <a href="transit-clearance.html" class="action-btn-large going">
+        <div class="btn-icon"><i class="fas fa-arrow-right"></i></div>
+        <div class="btn-label">GOING <span>Transit Clearance Consignment</span></div>
+        <i class="fas fa-chevron-right btn-arrow"></i>
+      </a>
+      <a href="return-clearance.html" class="action-btn-large return">
+        <div class="btn-icon"><i class="fas fa-arrow-left"></i></div>
+        <div class="btn-label">RETURN <span>Transit Return Cargo Clearance</span></div>
+        <i class="fas fa-chevron-right btn-arrow"></i>
+      </a>
+    </div>
+    <div class="index-footer-card">
+      <span><span class="status-dot"></span>System Online</span>
+      <span>Mombasa Port Authority</span>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val">24</div>
+      <div class="stat-label">Active Going</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">8</div>
+      <div class="stat-label">In Transit</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">12</div>
+      <div class="stat-label">Returns Today</div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Distribution Fuel Report</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, 'Roboto', sans-serif;
+      font-size: 13px;
+      background: #f4f5f7;
+      color: #333;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===================== HEADER BANNER ===================== */
+    .banner {
+      background: #4ab3e8;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 24px;
+      margin-bottom: 0;
+    }
+    .banner-icon {
+      background: rgba(255,255,255,0.22);
+      border-radius: 8px;
+      width: 64px; height: 64px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .banner-icon i { font-size: 30px; color: #fff; }
+    .banner-content { flex: 1; }
+    .banner-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .banner-badges { display: flex; gap: 8px; }
+    .badge-dist {
+      background: #f0a030;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      border: none;
+    }
+    .badge-dist:hover { background: #d88b20; }
+    .badge-staff {
+      background: #5cb85c;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      border: none;
+    }
+    .badge-staff:hover { background: #449d44; }
+
+    /* ===================== MAIN CONTENT ===================== */
+    .main-content { padding: 18px 24px; }
+
+    /* ===================== PAGE TITLE BAR ===================== */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .page-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .btn-add {
+      background: #3a8fd1;
+      color: #fff;
+      border: none;
+      padding: 7px 22px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-add:hover { background: #2a6fa8; }
+
+    /* ===================== TOOLBAR ===================== */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .btn-tool {
+      background: #fff;
+      color: #555;
+      border: 1px solid #ccc;
+      padding: 5px 13px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      transition: background .12s, border-color .12s;
+    }
+    .btn-tool:hover { background: #e8f0fb; border-color: #3a8fd1; color: #3a8fd1; }
+    .btn-tool i { font-size: 11px; }
+
+    /* ===================== FILTER SECTION ===================== */
+    .filter-card {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 4px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 11.5px; color: #666; font-weight: 600; }
+    .filter-input {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 12.5px;
+      height: 31px;
+      width: 150px;
+      color: #444;
+      outline: none;
+      background: #fff;
+    }
+    .filter-input:focus { border-color: #3a8fd1; box-shadow: 0 0 0 2px rgba(58,143,209,.13); }
+    .btn-generate {
+      background: #3a8fd1;
+      color: #fff;
+      border: none;
+      padding: 6px 18px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 31px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-generate:hover { background: #2a6fa8; }
+    .btn-clear-filter {
+      background: #fff;
+      color: #888;
+      border: 1px solid #ccc;
+      padding: 6px 13px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      cursor: pointer;
+      height: 31px;
+    }
+    .btn-clear-filter:hover { background: #f5f5f5; }
+
+    /* ===================== TABLE CARD ===================== */
+    .table-card {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .table-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dde2e8;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .records-per-page {
+      display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #555;
+    }
+    .rpp-input {
+      width: 52px; height: 28px; border: 1px solid #ccc; border-radius: 3px;
+      font-size: 12.5px; text-align: center; padding: 2px 4px;
+    }
+    .rpp-input:focus { border-color: #3a8fd1; outline: none; }
+    .search-wrap { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #555; }
+    .search-wrap input {
+      border: 1px solid #ccc; border-radius: 3px; padding: 4px 8px;
+      font-size: 12.5px; height: 28px; width: 200px; outline: none;
+    }
+    .search-wrap input:focus { border-color: #3a8fd1; box-shadow: 0 0 0 2px rgba(58,143,209,.1); }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    thead th {
+      background: #f0f2f5;
+      color: #444;
+      font-weight: 700;
+      padding: 9px 10px;
+      text-align: left;
+      border-bottom: 2px solid #dde2e8;
+      border-right: 1px solid #e2e6ea;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    thead th:last-child { border-right: none; }
+    thead th .sort-icon { font-size: 10px; margin-left: 4px; color: #aaa; }
+    thead th.sort-asc .sort-icon::before { content: '\f0de'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #3a8fd1; }
+    thead th.sort-desc .sort-icon::before { content: '\f0dd'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #3a8fd1; }
+    thead th:not(.sort-asc):not(.sort-desc) .sort-icon::before { content: '\f0dc'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+    thead th:hover { background: #e8edf3; }
+    tbody tr { border-bottom: 1px solid #eaecf0; transition: background .1s; }
+    tbody tr:nth-child(even) { background: #fafbfc; }
+    tbody tr:hover { background: #e8f3fb; }
+    tbody td { padding: 8px 10px; color: #444; border-right: 1px solid #eaecf0; white-space: nowrap; }
+    tbody td:last-child { border-right: none; }
+    .btn-action-edit {
+      background: #3a8fd1;
+      color: #fff;
+      border: none;
+      width: 28px; height: 28px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      transition: background .12s;
+    }
+    .btn-action-edit:hover { background: #2a6fa8; }
+    .no-data { text-align: center; padding: 30px; color: #aaa; font-size: 13px; }
+
+    /* ===================== PAGINATION ===================== */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-top: 1px solid #dde2e8;
+      background: #f8f9fa;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pagination-info { font-size: 12px; color: #666; }
+    .pagination-btns { display: flex; gap: 4px; }
+    .pg-btn {
+      background: #fff;
+      border: 1px solid #ccc;
+      color: #555;
+      width: 30px; height: 28px;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background .1s;
+    }
+    .pg-btn:hover { background: #e8f0fb; border-color: #3a8fd1; color: #3a8fd1; }
+    .pg-btn.active { background: #3a8fd1; color: #fff; border-color: #3a8fd1; }
+    .pg-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ===================== EXPORT ===================== */
+    .btn-export {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 5px 13px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-export:hover { background: #1e7e34; }
+
+    /* ===================== MODAL ===================== */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 6px;
+      width: 640px; max-width: 96vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      overflow: hidden;
+      animation: modalIn .18s ease;
+    }
+    @keyframes modalIn { from { transform: translateY(-30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+    .modal-header {
+      background: #3a8fd1; color: #fff;
+      padding: 13px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 14px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; line-height:1; }
+    .modal-body { padding: 18px; }
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid #eee;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px 16px; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px 16px; margin-top: 14px; }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field label { font-size: 11.5px; font-weight: 700; color: #555; }
+    .form-field input {
+      border: 1px solid #ccc; border-radius: 4px; padding: 5px 9px;
+      font-size: 12.5px; height: 30px; outline: none; color: #333;
+    }
+    .form-field input:focus { border-color: #3a8fd1; box-shadow: 0 0 0 2px rgba(58,143,209,.13); }
+    .btn-save { background: #3a8fd1; color: #fff; border: none; padding: 7px 20px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-save:hover { background: #2a6fa8; }
+    .btn-cancel { background: #fff; color: #555; border: 1px solid #ccc; padding: 7px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .btn-cancel:hover { background: #f5f5f5; }
+
+    /* ===================== TOAST ===================== */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #28a745; color: #fff;
+      padding: 11px 20px; border-radius: 5px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+      z-index: 9999; display: none;
+      animation: fadeUp .22s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .banner { padding: 12px 14px; }
+      .main-content { padding: 12px 10px; }
+      .form-grid, .form-grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BANNER HEADER ===== -->
+<div class="banner">
+  <div class="banner-icon"><i class="fa fa-truck"></i></div>
+  <div class="banner-content">
+    <div class="banner-title">Distribution Fuel<br/>Report</div>
+    <div class="banner-badges">
+      <button class="badge-dist" onclick="filterType('DISTRIBUTION')">DISTRIBUTION</button>
+      <button class="badge-staff" onclick="filterType('STAFF')">STAFF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">Distribution Fuel Report</div>
+    <button class="btn-add" onclick="openAddModal()"><i class="fa fa-plus me-1"></i> Add</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn-tool" onclick="window.print()">
+      <i class="fa fa-print"></i> Print
+    </button>
+    <button class="btn-tool" onclick="showToast('Dashboard feature coming soon.', '#3a8fd1')">
+      <i class="fa fa-gauge-high"></i> Dashboard
+    </button>
+    <button class="btn-export" onclick="exportCSV()">
+      <i class="fa fa-file-csv"></i> Export CSV
+    </button>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card">
+    <div class="filter-group">
+      <label>From</label>
+      <input type="date" id="filterFrom" class="filter-input" placeholder="From"/>
+    </div>
+    <div class="filter-group">
+      <label>To</label>
+      <input type="date" id="filterTo" class="filter-input" placeholder="To"/>
+    </div>
+    <button class="btn-generate" onclick="generateReport()">
+      <i class="fa fa-bolt"></i> Generate
+    </button>
+    <button class="btn-clear-filter" onclick="clearFilters()">Clear</button>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-controls">
+      <div class="records-per-page">
+        <input type="number" id="rppInput" class="rpp-input" value="10" min="1" max="100" onchange="setPageSize(this.value)"/>
+        <span>records per page</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="search-wrap">
+          <span>Search:</span>
+          <input type="text" id="searchInput" placeholder="Search..." oninput="onSearch(this.value)"/>
+        </div>
+        <button class="pg-btn" title="Refresh table" onclick="renderTable()" style="width:auto;padding:0 8px;">
+          <i class="fa fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Date <span class="sort-icon"></span></th>
+            <th onclick="sortTable(1)">Name <span class="sort-icon"></span></th>
+            <th onclick="sortTable(2)">Vehicle No <span class="sort-icon"></span></th>
+            <th onclick="sortTable(3)">KM <span class="sort-icon"></span></th>
+            <th onclick="sortTable(4)">Mileage <span class="sort-icon"></span></th>
+            <th onclick="sortTable(5)">Amount <span class="sort-icon"></span></th>
+            <th onclick="sortTable(6)">Order No. <span class="sort-icon"></span></th>
+            <th onclick="sortTable(7)">Litres <span class="sort-icon"></span></th>
+            <th onclick="sortTable(8)">Remarks <span class="sort-icon"></span></th>
+            <th style="width:70px;cursor:default;">ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-bar">
+      <div class="pagination-info" id="paginationInfo"></div>
+      <div class="pagination-btns" id="paginationBtns"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT MODAL ===== -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3><i class="fa fa-pen-to-square" style="margin-right:7px;"></i><span id="modalTitle">Edit Record</span></h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editIdx"/>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Date <span style="color:red;">*</span></label>
+          <input type="date" id="editDate"/>
+        </div>
+        <div class="form-field">
+          <label>Name <span style="color:red;">*</span></label>
+          <input type="text" id="editName" placeholder="Name"/>
+        </div>
+        <div class="form-field">
+          <label>Vehicle No <span style="color:red;">*</span></label>
+          <input type="text" id="editVehicle" placeholder="e.g. T 902 DJQ"/>
+        </div>
+        <div class="form-field">
+          <label>KM</label>
+          <input type="number" id="editKM" placeholder="KM"/>
+        </div>
+        <div class="form-field">
+          <label>Mileage</label>
+          <input type="number" id="editMileage" placeholder="Mileage"/>
+        </div>
+        <div class="form-field">
+          <label>Amount <span style="color:red;">*</span></label>
+          <input type="number" step="0.01" id="editAmount" placeholder="Amount"/>
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label>Order No.</label>
+          <input type="text" id="editOrderNo" placeholder="Order No."/>
+        </div>
+        <div class="form-field">
+          <label>Litres</label>
+          <input type="number" step="0.01" id="editLitres" placeholder="Litres"/>
+        </div>
+        <div class="form-field" style="grid-column:span 2;">
+          <label>Remarks</label>
+          <input type="text" id="editRemarks" placeholder="Remarks"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()"><i class="fa fa-floppy-disk" style="margin-right:5px;"></i>Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   DATA
+================================================================ */
+let allData = [
+  { date:'12-Jul-21', name:'HASSAN SAID',    vehicle:'T 902 DJQ', km:83225, mileage:193, amount:100000.00, orderNo:7948, litres:45.14, remarks:'',              type:'DISTRIBUTION' },
+  { date:'12-Jul-21', name:'SHABAN MSHAMU',  vehicle:'T 370 DLT', km:19488, mileage:184, amount:100000.00, orderNo:7949, litres:45.14, remarks:'',              type:'DISTRIBUTION' },
+  { date:'12-Jul-21', name:'HUSSEIN ALLY',   vehicle:'T 986 ARL', km:'',    mileage:'',  amount:200000.00, orderNo:7950, litres:90.29, remarks:'ODOMETER ERROR', type:'DISTRIBUTION' },
+  { date:'13-Sep-21', name:'HUSSEIN ALLY',   vehicle:'T 986 ARL', km:51720, mileage:191, amount:200000.00, orderNo:9793, litres:88.84, remarks:'',              type:'DISTRIBUTION' },
+  { date:'13-Sep-21', name:'SHABAN MSHAM',   vehicle:'T 370 DLT', km:21188, mileage:198, amount:100000.00, orderNo:9794, litres:44.42, remarks:'',              type:'DISTRIBUTION' },
+  { date:'13-Sep-21', name:'HASSAN SAID',    vehicle:'T 902 DJQ', km:85187, mileage:210, amount:100000.00, orderNo:9795, litres:44.42, remarks:'',              type:'DISTRIBUTION' },
+  { date:'04-Oct-21', name:'JUMA RASHID',    vehicle:'T 445 GHK', km:62300, mileage:205, amount:150000.00, orderNo:10021,litres:67.50, remarks:'',              type:'STAFF' },
+  { date:'04-Oct-21', name:'ALI MWENDA',     vehicle:'T 812 PLM', km:33100, mileage:178, amount:120000.00, orderNo:10022,litres:54.00, remarks:'',              type:'STAFF' },
+  { date:'15-Nov-21', name:'FATUMA SALIM',   vehicle:'T 231 XYZ', km:47500, mileage:162, amount:110000.00, orderNo:10315,litres:49.50, remarks:'TANK CLEANED',  type:'DISTRIBUTION' },
+  { date:'15-Nov-21', name:'OMAR KHALID',    vehicle:'T 678 BNM', km:58900, mileage:220, amount:130000.00, orderNo:10316,litres:58.50, remarks:'',              type:'STAFF' },
+];
+
+let filteredData = [...allData];
+let currentPage = 1;
+let pageSize = 10;
+let sortCol = -1;
+let sortAsc = true;
+let activeType = null;
+
+/* ================================================================
+   RENDER TABLE
+================================================================ */
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const start = (currentPage - 1) * pageSize;
+  const end   = start + pageSize;
+  const pageData = filteredData.slice(start, end);
+
+  if (!pageData.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="no-data"><i class="fa fa-inbox" style="font-size:20px;margin-bottom:5px;"></i><br/>No records found</td></tr>`;
+  } else {
+    pageData.forEach((row, i) => {
+      const realIdx = allData.indexOf(row);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escHtml(row.date)}</td>
+        <td>${escHtml(row.name)}</td>
+        <td>${escHtml(row.vehicle)}</td>
+        <td>${row.km !== '' ? row.km : ''}</td>
+        <td>${row.mileage !== '' ? row.mileage : ''}</td>
+        <td>${row.amount !== '' ? Number(row.amount).toFixed(2) : ''}</td>
+        <td>${escHtml(String(row.orderNo))}</td>
+        <td>${row.litres !== '' ? Number(row.litres).toFixed(2) : ''}</td>
+        <td>${escHtml(row.remarks)}</td>
+        <td>
+          <button class="btn-action-edit" title="Edit" onclick="openEditModal(${realIdx})">
+            <i class="fa fa-pen-to-square"></i>
+          </button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  renderPagination();
+  updateSortIcons();
+}
+
+/* ================================================================
+   PAGINATION
+================================================================ */
+function renderPagination() {
+  const total = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const start = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const end   = Math.min(currentPage * pageSize, total);
+
+  document.getElementById('paginationInfo').textContent =
+    `Showing ${start} to ${end} of ${total} entries`;
+
+  const btnsEl = document.getElementById('paginationBtns');
+  btnsEl.innerHTML = '';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'pg-btn';
+  prevBtn.innerHTML = '<i class="fa fa-chevron-left"></i>';
+  prevBtn.disabled = currentPage <= 1;
+  prevBtn.onclick = () => { if(currentPage>1){ currentPage--; renderTable(); } };
+  btnsEl.appendChild(prevBtn);
+
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage   = Math.min(totalPages, startPage + 4);
+  if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+  for (let p = startPage; p <= endPage; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'pg-btn' + (p === currentPage ? ' active' : '');
+    btn.textContent = p;
+    btn.onclick = ((pg) => () => { currentPage = pg; renderTable(); })(p);
+    btnsEl.appendChild(btn);
+  }
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'pg-btn';
+  nextBtn.innerHTML = '<i class="fa fa-chevron-right"></i>';
+  nextBtn.disabled = currentPage >= totalPages;
+  nextBtn.onclick = () => { if(currentPage<totalPages){ currentPage++; renderTable(); } };
+  btnsEl.appendChild(nextBtn);
+}
+
+/* ================================================================
+   SEARCH & FILTER
+================================================================ */
+function onSearch(val) {
+  const q = val.trim().toLowerCase();
+  currentPage = 1;
+  let source = activeType ? allData.filter(r => r.type === activeType) : allData;
+  filteredData = source.filter(r =>
+    Object.values(r).some(v => String(v).toLowerCase().includes(q))
+  );
+  renderTable();
+}
+
+function filterType(type) {
+  activeType = (activeType === type) ? null : type;
+  currentPage = 1;
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let source = activeType ? allData.filter(r => r.type === activeType) : allData;
+  filteredData = q ? source.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(q))) : source;
+  renderTable();
+}
+
+function generateReport() {
+  const from = document.getElementById('filterFrom').value;
+  const to   = document.getElementById('filterTo').value;
+  if (!from && !to) { showToast('Please select at least one date.', '#e07b20'); return; }
+  currentPage = 1;
+  filteredData = allData.filter(row => {
+    const d = parseDate(row.date);
+    if (!d) return true;
+    const fromOk = !from || d >= new Date(from);
+    const toOk   = !to   || d <= new Date(to);
+    return fromOk && toOk;
+  });
+  renderTable();
+  showToast(`Report generated: ${filteredData.length} record(s) found.`);
+}
+
+function parseDate(str) {
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const parts = str.split('-');
+  if (parts.length === 3) {
+    const d = parseInt(parts[0]), m = months[parts[1]], y = parseInt('20'+parts[2]);
+    if (!isNaN(d) && m !== undefined && !isNaN(y)) return new Date(y, m, d);
+  }
+  return null;
+}
+
+function clearFilters() {
+  document.getElementById('filterFrom').value = '';
+  document.getElementById('filterTo').value = '';
+  document.getElementById('searchInput').value = '';
+  activeType = null;
+  currentPage = 1;
+  filteredData = [...allData];
+  renderTable();
+}
+
+/* ================================================================
+   SORTING
+================================================================ */
+function sortTable(col) {
+  if (sortCol === col) {
+    sortAsc = !sortAsc;
+  } else {
+    sortCol = col; sortAsc = true;
+  }
+  const keys = ['date','name','vehicle','km','mileage','amount','orderNo','litres','remarks'];
+  filteredData.sort((a, b) => {
+    let va = a[keys[col]], vb = b[keys[col]];
+    if (va === '' || va === null) va = '';
+    if (vb === '' || vb === null) vb = '';
+    if (!isNaN(va) && !isNaN(vb)) return sortAsc ? va - vb : vb - va;
+    return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function updateSortIcons() {
+  const ths = document.querySelectorAll('#dataTable thead th');
+  ths.forEach((th, i) => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === sortCol) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+  });
+}
+
+/* ================================================================
+   PAGE SIZE
+================================================================ */
+function setPageSize(val) {
+  pageSize = Math.max(1, parseInt(val) || 10);
+  currentPage = 1;
+  renderTable();
+}
+
+/* ================================================================
+   MODALS
+================================================================ */
+function openAddModal() {
+  window.location.href = 'add-distribution-fuel.html';
+}
+
+function openEditModal(idx) {
+  const row = allData[idx];
+  document.getElementById('editIdx').value = idx;
+  document.getElementById('modalTitle').textContent = 'Edit Record';
+  document.getElementById('editDate').value    = toInputDate(row.date);
+  document.getElementById('editName').value    = row.name;
+  document.getElementById('editVehicle').value = row.vehicle;
+  document.getElementById('editKM').value      = row.km;
+  document.getElementById('editMileage').value = row.mileage;
+  document.getElementById('editAmount').value  = row.amount;
+  document.getElementById('editOrderNo').value = row.orderNo;
+  document.getElementById('editLitres').value  = row.litres;
+  document.getElementById('editRemarks').value = row.remarks;
+  document.getElementById('editModal').classList.add('show');
+}
+
+function toInputDate(str) {
+  const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+  const parts = str.split('-');
+  if (parts.length === 3) {
+    const d = parts[0].padStart(2,'0');
+    const m = months[parts[1]] || '01';
+    const y = '20'+parts[2];
+    return `${y}-${m}-${d}`;
+  }
+  return '';
+}
+
+function saveModal() {
+  const name = document.getElementById('editName').value.trim();
+  const vehicle = document.getElementById('editVehicle').value.trim();
+  const amount = document.getElementById('editAmount').value;
+  if (!name || !vehicle || amount === '') {
+    showToast('Please fill required fields (Name, Vehicle No, Amount).', '#dc3545');
+    return;
+  }
+  const idx = parseInt(document.getElementById('editIdx').value);
+  const dateVal = document.getElementById('editDate').value;
+  allData[idx] = {
+    date: dateVal ? formatDisplayDate(dateVal) : allData[idx].date,
+    name, vehicle,
+    km: document.getElementById('editKM').value,
+    mileage: document.getElementById('editMileage').value,
+    amount: parseFloat(amount),
+    orderNo: document.getElementById('editOrderNo').value,
+    litres: document.getElementById('editLitres').value,
+    remarks: document.getElementById('editRemarks').value,
+    type: allData[idx].type
+  };
+  filteredData = [...allData];
+  closeModal(); renderTable();
+  showToast('Record updated successfully!');
+}
+
+function formatDisplayDate(iso) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = new Date(iso);
+  return `${String(d.getDate()).padStart(2,'0')}-${months[d.getMonth()]}-${String(d.getFullYear()).slice(2)}`;
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('show');
+}
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ================================================================
+   EXPORT CSV
+================================================================ */
+function exportCSV() {
+  const headers = ['Date','Name','Vehicle No','KM','Mileage','Amount','Order No','Litres','Remarks'];
+  const rows = filteredData.map(r =>
+    [r.date,r.name,r.vehicle,r.km,r.mileage,r.amount,r.orderNo,r.litres,r.remarks]
+    .map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')
+  );
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'distribution-fuel-report.csv';
+  a.click();
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function showToast(msg, color='#28a745') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = color;
+  el.style.display = 'block';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+/* ================================================================
+   UTILS
+================================================================ */
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+document.getElementById('rppInput').addEventListener('change', function(){ setPageSize(this.value); });
+renderTable();
+</script>
+</body>
+</html>

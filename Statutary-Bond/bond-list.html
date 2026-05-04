@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bond Licenses</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --primary: #2e86de;
+      --primary-dark: #1a6bbf;
+      --header-border: #dee2e6;
+      --text-muted: #6c757d;
+      --badge-issue: #2e86de;
+      --badge-expiry: #e74c3c;
+      --badge-renewal: #f39c12;
+      --tbl-head: #f8f9fa;
+      --border: #dee2e6;
+    }
+    body { background: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; color: #333; }
+    .page-header { background: #fff; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .page-header h4 { margin: 0; font-weight: 700; font-size: 1.35rem; color: #222; }
+    .page-header .badge-group .badge { font-size: 11px; padding: 4px 10px; border-radius: 3px; font-weight: 600; margin-left: 6px; }
+    .badge-hll { background: #27ae60; color: #fff; }
+    .badge-cfs { background: #3498db; color: #fff; }
+    .badge-trs { background: #f39c12; color: #fff; }
+    .btn-add { background: var(--primary); color: #fff; border: none; border-radius: 4px; padding: 7px 18px; font-size: 13px; font-weight: 600; transition: background 0.2s; }
+    .btn-add:hover { background: var(--primary-dark); color: #fff; }
+    .card-section { background: #fff; border: 1px solid var(--border); border-radius: 4px; margin: 18px; padding: 0; }
+    .card-section-header { background: #f8f9fa; border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #555; }
+    .table-controls { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); background: #fff; }
+    .records-select { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .records-select select { width: 60px; font-size: 13px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; }
+    .search-wrap { display: flex; align-items: center; gap: 8px; }
+    .search-wrap input { border: 1px solid #ccc; border-radius: 3px; padding: 4px 10px; font-size: 13px; width: 200px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: var(--tbl-head); border-bottom: 2px solid var(--border); border-top: 1px solid var(--border); padding: 9px 10px; font-weight: 600; font-size: 12.5px; color: #444; cursor: pointer; white-space: nowrap; user-select: none; }
+    thead th .sort-icon { color: #aaa; font-size: 10px; margin-left: 4px; }
+    tbody tr { border-bottom: 1px solid #eee; }
+    tbody tr:hover { background: #f5f9ff; }
+    tbody td { padding: 8px 10px; font-size: 13px; vertical-align: middle; }
+    .date-badge { display: inline-block; border-radius: 3px; padding: 2px 10px; font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; }
+    .badge-issue-date { background: var(--badge-issue); }
+    .badge-expiry-date { background: var(--badge-expiry); }
+    .badge-renewal-date { background: var(--badge-renewal); }
+    .attach-link { color: var(--primary); text-decoration: none; font-size: 12.5px; }
+    .attach-link:hover { text-decoration: underline; }
+    .action-btns { display: flex; gap: 4px; }
+    .btn-act { border: none; border-radius: 3px; padding: 4px 9px; font-size: 12px; cursor: pointer; color: #fff; transition: opacity 0.15s; }
+    .btn-act:hover { opacity: 0.85; }
+    .btn-view { background: #17a2b8; }
+    .btn-edit { background: #27ae60; }
+    .btn-del { background: #e74c3c; }
+    .pagination-wrap { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); background: #fff; }
+    .showing-info { font-size: 12.5px; color: #666; }
+    .pag-btns { display: flex; gap: 3px; }
+    .pag-btn { border: 1px solid #ccc; background: #fff; border-radius: 3px; padding: 3px 10px; font-size: 12.5px; cursor: pointer; color: #333; transition: background 0.15s; }
+    .pag-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .pag-btn:hover:not(.active):not(:disabled) { background: #e9f0fb; }
+    .pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sort-asc .sort-icon::after { content: ' ▲'; }
+    .sort-desc .sort-icon::after { content: ' ▼'; }
+  </style>
+</head>
+<body>
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="d-flex align-items-center gap-2">
+      <h4>Bond Licenses</h4>
+      <div class="badge-group">
+        <span class="badge badge-hll">HLL</span>
+        <span class="badge badge-cfs">CFS</span>
+        <span class="badge badge-trs">TRS</span>
+      </div>
+    </div>
+    <button class="btn-add" onclick="window.location='add-bond.html'">
+      <i class="fa fa-plus me-1"></i> Add Bond License
+    </button>
+  </div>
+
+  <!-- Card Section -->
+  <div class="card-section">
+    <div class="card-section-header">
+      All Bond Licenses <i class="fa fa-rotate-right text-secondary" style="cursor:pointer" onclick="refreshTable()"></i>
+    </div>
+
+    <!-- Table Controls -->
+    <div class="table-controls">
+      <div class="records-select">
+        <select id="perPage" onchange="renderTable()">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
+        <span>records per page</span>
+      </div>
+      <div class="search-wrap">
+        <label>Search:</label>
+        <input type="text" id="searchInput" placeholder="" oninput="filterTable()" />
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;">
+      <table id="bondTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Bond No <span class="sort-icon"></span></th>
+            <th onclick="sortTable(1)">Bond Type <span class="sort-icon"></span></th>
+            <th onclick="sortTable(2)">Issue Date <span class="sort-icon"></span></th>
+            <th onclick="sortTable(3)">Expiry Date <span class="sort-icon"></span></th>
+            <th onclick="sortTable(4)">Renewal Date <span class="sort-icon"></span></th>
+            <th onclick="sortTable(5)">Attachment <span class="sort-icon"></span></th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrap">
+      <div class="showing-info" id="showingInfo"></div>
+      <div class="pag-btns" id="pagBtns"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Dummy Data ──────────────────────────────────────────────
+    const rawData = [
+      { bondNo: '038',          type: 'BOND_CFS_C19',       issue: '28-Nov-2023', expiry: '31-Dec-2024', renewal: '01-Nov-2024', file: 'LICENCE_FOR_CFS_038_BOND_-_2024.pdf' },
+      { bondNo: '488',          type: 'NAS_BOND_LICENCE',   issue: '30-Nov-2023', expiry: '31-Dec-2024', renewal: '01-Nov-2024', file: 'NAS_BOND_LICENCE_2024.pdf' },
+      { bondNo: 'CA. 274/644/038', type: 'CFS NIL',         issue: '01-Sep-2023', expiry: '31-Dec-2023', renewal: '15-Nov-2023', file: 'CFS_NIL_BOND_LETTER.pdf' },
+      { bondNo: 'CC/02/17/2022', type: 'CB_02',             issue: '01-Sep-2023', expiry: '31-Dec-2023', renewal: '01-Nov-2023', file: 'BOND_CB-02_CFS_TANZINDIA_HOWDENPURI.pdf' },
+      { bondNo: 'CC/03/28/2019', type: 'CB_03',             issue: '01-Jan-2023', expiry: '31-Dec-2023', renewal: '01-Oct-2023', file: 'BOND_CB-03_NAS_TYRE_ALLIANCE.pdf' },
+      { bondNo: 'CC/03/75/2021', type: 'CB_03',             issue: '01-Jan-2023', expiry: '31-Dec-2023', renewal: '01-Oct-2023', file: 'BOND_CB-03_NAS_TYRE_MAYFAIR_.pdf' },
+      { bondNo: 'BND/2024/001',  type: 'BOND_TRS_A10',      issue: '15-Mar-2024', expiry: '14-Mar-2025', renewal: '01-Feb-2025', file: 'TRS_BOND_A10_2024.pdf' },
+      { bondNo: 'BND/2024/002',  type: 'BOND_HLL_B05',      issue: '10-Apr-2024', expiry: '09-Apr-2025', renewal: '15-Mar-2025', file: 'HLL_BOND_B05_2024.pdf' },
+      { bondNo: 'BND/2023/015',  type: 'NAS_BOND_LICENCE',  issue: '05-Jun-2023', expiry: '04-Jun-2024', renewal: '10-May-2024', file: 'NAS_BOND_2023_015.pdf' },
+      { bondNo: 'BND/2023/020',  type: 'BOND_CFS_C20',      issue: '20-Jul-2023', expiry: '19-Jul-2024', renewal: '01-Jun-2024', file: 'CFS_BOND_C20_2023.pdf' },
+      { bondNo: 'CC/04/11/2022', type: 'CB_04',             issue: '01-Feb-2023', expiry: '31-Jan-2024', renewal: '15-Jan-2024', file: 'BOND_CB-04_TRS_2022.pdf' },
+      { bondNo: 'CC/05/33/2023', type: 'CB_05',             issue: '15-Aug-2023', expiry: '14-Aug-2024', renewal: '01-Jul-2024', file: 'BOND_CB-05_HLL_2023.pdf' },
+      { bondNo: '501',           type: 'BOND_CFS_C21',      issue: '01-Dec-2023', expiry: '30-Nov-2024', renewal: '15-Oct-2024', file: 'BOND_CFS_C21_501_2023.pdf' },
+      { bondNo: 'BND/2024/010',  type: 'BOND_TRS_B08',      issue: '05-May-2024', expiry: '04-May-2025', renewal: '01-Apr-2025', file: 'TRS_BOND_B08_2024.pdf' },
+    ];
+
+    let filtered = [...rawData];
+    let currentPage = 1;
+    let sortCol = -1, sortDir = 1;
+
+    function formatDate(d) { return d; }
+
+    function filterTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      filtered = rawData.filter(r =>
+        Object.values(r).some(v => v.toLowerCase().includes(q))
+      );
+      currentPage = 1;
+      renderTable();
+    }
+
+    function sortTable(col) {
+      const headers = document.querySelectorAll('#bondTable thead th');
+      headers.forEach((h, i) => { h.classList.remove('sort-asc', 'sort-desc'); });
+      if (sortCol === col) sortDir *= -1;
+      else { sortCol = col; sortDir = 1; }
+      const keys = ['bondNo','type','issue','expiry','renewal','file'];
+      filtered.sort((a, b) => {
+        return a[keys[col]].localeCompare(b[keys[col]]) * sortDir;
+      });
+      headers[col].classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+      currentPage = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      const perPage = parseInt(document.getElementById('perPage').value);
+      const start = (currentPage - 1) * perPage;
+      const end = Math.min(start + perPage, filtered.length);
+      const page = filtered.slice(start, end);
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      if (page.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No records found</td></tr>';
+      } else {
+        page.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.bondNo}</td>
+            <td>${r.type}</td>
+            <td><span class="date-badge badge-issue-date">${r.issue}</span></td>
+            <td><span class="date-badge badge-expiry-date">${r.expiry}</span></td>
+            <td><span class="date-badge badge-renewal-date">${r.renewal}</span></td>
+            <td><a class="attach-link" href="#"><i class="fa fa-file-pdf me-1" style="color:#e74c3c"></i>${r.file}</a></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-act btn-view" title="View"><i class="fa fa-print"></i></button>
+                <button class="btn-act btn-edit" title="Edit"><i class="fa fa-pen-to-square"></i></button>
+                <button class="btn-act btn-del" title="Delete" onclick="deleteRow(this)"><i class="fa fa-xmark"></i></button>
+              </div>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+      }
+      // showing info
+      document.getElementById('showingInfo').textContent =
+        filtered.length === 0 ? 'No entries' :
+        `Showing ${start+1} to ${end} of ${filtered.length} entries`;
+      renderPagination(perPage);
+    }
+
+    function renderPagination(perPage) {
+      const total = Math.ceil(filtered.length / perPage);
+      const wrap = document.getElementById('pagBtns');
+      wrap.innerHTML = '';
+      const prev = document.createElement('button');
+      prev.className = 'pag-btn'; prev.textContent = 'Previous';
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => { currentPage--; renderTable(); };
+      wrap.appendChild(prev);
+      for (let i = 1; i <= total; i++) {
+        if (total > 7 && i > 3 && i < total - 2 && Math.abs(i - currentPage) > 1) {
+          if (i === 4) { const dots = document.createElement('span'); dots.textContent='...'; dots.style.padding='3px 6px'; wrap.appendChild(dots); }
+          continue;
+        }
+        const btn = document.createElement('button');
+        btn.className = 'pag-btn' + (i === currentPage ? ' active' : '');
+        btn.textContent = i;
+        btn.onclick = (p => () => { currentPage = p; renderTable(); })(i);
+        wrap.appendChild(btn);
+      }
+      const next = document.createElement('button');
+      next.className = 'pag-btn'; next.textContent = 'Next';
+      next.disabled = currentPage === total || total === 0;
+      next.onclick = () => { currentPage++; renderTable(); };
+      wrap.appendChild(next);
+    }
+
+    function deleteRow(btn) {
+      if (confirm('Delete this bond license?')) {
+        const row = btn.closest('tr');
+        const bondNo = row.cells[0].textContent.trim();
+        const idx = filtered.findIndex(r => r.bondNo === bondNo);
+        if (idx > -1) filtered.splice(idx, 1);
+        const rawIdx = rawData.findIndex(r => r.bondNo === bondNo);
+        if (rawIdx > -1) rawData.splice(rawIdx, 1);
+        renderTable();
+      }
+    }
+
+    function refreshTable() {
+      document.getElementById('searchInput').value = '';
+      filtered = [...rawData];
+      currentPage = 1;
+      sortCol = -1; sortDir = 1;
+      renderTable();
+    }
+
+    // Init
+    renderTable();
+  </script>
+</body>
+</html>
