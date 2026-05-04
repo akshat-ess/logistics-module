@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Vehicle License — ERP System</title>
+  <link rel="stylesheet" href="styles4.css" />
+</head>
+<body>
+
+<!-- ====== TOP NAV BAR ====== -->
+<!-- <header class="page-header">
+  <span class="logo">&#9776; ERP Fleet Management</span>
+  <span class="nav-spacer"></span>
+  <span class="nav-item">Home</span>
+  <span class="nav-item">Fleet</span>
+  <span class="nav-item">Reports</span>
+  <span class="nav-item">Settings</span>
+  <span class="nav-item">&#128100; Admin</span>
+</header> -->
+
+<!-- ====== CONTENT ====== -->
+<div class="content-wrapper">
+
+  <!-- Edit Title Bar -->
+  <div class="edit-title-bar">
+    <h1>Edit Vehicle License</h1>
+    <button class="btn btn-nav" id="backToListBtn">&#128221; View Vehicle Licenses</button>
+  </div>
+
+  <!-- ── FORM ── -->
+  <form id="editForm" novalidate>
+
+    <!-- ── SECTION 1 : Core Details ── -->
+    <div class="form-section">
+      <div class="form-section-header">
+        Vehicle License Details
+        <button type="button" class="refresh-icon" id="refreshFormBtn" title="Reset form">&#8635;</button>
+      </div>
+      <div class="form-section-body">
+        <div class="form-grid form-grid-5">
+
+          <div class="form-field">
+            <label for="f_username">Username *</label>
+            <input type="text" id="f_username" readonly placeholder="–" />
+            <span class="field-error" id="f_username_err"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="f_vehicleType">Vehicle Type *</label>
+            <select id="f_vehicleType">
+              <option value="">— Select —</option>
+              <option value="MOTOR Private Vehicle">MOTOR Private Vehicle</option>
+              <option value="MOTOR Commercial Vehicle">MOTOR Commercial Vehicle</option>
+              <option value="Heavy Commercial Vehicle">Heavy Commercial Vehicle</option>
+              <option value="Motorcycle">Motorcycle</option>
+              <option value="Plant & Equipment">Plant &amp; Equipment</option>
+            </select>
+            <span class="field-error" id="f_vehicleType_err"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="f_makeModel">Make / Model</label>
+            <input type="text" id="f_makeModel" placeholder="e.g. Toyota Hilux" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_regNo">Registration No. *</label>
+            <input type="text" id="f_regNo" placeholder="e.g. T694DMW" />
+            <span class="field-error" id="f_regNo_err"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="f_regDate">Registration Date</label>
+            <input type="date" id="f_regDate" />
+            <span class="field-error" id="f_regDate_err"></span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2 : Purchase Details ── -->
+    <div class="form-section">
+      <div class="form-section-header">Purchase Details</div>
+      <div class="form-section-body">
+        <div class="form-grid form-grid-4">
+
+          <div class="form-field">
+            <label for="f_purchaseDate">Purchase Date</label>
+            <input type="date" id="f_purchaseDate" />
+            <span class="field-error" id="f_purchaseDate_err"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="f_purchaseCost">Purchase Cost (TZS)</label>
+            <input type="text" id="f_purchaseCost" placeholder="e.g. 2,500,000" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_purchaseDealer">Purchase Dealer</label>
+            <input type="text" id="f_purchaseDealer" placeholder="Dealer name" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_office">Office</label>
+            <select id="f_office">
+              <option value="">— Select —</option>
+              <option value="HLL">HLL</option>
+              <option value="CFS">CFS</option>
+              <option value="TRS">TRS</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3 : Road Safety ── -->
+    <div class="form-section">
+      <div class="form-section-header">Road Safety</div>
+      <div class="form-section-body">
+        <div class="form-grid form-grid-5">
+
+          <div class="form-field">
+            <label for="f_roadSafetyReport">Road Safety Report</label>
+            <input type="text" id="f_roadSafetyReport" placeholder="Report no." />
+          </div>
+
+          <div class="form-field">
+            <label for="f_roadSafetyIssue">Issue Date</label>
+            <input type="date" id="f_roadSafetyIssue" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_roadSafetyExpiry">Expiry Date</label>
+            <input type="date" id="f_roadSafetyExpiry" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_roadSafetyRenewal">Renewal Date</label>
+            <input type="date" id="f_roadSafetyRenewal" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_roadSafetyCost">Road Safety Cost (TZS)</label>
+            <input type="text" id="f_roadSafetyCost" placeholder="e.g. 150,000" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4 : TRA Details ── -->
+    <div class="form-section">
+      <div class="form-section-header">TRA Details</div>
+      <div class="form-section-body">
+        <div class="form-grid form-grid-5">
+
+          <div class="form-field">
+            <label for="f_traSticker">TRA Sticker No.</label>
+            <input type="text" id="f_traSticker" placeholder="Sticker no." />
+          </div>
+
+          <div class="form-field">
+            <label for="f_traIssue">Issue Date</label>
+            <input type="date" id="f_traIssue" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_traExpiry">Expiry Date</label>
+            <input type="date" id="f_traExpiry" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_traRenewal">Renewal Date</label>
+            <input type="date" id="f_traRenewal" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_traCost">TRA Cost (TZS)</label>
+            <input type="text" id="f_traCost" placeholder="e.g. 80,000" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 5 : Insurance ── -->
+    <div class="form-section">
+      <div class="form-section-header">Insurance</div>
+      <div class="form-section-body">
+
+        <!-- Row 1 -->
+        <div class="form-grid form-grid-4" style="margin-bottom:12px;">
+          <div class="form-field">
+            <label for="f_insurer">Insurer</label>
+            <input type="text" id="f_insurer" placeholder="Insurer name" />
+          </div>
+          <div class="form-field">
+            <label for="f_insurerIssue">Issue Date</label>
+            <input type="date" id="f_insurerIssue" />
+          </div>
+          <div class="form-field">
+            <label for="f_insurerExpiry">Expiry Date</label>
+            <input type="date" id="f_insurerExpiry" />
+          </div>
+          <div class="form-field">
+            <label for="f_insurerRenewal">Renewal Date</label>
+            <input type="date" id="f_insurerRenewal" />
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="form-grid form-grid-2">
+          <div class="form-field">
+            <label for="f_insuredAmount">Insured Amount (TZS)</label>
+            <input type="text" id="f_insuredAmount" placeholder="e.g. 10,000,000" />
+          </div>
+          <div class="form-field">
+            <label for="f_insurerCost">Insurer Cost (TZS)</label>
+            <input type="text" id="f_insurerCost" placeholder="e.g. 500,000" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SECTION 6 : Town Kibali ── -->
+    <div class="form-section">
+      <div class="form-section-header">Town Kibali</div>
+      <div class="form-section-body">
+        <div class="form-grid form-grid-5">
+
+          <div class="form-field">
+            <label for="f_tkIssuedBy">Town Kibali Issued By</label>
+            <input type="text" id="f_tkIssuedBy" placeholder="Issuing office" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_tkIssue">Issue Date</label>
+            <input type="date" id="f_tkIssue" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_tkExpiry">Expiry Date</label>
+            <input type="date" id="f_tkExpiry" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_tkRenewal">Renewal Date</label>
+            <input type="date" id="f_tkRenewal" />
+          </div>
+
+          <div class="form-field">
+            <label for="f_tkCost">Town Kibali Cost (TZS)</label>
+            <input type="text" id="f_tkCost" placeholder="e.g. 50,000" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FORM FOOTER ── -->
+    <div class="form-footer">
+      <button type="button" class="btn btn-save" id="saveBtn">&#10003; Save Changes</button>
+      <button type="button" class="btn btn-cancel" id="cancelBtn">&#10005; Cancel</button>
+    </div>
+
+  </form><!-- /editForm -->
+
+</div><!-- /content-wrapper -->
+
+<!-- ====== TOAST ====== -->
+<div class="toast" id="toast"></div>
+
+<script src="script4.js"></script>
+</body>
+</html>

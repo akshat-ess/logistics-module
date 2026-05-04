@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vehicles Licenses — ERP System</title>
+  <link rel="stylesheet" href="styles4.css" />
+</head>
+<body>
+
+<!-- ====== TOP NAV BAR ====== -->
+<!-- <header class="page-header">
+  <span class="logo">&#9776; ERP Fleet Management</span>
+  <span class="nav-spacer"></span>
+  <span class="nav-item">Home</span>
+  <span class="nav-item">Fleet</span>
+  <span class="nav-item">Reports</span>
+  <span class="nav-item">Settings</span>
+  <span class="nav-item">&#128100; Admin</span>
+</header> -->
+
+<!-- ====== CONTENT ====== -->
+<div class="content-wrapper">
+
+  <!-- Page Title + Badge Tabs -->
+  <div class="page-title-bar">
+    <h1>Vehicles Licenses</h1>
+    <button class="badge-tab green">HLL</button>
+    <button class="badge-tab blue">CFS</button>
+    <button class="badge-tab orange">TRS</button>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <div class="card-header">
+      All Vehicle Licenses
+      <button class="refresh-icon" id="refreshBtn" title="Refresh">&#8635;</button>
+    </div>
+    <div class="card-body">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <label for="perPageSel">Records per page:</label>
+          <select id="perPageSel">
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <div class="toolbar-extra">
+            <button class="btn btn-export" id="exportBtn" title="Export to CSV">&#8595; CSV</button>
+            <button class="btn btn-print"  id="printBtn"  title="Print table">&#128438; Print</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <div class="search-wrap">
+            <label for="searchInput">Search:</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Username, Reg. No…" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="erp-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="username">Username</th>
+              <th class="sortable" data-col="regNo">Registration No.</th>
+              <th class="sortable" data-col="regDate">Registration Date</th>
+              <th class="sortable" data-col="purchaseDate">Purchase Date</th>
+              <th class="sortable" data-col="purchaseCost">Purchase Cost</th>
+              <th class="sortable" data-col="purchaseDealer">Purchase Dealer</th>
+              <th>Uploads</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTableBody">
+            <!-- Populated by script.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <span class="pag-info" id="pagInfo"></span>
+        <div class="pag-controls" id="pagButtons"></div>
+      </div>
+
+    </div><!-- /card-body -->
+  </div><!-- /card -->
+
+</div><!-- /content-wrapper -->
+
+<!-- ====== DELETE CONFIRM MODAL ====== -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      Confirm Deletion
+      <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg">
+        Are you sure you want to delete the record for<br />
+        <strong id="deleteName"></strong>?<br />
+        This action cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" id="cancelDeleteBtn">Cancel</button>
+      <button class="btn btn-delete" id="confirmDeleteBtn">&#10005; Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== VIEW RECORD MODAL ====== -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box" style="width:600px;">
+    <div class="modal-header">
+      Vehicle License — Details
+      <button class="modal-close" id="closeViewModal">&times;</button>
+    </div>
+    <div class="modal-body" id="viewModalBody">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" id="closeViewModalFooter">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TOAST ====== -->
+<div class="toast" id="toast"></div>
+
+<script src="script4.js"></script>
+</body>
+</html>
