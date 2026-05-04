@@ -469,7 +469,7 @@ function initEditPage() {
 
   /* Back button */
   var backBtn = document.getElementById('backToListBtn');
-  if (backBtn) { backBtn.addEventListener('click', function() { window.location.href = 'index.html'; }); }
+  if (backBtn) { backBtn.addEventListener('click', function() { window.location.href = 'vehicle-license-index.html'; }); }
 
   /* Validation */
   function validateForm() {
