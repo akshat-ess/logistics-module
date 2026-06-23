@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T11 – Transit Clearance Cargo (Round Trip)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #e65c00 0%, #c44b00 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(230,92,0,0.35);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text span { font-size: 13px; opacity: 0.85; }
+
+  .toolbar {
+    background: white; padding: 14px 32px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #e0e4ea; flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 4px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #e65c00; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #e65c00;
+  }
+  .card .val { font-size: 28px; font-weight: 700; color: #e65c00; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+  .table-title { padding: 14px 20px; background: #e65c00; color: white; font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #fff3e0; padding: 10px 14px; text-align: left; font-weight: 600; color: #b84500; border-bottom: 2px solid #ffcc80; }
+  tbody tr:nth-child(even) { background: #fff8f2; }
+  tbody tr:hover { background: #fff3e0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-purple { background: #ede9fe; color: #6d28d9; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+  .rt-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #e65c00; font-weight: 600; }
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🔄</div>
+  <div class="header-text">
+    <h1>Transit Clearance Cargo (Round Trip)</h1>
+    <span>Report Code: T11 &nbsp;|&nbsp; Generated: <span id="genDate"></span></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Trip Phase:</label>
+  <select>
+    <option>All Phases</option>
+    <option>Outbound</option>
+    <option>Return</option>
+    <option>Completed</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+  <div class="summary-cards">
+    <div class="card"><div class="val">214</div><div class="lbl">Total Round Trips</div></div>
+    <div class="card" style="border-color:#6d28d9"><div class="val" style="color:#6d28d9">88</div><div class="lbl">Outbound</div></div>
+    <div class="card" style="border-color:#1d4ed8"><div class="val" style="color:#1d4ed8">74</div><div class="lbl">Return</div></div>
+    <div class="card" style="border-color:#17a865"><div class="val" style="color:#17a865">52</div><div class="lbl">Completed</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">Round Trip Cargo Details</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Trip ID</th>
+          <th>Carrier</th>
+          <th>Origin → Destination</th>
+          <th>Outbound Cargo</th>
+          <th>Return Cargo</th>
+          <th>Out Weight (kg)</th>
+          <th>Ret Weight (kg)</th>
+          <th>Outbound Date</th>
+          <th>Return Date</th>
+          <th>Phase</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>RT-2024-001</td><td>Horizon Logistics</td><td>Addis ↔ Nairobi</td>
+          <td>Textiles</td><td>Fresh Produce</td><td>4,200</td><td>3,800</td>
+          <td>2024-06-01</td><td>2024-06-06</td><td><span class="badge badge-green">Completed</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td>RT-2024-002</td><td>Trans-Africa Cargo</td><td>Addis ↔ Khartoum</td>
+          <td>Machinery</td><td>Cotton</td><td>9,500</td><td>7,200</td>
+          <td>2024-06-03</td><td>2024-06-10</td><td><span class="badge badge-blue">Return</span></td>
+        </tr>
+        <tr>
+          <td>3</td><td>RT-2024-003</td><td>Eagle Freight</td><td>Addis ↔ Djibouti</td>
+          <td>Electronics</td><td>Empty</td><td>2,100</td><td>0</td>
+          <td>2024-06-04</td><td>—</td><td><span class="badge badge-purple">Outbound</span></td>
+        </tr>
+        <tr>
+          <td>4</td><td>RT-2024-004</td><td>Rift Valley Express</td><td>Addis ↔ Juba</td>
+          <td>Medicine</td><td>Cattle Hides</td><td>850</td><td>2,400</td>
+          <td>2024-06-05</td><td>2024-06-12</td><td><span class="badge badge-green">Completed</span></td>
+        </tr>
+        <tr>
+          <td>5</td><td>RT-2024-005</td><td>Continental Haulage</td><td>Addis ↔ Kampala</td>
+          <td>Foodstuff</td><td>Coffee Beans</td><td>6,300</td><td>5,800</td>
+          <td>2024-06-06</td><td>2024-06-14</td><td><span class="badge badge-blue">Return</span></td>
+        </tr>
+        <tr>
+          <td>6</td><td>RT-2024-006</td><td>Sunrise Transport</td><td>Addis ↔ Mogadishu</td>
+          <td>Building Materials</td><td>Fish Products</td><td>11,200</td><td>4,100</td>
+          <td>2024-06-07</td><td>—</td><td><span class="badge badge-purple">Outbound</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">T11 – Transit Clearance Cargo (Round Trip) Report &copy; 2024 Customs & Revenue Authority</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R05 – Local Clearance Cargo Position</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #3a5bd9 0%, #2a46b8 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(58,91,217,0.3);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; }
+  .header-text span { font-size: 13px; opacity: 0.85; }
+
+  .toolbar {
+    background: white;
+    padding: 14px 32px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #e0e4ea;
+    flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 4px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #333;
+    background: #fafbfc;
+  }
+  .btn {
+    padding: 7px 18px;
+    border-radius: 5px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary { background: #3a5bd9; color: white; }
+  .btn-export { background: #17a865; color: white; }
+  .btn-print  { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+
+  .summary-cards {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 18px 22px;
+    flex: 1;
+    min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #3a5bd9;
+  }
+  .card .val { font-size: 28px; font-weight: 700; color: #3a5bd9; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .table-wrap {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .table-title {
+    padding: 14px 20px;
+    background: #3a5bd9;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: #eef1fb;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #3a5bd9;
+    border-bottom: 2px solid #d0d8f5;
+  }
+  tbody tr:nth-child(even) { background: #f8f9ff; }
+  tbody tr:hover { background: #eef1fb; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">📋</div>
+  <div class="header-text">
+    <h1>Local Clearance Cargo Position</h1>
+    <span>Report Code: R05 &nbsp;|&nbsp; Generated: <span id="genDate"></span></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>From:</label>
+  <input type="date" id="fromDate">
+  <label>To:</label>
+  <input type="date" id="toDate">
+  <label>Station:</label>
+  <select>
+    <option>All Stations</option>
+    <option>Station A</option>
+    <option>Station B</option>
+    <option>Station C</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+  <div class="summary-cards">
+    <div class="card"><div class="val">1,248</div><div class="lbl">Total Consignments</div></div>
+    <div class="card" style="border-color:#17a865"><div class="val" style="color:#17a865">1,091</div><div class="lbl">Cleared</div></div>
+    <div class="card" style="border-color:#f59e0b"><div class="val" style="color:#f59e0b">112</div><div class="lbl">Pending</div></div>
+    <div class="card" style="border-color:#e53e3e"><div class="val" style="color:#e53e3e">45</div><div class="lbl">On Hold</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">Local Clearance Cargo Details</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>AWB / BL No.</th>
+          <th>Consignee</th>
+          <th>Origin</th>
+          <th>Cargo Type</th>
+          <th>Weight (kg)</th>
+          <th>Arrival Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>ETH-2024-001</td><td>Addis Trading Co.</td><td>Dubai</td><td>General</td><td>1,250</td><td>2024-06-01</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>2</td><td>ETH-2024-002</td><td>National Imports Ltd.</td><td>London</td><td>Electronics</td><td>340</td><td>2024-06-02</td><td><span class="badge badge-orange">Pending</span></td></tr>
+        <tr><td>3</td><td>ETH-2024-003</td><td>Capital Supplies</td><td>Beijing</td><td>Textiles</td><td>2,100</td><td>2024-06-03</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>4</td><td>ETH-2024-004</td><td>Sunrise Pharma</td><td>Mumbai</td><td>Pharmaceuticals</td><td>180</td><td>2024-06-04</td><td><span class="badge badge-red">On Hold</span></td></tr>
+        <tr><td>5</td><td>ETH-2024-005</td><td>East Africa Foods</td><td>Rotterdam</td><td>Foodstuff</td><td>3,400</td><td>2024-06-05</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>6</td><td>ETH-2024-006</td><td>Metro Electronics</td><td>Seoul</td><td>Electronics</td><td>760</td><td>2024-06-06</td><td><span class="badge badge-orange">Pending</span></td></tr>
+        <tr><td>7</td><td>ETH-2024-007</td><td>Atlas Machinery</td><td>Frankfurt</td><td>Machinery</td><td>5,800</td><td>2024-06-07</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>8</td><td>ETH-2024-008</td><td>Prime Chemicals</td><td>Houston</td><td>Chemicals</td><td>920</td><td>2024-06-08</td><td><span class="badge badge-red">On Hold</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">R05 – Local Clearance Cargo Position Report &copy; 2024 Customs & Revenue Authority</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>

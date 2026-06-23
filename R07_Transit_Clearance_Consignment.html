@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R07 – Transit Clearance Consignment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(46,125,50,0.3);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text span { font-size: 13px; opacity: 0.85; }
+
+  .toolbar {
+    background: white; padding: 14px 32px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #e0e4ea; flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 4px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #2e7d32; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #2e7d32;
+  }
+  .card .val { font-size: 28px; font-weight: 700; color: #2e7d32; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .table-title { padding: 14px 20px; background: #2e7d32; color: white; font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #e8f5e9; padding: 10px 14px; text-align: left; font-weight: 600; color: #2e7d32; border-bottom: 2px solid #c8e6c9; }
+  tbody tr:nth-child(even) { background: #f1f8f1; }
+  tbody tr:hover { background: #e8f5e9; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🚚</div>
+  <div class="header-text">
+    <h1>Transit Clearance Consignment</h1>
+    <span>Report Code: R07 &nbsp;|&nbsp; Generated: <span id="genDate"></span></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Destination:</label>
+  <select>
+    <option>All Destinations</option>
+    <option>Djibouti</option>
+    <option>Kenya</option>
+    <option>Sudan</option>
+    <option>South Sudan</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+  <div class="summary-cards">
+    <div class="card"><div class="val">563</div><div class="lbl">Total Consignments</div></div>
+    <div class="card" style="border-color:#1d4ed8"><div class="val" style="color:#1d4ed8">198</div><div class="lbl">In Transit</div></div>
+    <div class="card" style="border-color:#17a865"><div class="val" style="color:#17a865">312</div><div class="lbl">Delivered</div></div>
+    <div class="card" style="border-color:#e53e3e"><div class="val" style="color:#e53e3e">53</div><div class="lbl">Delayed</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">Transit Consignment Details</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Transit No.</th>
+          <th>Consignor</th>
+          <th>Destination Country</th>
+          <th>Route</th>
+          <th>Cargo Desc.</th>
+          <th>Weight (kg)</th>
+          <th>Departure</th>
+          <th>Expected Arrival</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>TR-2024-0071</td><td>Global Traders</td><td>Kenya</td><td>Addis → Moyale</td><td>Electronics</td><td>2,400</td><td>2024-06-01</td><td>2024-06-05</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td>2</td><td>TR-2024-0072</td><td>Horn Exporters</td><td>Djibouti</td><td>Addis → Djibouti Port</td><td>Machinery</td><td>8,700</td><td>2024-06-03</td><td>2024-06-07</td><td><span class="badge badge-blue">In Transit</span></td></tr>
+        <tr><td>3</td><td>TR-2024-0073</td><td>Sahel Commerce</td><td>Sudan</td><td>Addis → Metema</td><td>Foodstuff</td><td>5,200</td><td>2024-06-04</td><td>2024-06-09</td><td><span class="badge badge-orange">Delayed</span></td></tr>
+        <tr><td>4</td><td>TR-2024-0074</td><td>East Gate Imports</td><td>South Sudan</td><td>Addis → Gambella</td><td>Medicine</td><td>900</td><td>2024-06-05</td><td>2024-06-10</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td>5</td><td>TR-2024-0075</td><td>Pan Africa Goods</td><td>Kenya</td><td>Addis → Moyale</td><td>Textiles</td><td>3,100</td><td>2024-06-06</td><td>2024-06-11</td><td><span class="badge badge-blue">In Transit</span></td></tr>
+        <tr><td>6</td><td>TR-2024-0076</td><td>Rift Valley Co.</td><td>Djibouti</td><td>Addis → Djibouti Port</td><td>Chemicals</td><td>4,500</td><td>2024-06-07</td><td>2024-06-12</td><td><span class="badge badge-orange">Delayed</span></td></tr>
+        <tr><td>7</td><td>TR-2024-0077</td><td>Nile Bridge Traders</td><td>Sudan</td><td>Addis → Humera</td><td>Building Materials</td><td>12,000</td><td>2024-06-08</td><td>2024-06-14</td><td><span class="badge badge-blue">In Transit</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">R07 – Transit Clearance Consignment Report &copy; 2024 Customs & Revenue Authority</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>

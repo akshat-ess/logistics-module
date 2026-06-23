@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TR07 – Transit Return Cargo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #b71c1c 0%, #7f0000 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(183,28,28,0.35);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text span { font-size: 13px; opacity: 0.85; }
+
+  .toolbar {
+    background: white; padding: 14px 32px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #e0e4ea; flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 4px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #b71c1c; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #b71c1c;
+  }
+  .card .val { font-size: 28px; font-weight: 700; color: #b71c1c; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+  .table-title { padding: 14px 20px; background: #b71c1c; color: white; font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #ffebee; padding: 10px 14px; text-align: left; font-weight: 600; color: #b71c1c; border-bottom: 2px solid #ffcdd2; }
+  tbody tr:nth-child(even) { background: #fff8f8; }
+  tbody tr:hover { background: #ffebee; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+
+  .info-box {
+    background: #fff8e1;
+    border: 1px solid #ffcc02;
+    border-left: 4px solid #f9a825;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #5d4037;
+  }
+  .info-box strong { color: #b71c1c; }
+
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">↩️</div>
+  <div class="header-text">
+    <h1>Transit Return Cargo</h1>
+    <span>Report Code: TR07 &nbsp;|&nbsp; Generated: <span id="genDate"></span></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Cargo Type:</label>
+  <select>
+    <option>All Types</option>
+    <option>General</option>
+    <option>Perishables</option>
+    <option>Machinery</option>
+    <option>Chemicals</option>
+  </select>
+  <label>Return Reason:</label>
+  <select>
+    <option>All Reasons</option>
+    <option>Border Refusal</option>
+    <option>Documentation Error</option>
+    <option>Quality Rejection</option>
+    <option>Consignee Refused</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+  <div class="info-box">
+    ⚠️ <strong>Transit Return Cargo</strong> — This report tracks shipments returned from transit due to quality rejection, documentation issues, or border refusal. All returned lots must undergo re-inspection before re-export approval.
+  </div>
+
+  <div class="summary-cards">
+    <div class="card"><div class="val">96</div><div class="lbl">Return Shipments</div></div>
+    <div class="card" style="border-color:#b71c1c"><div class="val" style="color:#b71c1c">482 t</div><div class="lbl">Total Weight</div></div>
+    <div class="card" style="border-color:#17a865"><div class="val" style="color:#17a865">61</div><div class="lbl">Re-Cleared</div></div>
+    <div class="card" style="border-color:#e53e3e"><div class="val" style="color:#e53e3e">35</div><div class="lbl">Pending Re-Insp.</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">Return Cargo Details</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Return Ref.</th>
+          <th>Exporter</th>
+          <th>Origin</th>
+          <th>Cargo Type</th>
+          <th>Weight (kg)</th>
+          <th>Intended Dest.</th>
+          <th>Return Reason</th>
+          <th>Return Date</th>
+          <th>Re-Insp.</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>RET-2024-0701</td><td>Abyssinia Trading</td><td>Addis Ababa</td><td>General</td><td>18,000</td><td>Germany</td><td>Moisture High</td><td>2024-06-01</td><td>Yes</td><td><span class="badge badge-green">Re-Cleared</span></td></tr>
+        <tr><td>2</td><td>RET-2024-0702</td><td>Harar Traders</td><td>Dire Dawa</td><td>Perishables</td><td>9,500</td><td>Italy</td><td>Cert. Expired</td><td>2024-06-02</td><td>No</td><td><span class="badge badge-orange">Pending Re-Insp.</span></td></tr>
+        <tr><td>3</td><td>RET-2024-0703</td><td>Guji Agro</td><td>Oromia</td><td>General</td><td>5,000</td><td>Japan</td><td>Label Error</td><td>2024-06-03</td><td>Yes</td><td><span class="badge badge-green">Re-Cleared</span></td></tr>
+        <tr><td>4</td><td>RET-2024-0704</td><td>Highland Co.</td><td>SNNPR</td><td>Machinery</td><td>12,500</td><td>USA</td><td>Border Refusal</td><td>2024-06-05</td><td>No</td><td><span class="badge badge-orange">Pending Re-Insp.</span></td></tr>
+        <tr><td>5</td><td>RET-2024-0705</td><td>Sidama Export</td><td>Sidama</td><td>Chemicals</td><td>7,500</td><td>France</td><td>Quality Rejection</td><td>2024-06-06</td><td>Yes</td><td><span class="badge badge-red">Rejected</span></td></tr>
+        <tr><td>6</td><td>RET-2024-0706</td><td>Jimma Harvest</td><td>Jimma</td><td>General</td><td>22,000</td><td>UAE</td><td>Moisture High</td><td>2024-06-08</td><td>Yes</td><td><span class="badge badge-green">Re-Cleared</span></td></tr>
+        <tr><td>7</td><td>RET-2024-0707</td><td>Bench Maji Traders</td><td>Bench Sheko</td><td>Perishables</td><td>3,500</td><td>South Korea</td><td>Cert. Expired</td><td>2024-06-09</td><td>No</td><td><span class="badge badge-orange">Pending Re-Insp.</span></td></tr>
+        <tr><td>8</td><td>RET-2024-0708</td><td>Bale Mountain Exports</td><td>Bale</td><td>General</td><td>16,000</td><td>Netherlands</td><td>Label Error</td><td>2024-06-10</td><td>Yes</td><td><span class="badge badge-green">Re-Cleared</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">TR07 – Transit Return Cargo Report &copy; 2024 Customs & Revenue Authority</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>

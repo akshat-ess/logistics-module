@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TR06 – Transit Return Cargo Clearance</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #7b1fa2 0%, #4a0072 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(123,31,162,0.35);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text span { font-size: 13px; opacity: 0.85; }
+
+  .toolbar {
+    background: white; padding: 14px 32px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #e0e4ea; flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 4px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #7b1fa2; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #7b1fa2;
+  }
+  .card .val { font-size: 28px; font-weight: 700; color: #7b1fa2; }
+  .card .lbl { font-size: 12px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .table-title { padding: 14px 20px; background: #7b1fa2; color: white; font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f3e5f5; padding: 10px 14px; text-align: left; font-weight: 600; color: #7b1fa2; border-bottom: 2px solid #ce93d8; }
+  tbody tr:nth-child(even) { background: #faf4fc; }
+  tbody tr:hover { background: #f3e5f5; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-purple { background: #ede9fe; color: #6d28d9; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">↩️</div>
+  <div class="header-text">
+    <h1>Transit Return Cargo Clearance</h1>
+    <span>Report Code: TR06 &nbsp;|&nbsp; Generated: <span id="genDate"></span></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Return Reason:</label>
+  <select>
+    <option>All Reasons</option>
+    <option>Rejected at Border</option>
+    <option>Documentation Error</option>
+    <option>Customs Refusal</option>
+    <option>Consignee Refused</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+  <div class="summary-cards">
+    <div class="card"><div class="val">178</div><div class="lbl">Total Returns</div></div>
+    <div class="card" style="border-color:#17a865"><div class="val" style="color:#17a865">134</div><div class="lbl">Cleared</div></div>
+    <div class="card" style="border-color:#f59e0b"><div class="val" style="color:#f59e0b">29</div><div class="lbl">Under Review</div></div>
+    <div class="card" style="border-color:#e53e3e"><div class="val" style="color:#e53e3e">15</div><div class="lbl">Confiscated</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">Return Cargo Clearance Details</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Return Ref.</th>
+          <th>Original Transit No.</th>
+          <th>Carrier</th>
+          <th>Cargo Description</th>
+          <th>Return Reason</th>
+          <th>Weight (kg)</th>
+          <th>Return Date</th>
+          <th>Re-Export?</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>RET-2024-0601</td><td>TR-2024-0045</td><td>Eagle Freight</td><td>Electronics</td><td>Documentation Error</td><td>1,200</td><td>2024-06-02</td><td>Yes</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>2</td><td>RET-2024-0602</td><td>TR-2024-0048</td><td>Nile Express</td><td>Textiles</td><td>Rejected at Border</td><td>3,400</td><td>2024-06-03</td><td>No</td><td><span class="badge badge-orange">Under Review</span></td></tr>
+        <tr><td>3</td><td>RET-2024-0603</td><td>TR-2024-0052</td><td>Pan Africa Cargo</td><td>Pharmaceuticals</td><td>Customs Refusal</td><td>420</td><td>2024-06-05</td><td>No</td><td><span class="badge badge-red">Confiscated</span></td></tr>
+        <tr><td>4</td><td>RET-2024-0604</td><td>TR-2024-0055</td><td>Horn Logistics</td><td>Food Products</td><td>Consignee Refused</td><td>5,600</td><td>2024-06-06</td><td>Yes</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>5</td><td>RET-2024-0605</td><td>TR-2024-0059</td><td>Trans-Africa</td><td>Chemicals</td><td>Documentation Error</td><td>2,100</td><td>2024-06-08</td><td>Yes</td><td><span class="badge badge-green">Cleared</span></td></tr>
+        <tr><td>6</td><td>RET-2024-0606</td><td>TR-2024-0063</td><td>Summit Haulage</td><td>Building Materials</td><td>Rejected at Border</td><td>9,800</td><td>2024-06-09</td><td>No</td><td><span class="badge badge-orange">Under Review</span></td></tr>
+        <tr><td>7</td><td>RET-2024-0607</td><td>TR-2024-0067</td><td>Sunrise Transport</td><td>Machinery</td><td>Documentation Error</td><td>4,700</td><td>2024-06-10</td><td>Yes</td><td><span class="badge badge-green">Cleared</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">TR06 – Transit Return Cargo Clearance Report &copy; 2024 Customs & Revenue Authority</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>
