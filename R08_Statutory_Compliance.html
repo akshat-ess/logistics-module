@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R08 – Statutory Compliance Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #1a6b5a 0%, #0d4f41 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(26,107,90,0.3);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+  .section-banner {
+    background: #f97316;
+    color: white;
+    padding: 8px 32px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+
+  .toolbar {
+    background: white; padding: 14px 32px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #e0e4ea; flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 2px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc; color: #333;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #1a6b5a; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 150px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #1a6b5a;
+  }
+  .card .val { font-size: 26px; font-weight: 700; color: #1a6b5a; }
+  .card .lbl { font-size: 11px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Compliance checklist panel */
+  .checklist-panel {
+    background: white; border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow: hidden; margin-bottom: 24px;
+  }
+  .panel-title {
+    padding: 13px 20px; background: #1a6b5a;
+    color: white; font-size: 14px; font-weight: 600;
+  }
+  .checklist-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid #e8f5f2;
+    border-right: 1px solid #e8f5f2;
+  }
+  .check-item:nth-child(even) { border-right: none; }
+  .check-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .check-body .check-name { font-size: 13px; font-weight: 600; color: #222; }
+  .check-body .check-desc { font-size: 11px; color: #777; margin-top: 2px; }
+  .check-body .check-due  { font-size: 11px; color: #1a6b5a; font-weight: 600; margin-top: 3px; }
+
+  /* Main table */
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+  .table-title { padding: 14px 20px; background: #1a6b5a; color: white; font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #e6f4f1; padding: 10px 14px; text-align: left; font-weight: 600; color: #1a6b5a; border-bottom: 2px solid #b2d9d0; }
+  tbody tr:nth-child(even) { background: #f4faf8; }
+  tbody tr:hover { background: #e6f4f1; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-gray   { background: #f0f0f0; color: #555; }
+
+  /* Violations table */
+  .violations-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .violations-title { padding: 14px 20px; background: #b71c1c; color: white; font-size: 14px; font-weight: 600; }
+
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+
+  @media print {
+    .toolbar, .btn { display: none; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">📜</div>
+  <div class="header-text">
+    <h1>Statutory Compliance Report</h1>
+    <p>Report Code: R08 &nbsp;|&nbsp; Compliance &amp; Bond Reports &nbsp;|&nbsp; Generated: <span id="genDate"></span></p>
+  </div>
+</div>
+
+<div class="section-banner">📂 Compliance &amp; Bond Reports &nbsp;›&nbsp; Statutory (R08) &nbsp;—&nbsp; Clearing &amp; Forwarding Agents</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Agent Type:</label>
+  <select>
+    <option>All Agents</option>
+    <option>Licensed Clearing Agent</option>
+    <option>Freight Forwarder</option>
+    <option>Customs Broker</option>
+  </select>
+  <label>Compliance:</label>
+  <select>
+    <option>All Status</option>
+    <option>Compliant</option>
+    <option>Non-Compliant</option>
+    <option>Pending Review</option>
+    <option>Suspended</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card">
+      <div class="val">87</div>
+      <div class="lbl">Registered Agents</div>
+    </div>
+    <div class="card" style="border-color:#17a865">
+      <div class="val" style="color:#17a865">61</div>
+      <div class="lbl">Fully Compliant</div>
+    </div>
+    <div class="card" style="border-color:#f59e0b">
+      <div class="val" style="color:#f59e0b">18</div>
+      <div class="lbl">Pending Review</div>
+    </div>
+    <div class="card" style="border-color:#e53e3e">
+      <div class="val" style="color:#e53e3e">8</div>
+      <div class="lbl">Non-Compliant</div>
+    </div>
+    <div class="card" style="border-color:#7b1fa2">
+      <div class="val" style="color:#7b1fa2">3</div>
+      <div class="lbl">Suspended</div>
+    </div>
+    <div class="card" style="border-color:#1d4ed8">
+      <div class="val" style="color:#1d4ed8">70.1%</div>
+      <div class="lbl">Compliance Rate</div>
+    </div>
+  </div>
+
+  <!-- Statutory Requirements Checklist -->
+  <div class="checklist-panel">
+    <div class="panel-title">📋 Statutory Requirements Checklist — Clearing &amp; Forwarding</div>
+    <div class="checklist-grid">
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div class="check-body">
+          <div class="check-name">Operating License (ECX / ERA)</div>
+          <div class="check-desc">Valid license from Ethiopian Customs Authority</div>
+          <div class="check-due">Renewal: Annual</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div class="check-body">
+          <div class="check-name">Customs Agent Accreditation</div>
+          <div class="check-desc">Accredited by Customs &amp; Revenue Authority</div>
+          <div class="check-due">Renewal: Biennial</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">⚠️</div>
+        <div class="check-body">
+          <div class="check-name">Bond / Guarantee Submission</div>
+          <div class="check-desc">Financial guarantee lodged with authority</div>
+          <div class="check-due">Due: Rolling — reviewed quarterly</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div class="check-body">
+          <div class="check-name">Tax Compliance Certificate (TCC)</div>
+          <div class="check-desc">Current TCC from Ethiopian Revenue Authority</div>
+          <div class="check-due">Renewal: Annual</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div class="check-body">
+          <div class="check-name">Professional Indemnity Insurance</div>
+          <div class="check-desc">Minimum coverage as per statutory requirement</div>
+          <div class="check-due">Renewal: Annual</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">❌</div>
+        <div class="check-body">
+          <div class="check-name">Anti-Money Laundering (AML) Training</div>
+          <div class="check-desc">All staff must complete AML certification</div>
+          <div class="check-due">Due: Every 2 years</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div class="check-body">
+          <div class="check-name">Business Registration (Trade License)</div>
+          <div class="check-desc">Valid commercial registration certificate</div>
+          <div class="check-due">Renewal: Annual</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">⚠️</div>
+        <div class="check-body">
+          <div class="check-name">ASYCUDA World System Access</div>
+          <div class="check-desc">Active user registration in customs system</div>
+          <div class="check-due">Renewal: Annual — pending renewal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Compliance Table -->
+  <div class="table-wrap">
+    <div class="table-title">Agent Statutory Compliance Status — Clearing &amp; Forwarding</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Agent Name</th>
+          <th>License No.</th>
+          <th>Agent Type</th>
+          <th>License Expiry</th>
+          <th>TCC Status</th>
+          <th>Bond Status</th>
+          <th>AML Cert.</th>
+          <th>Insurance</th>
+          <th>Overall Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>Alpha Clearing &amp; Fwd</td><td>CFA-2024-001</td><td>Clearing Agent</td>
+          <td>2025-03-31</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-green">Certified</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Compliant</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td>Beta Forwarders Ltd.</td><td>CFA-2024-002</td><td>Freight Forwarder</td>
+          <td>2024-08-15</td>
+          <td><span class="badge badge-orange">Expiring</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-orange">Pending Review</span></td>
+        </tr>
+        <tr>
+          <td>3</td><td>Gamma Logistics Co.</td><td>CFA-2024-003</td><td>Customs Broker</td>
+          <td>2025-06-30</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-green">Certified</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Compliant</span></td>
+        </tr>
+        <tr>
+          <td>4</td><td>Delta Shipping Agency</td><td>CFA-2024-004</td><td>Clearing Agent</td>
+          <td>2024-07-01</td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-red">Exhausted</span></td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-orange">Expiring</span></td>
+          <td><span class="badge badge-red">Non-Compliant</span></td>
+        </tr>
+        <tr>
+          <td>5</td><td>Eagle Freight &amp; Clearance</td><td>CFA-2024-005</td><td>Freight Forwarder</td>
+          <td>2025-01-20</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-green">Certified</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Compliant</span></td>
+        </tr>
+        <tr>
+          <td>6</td><td>Summit Freight Services</td><td>CFA-2024-006</td><td>Customs Broker</td>
+          <td>2025-04-10</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-orange">Near Limit</span></td>
+          <td><span class="badge badge-green">Certified</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-orange">Pending Review</span></td>
+        </tr>
+        <tr>
+          <td>7</td><td>Horizon Clearing Agents</td><td>CFA-2024-007</td><td>Clearing Agent</td>
+          <td>2024-06-30</td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-red">Suspended</span></td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-red">Lapsed</span></td>
+          <td><span class="badge badge-gray">Suspended</span></td>
+        </tr>
+        <tr>
+          <td>8</td><td>Nile Forwarding Co.</td><td>CFA-2024-008</td><td>Freight Forwarder</td>
+          <td>2025-02-28</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-orange">Due Soon</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-orange">Pending Review</span></td>
+        </tr>
+        <tr>
+          <td>9</td><td>Continental Haulage &amp; Fwd</td><td>CFA-2024-009</td><td>Clearing Agent</td>
+          <td>2025-05-15</td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-green">Certified</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-green">Compliant</span></td>
+        </tr>
+        <tr>
+          <td>10</td><td>Rift Valley Express Logistics</td><td>CFA-2024-010</td><td>Customs Broker</td>
+          <td>2024-09-30</td>
+          <td><span class="badge badge-orange">Expiring</span></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><span class="badge badge-red">Expired</span></td>
+          <td><span class="badge badge-green">Valid</span></td>
+          <td><span class="badge badge-red">Non-Compliant</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Violations / Penalties Table -->
+  <div class="violations-wrap">
+    <div class="violations-title">⚠️ Statutory Violations &amp; Penalties — Current Period</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Agent</th>
+          <th>Violation Type</th>
+          <th>Details</th>
+          <th>Date Raised</th>
+          <th>Penalty (ETB)</th>
+          <th>Action Taken</th>
+          <th>Resolution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>Delta Shipping Agency</td><td>License Expired</td>
+          <td>Operating beyond license validity</td><td>2024-07-02</td>
+          <td>25,000</td><td>Operations Suspended</td><td><span class="badge badge-red">Open</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td>Beta Forwarders Ltd.</td><td>AML Cert. Lapsed</td>
+          <td>Staff certification not renewed</td><td>2024-06-15</td>
+          <td>10,000</td><td>Warning Issued</td><td><span class="badge badge-orange">Pending</span></td>
+        </tr>
+        <tr>
+          <td>3</td><td>Horizon Clearing Agents</td><td>Bond Suspended</td>
+          <td>Bond exhausted, not topped up</td><td>2024-06-30</td>
+          <td>50,000</td><td>Licence Revoked</td><td><span class="badge badge-red">Open</span></td>
+        </tr>
+        <tr>
+          <td>4</td><td>Rift Valley Express Logistics</td><td>AML Cert. Expired</td>
+          <td>No record of renewal submitted</td><td>2024-06-20</td>
+          <td>10,000</td><td>Notice Issued</td><td><span class="badge badge-orange">Pending</span></td>
+        </tr>
+        <tr>
+          <td>5</td><td>Summit Freight Services</td><td>Bond Near Limit</td>
+          <td>Bond utilization exceeded 90%</td><td>2024-06-25</td>
+          <td>—</td><td>Advisory Notice</td><td><span class="badge badge-blue">Under Review</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">R08 – Statutory Compliance Report &copy; 2024 Customs &amp; Revenue Authority &nbsp;|&nbsp; Clearing &amp; Forwarding Division</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>

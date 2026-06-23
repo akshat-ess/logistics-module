@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R01 – Bond Utilization</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+  .header {
+    background: linear-gradient(135deg, #3a5bd9 0%, #2a46b8 100%);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(58,91,217,0.3);
+  }
+  .header-icon { font-size: 28px; }
+  .header-text h1 { font-size: 20px; font-weight: 700; }
+  .header-text p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+  .section-banner {
+    background: #f97316;
+    color: white;
+    padding: 8px 32px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+
+  .toolbar {
+    background: white;
+    padding: 14px 32px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #e0e4ea;
+    flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: #555; margin-right: 2px; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #cdd3dc; border-radius: 5px;
+    padding: 6px 10px; font-size: 13px; background: #fafbfc; color: #333;
+  }
+  .btn { padding: 7px 18px; border-radius: 5px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #3a5bd9; color: white; }
+  .btn-export  { background: #17a865; color: white; }
+  .btn-print   { background: #6c757d; color: white; }
+
+  .content { padding: 24px 32px; }
+
+  /* Summary cards */
+  .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    background: white; border-radius: 8px; padding: 18px 22px;
+    flex: 1; min-width: 160px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #3a5bd9;
+  }
+  .card .val { font-size: 26px; font-weight: 700; color: #3a5bd9; }
+  .card .lbl { font-size: 11px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 24px; background: white; border-radius: 8px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .progress-wrap h3 { font-size: 14px; font-weight: 600; color: #3a5bd9; margin-bottom: 16px; }
+  .progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .progress-label { width: 180px; font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .progress-bar-bg { flex: 1; background: #eef1fb; border-radius: 20px; height: 14px; }
+  .progress-bar-fill { height: 14px; border-radius: 20px; }
+  .progress-pct { width: 44px; text-align: right; font-size: 12px; font-weight: 700; color: #3a5bd9; }
+
+  /* Table */
+  .table-wrap { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .table-title { padding: 14px 20px; background: #3a5bd9; color: white; font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .table-title span { font-size: 12px; opacity: 0.8; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #eef1fb; padding: 10px 14px; text-align: left; font-weight: 600; color: #3a5bd9; border-bottom: 2px solid #d0d8f5; }
+  tbody tr:nth-child(even) { background: #f8f9ff; }
+  tbody tr:hover { background: #eef1fb; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #eaedf3; color: #444; }
+  tfoot td { padding: 10px 14px; font-weight: 700; background: #eef1fb; color: #3a5bd9; border-top: 2px solid #d0d8f5; }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green  { background: #d4f5e7; color: #0e7a4a; }
+  .badge-orange { background: #fff0d9; color: #b06000; }
+  .badge-red    { background: #fde8e8; color: #b00020; }
+
+  .util-bar { display: inline-block; width: 80px; height: 8px; border-radius: 4px; background: #e0e4ea; vertical-align: middle; margin-right: 6px; }
+  .util-fill { height: 8px; border-radius: 4px; }
+
+  .footer { text-align: center; padding: 18px; font-size: 12px; color: #999; }
+
+  @media print {
+    .toolbar, .btn { display: none; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🔒</div>
+  <div class="header-text">
+    <h1>Bond Utilization Report</h1>
+    <p>Report Code: R01 &nbsp;|&nbsp; Compliance &amp; Bond Reports &nbsp;|&nbsp; Generated: <span id="genDate"></span></p>
+  </div>
+</div>
+
+<div class="section-banner">📂 Compliance &amp; Bond Reports &nbsp;›&nbsp; Bond Utilization (R01)</div>
+
+<div class="toolbar">
+  <label>From:</label><input type="date" id="fromDate">
+  <label>To:</label><input type="date" id="toDate">
+  <label>Bond Type:</label>
+  <select>
+    <option>All Bond Types</option>
+    <option>Customs Bond</option>
+    <option>Transit Bond</option>
+    <option>Warehouse Bond</option>
+    <option>Temporary Import Bond</option>
+  </select>
+  <label>Agent:</label>
+  <select>
+    <option>All Agents</option>
+    <option>Alpha Clearing</option>
+    <option>Beta Forwarders</option>
+    <option>Gamma Logistics</option>
+  </select>
+  <button class="btn btn-primary">🔍 Generate</button>
+  <button class="btn btn-export">⬇ Export CSV</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="content">
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card">
+      <div class="val">ETB 48.2M</div>
+      <div class="lbl">Total Bond Value</div>
+    </div>
+    <div class="card" style="border-color:#f97316">
+      <div class="val" style="color:#f97316">ETB 31.5M</div>
+      <div class="lbl">Total Utilized</div>
+    </div>
+    <div class="card" style="border-color:#17a865">
+      <div class="val" style="color:#17a865">ETB 16.7M</div>
+      <div class="lbl">Available Balance</div>
+    </div>
+    <div class="card" style="border-color:#e53e3e">
+      <div class="val" style="color:#e53e3e">65.4%</div>
+      <div class="lbl">Overall Utilization</div>
+    </div>
+    <div class="card" style="border-color:#7b1fa2">
+      <div class="val" style="color:#7b1fa2">42</div>
+      <div class="lbl">Active Bonds</div>
+    </div>
+  </div>
+
+  <!-- Utilization by Bond Type -->
+  <div class="progress-wrap">
+    <h3>Bond Utilization by Type</h3>
+    <div class="progress-row">
+      <div class="progress-label">Customs Bond</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:78%;background:#3a5bd9;"></div></div>
+      <div class="progress-pct">78%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Transit Bond</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:62%;background:#f97316;"></div></div>
+      <div class="progress-pct">62%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Warehouse Bond</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:45%;background:#17a865;"></div></div>
+      <div class="progress-pct">45%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Temporary Import Bond</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:91%;background:#e53e3e;"></div></div>
+      <div class="progress-pct" style="color:#e53e3e">91%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Re-Export Bond</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:33%;background:#7b1fa2;"></div></div>
+      <div class="progress-pct" style="color:#7b1fa2">33%</div>
+    </div>
+  </div>
+
+  <!-- Detail Table -->
+  <div class="table-wrap">
+    <div class="table-title">
+      Bond Utilization Details — Clearing &amp; Forwarding Agents
+      <span>All figures in ETB</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Bond No.</th>
+          <th>Agent / Company</th>
+          <th>Bond Type</th>
+          <th>Bond Value (ETB)</th>
+          <th>Utilized (ETB)</th>
+          <th>Available (ETB)</th>
+          <th>Utilization %</th>
+          <th>Expiry Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>BND-2024-0011</td><td>Alpha Clearing &amp; Fwd</td><td>Customs Bond</td>
+          <td>5,000,000</td><td>4,200,000</td><td>800,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:84%;background:#e53e3e;"></div></div>84%
+          </td>
+          <td>2024-12-31</td><td><span class="badge badge-orange">Near Limit</span></td>
+        </tr>
+        <tr>
+          <td>2</td><td>BND-2024-0012</td><td>Beta Forwarders Ltd.</td><td>Transit Bond</td>
+          <td>3,500,000</td><td>1,750,000</td><td>1,750,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:50%;background:#f97316;"></div></div>50%
+          </td>
+          <td>2025-03-15</td><td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>3</td><td>BND-2024-0013</td><td>Gamma Logistics Co.</td><td>Warehouse Bond</td>
+          <td>2,000,000</td><td>780,000</td><td>1,220,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:39%;background:#17a865;"></div></div>39%
+          </td>
+          <td>2025-06-30</td><td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>4</td><td>BND-2024-0014</td><td>Delta Shipping Agency</td><td>Temporary Import Bond</td>
+          <td>4,800,000</td><td>4,600,000</td><td>200,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:96%;background:#e53e3e;"></div></div>96%
+          </td>
+          <td>2024-09-01</td><td><span class="badge badge-red">Critical</span></td>
+        </tr>
+        <tr>
+          <td>5</td><td>BND-2024-0015</td><td>Eagle Freight &amp; Clearance</td><td>Customs Bond</td>
+          <td>6,200,000</td><td>3,100,000</td><td>3,100,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:50%;background:#f97316;"></div></div>50%
+          </td>
+          <td>2025-01-20</td><td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>6</td><td>BND-2024-0016</td><td>Summit Freight Services</td><td>Re-Export Bond</td>
+          <td>1,500,000</td><td>420,000</td><td>1,080,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:28%;background:#17a865;"></div></div>28%
+          </td>
+          <td>2025-04-10</td><td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>7</td><td>BND-2024-0017</td><td>Horizon Clearing Agents</td><td>Transit Bond</td>
+          <td>3,000,000</td><td>2,500,000</td><td>500,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:83%;background:#e53e3e;"></div></div>83%
+          </td>
+          <td>2024-10-05</td><td><span class="badge badge-orange">Near Limit</span></td>
+        </tr>
+        <tr>
+          <td>8</td><td>BND-2024-0018</td><td>Nile Forwarding Co.</td><td>Customs Bond</td>
+          <td>4,200,000</td><td>2,100,000</td><td>2,100,000</td>
+          <td>
+            <div class="util-bar"><div class="util-fill" style="width:50%;background:#f97316;"></div></div>50%
+          </td>
+          <td>2025-02-28</td><td><span class="badge badge-green">Active</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">TOTAL</td>
+          <td>30,200,000</td>
+          <td>19,450,000</td>
+          <td>10,750,000</td>
+          <td>64.4%</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="footer">R01 – Bond Utilization Report &copy; 2024 Customs &amp; Revenue Authority &nbsp;|&nbsp; Compliance &amp; Bond Reports</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('genDate').textContent = today.toLocaleDateString('en-GB');
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('toDate').value = fmt(today);
+  const from = new Date(today); from.setDate(from.getDate()-30);
+  document.getElementById('fromDate').value = fmt(from);
+</script>
+</body>
+</html>
